@@ -332,7 +332,7 @@ document.addEventListener(
     widgetOverflow.addEventListener("click", onClick);
     document
       .getElementById("sidebar-container")
-      ?.addEventListener("click", onClick);
+      .addEventListener("click", onClick);
 
     function onKeyPress(event) {
       const isLikeLeftClick = event.key === "Enter" || event.key === " ";

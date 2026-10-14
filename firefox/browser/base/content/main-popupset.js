@@ -42,9 +42,6 @@ document.addEventListener(
     mainPopupSet.addEventListener("command", event => {
       switch (event.target.id) {
         // == tabContextMenu ==
-        case "context_toggleVerticalTabs":
-          SidebarController.toggleVerticalTabs();
-          break;
         case "context_openANewTab":
           // The tab context menu can be invoked on a window that isn't the
           // OS-level frontmost window (most reproducibly on macOS in a

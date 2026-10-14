@@ -3,52 +3,34 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 <hbox flex="1" id="browser">
-  <!-- Independent Vertical Tabs Strip (Left side, only tabs, decoupled from any sidebar) -->
-  <vbox id="vertical-tabs-box" hidden="true" class="chromeclass-extrachrome">
-    <box id="vertical-tabs" flex="1" customizable="true" contextmenu="toolbar-context-menu"></box>
+  <box context="sidebar-context-menu" id="sidebar-container" hidden="true">
+    <html:sidebar-main flex="1">
+      <box id="vertical-tabs" slot="tabstrip" customizable="true" contextmenu="toolbar-context-menu"></box>
+    </html:sidebar-main>
+  </box>
+  <splitter id="sidebar-launcher-splitter" class="chromeclass-extrachrome sidebar-splitter" resizebefore="sibling" resizeafter="none" hidden="true"/>
+  <vbox id="sidebar-box" hidden="true" class="chromeclass-extrachrome">
+    <box id="sidebar-header" align="center">
+      <toolbarbutton id="sidebar-switcher-target" class="tabbable" aria-expanded="false">
+        <image id="sidebar-icon" consumeanchor="sidebar-switcher-target"/>
+        <label id="sidebar-title" crop="end" control="sidebar"/>
+        <image id="sidebar-switcher-arrow"/>
+      </toolbarbutton>
+      <image id="sidebar-throbber"/>
+      <spacer id="sidebar-spacer"/>
+      <toolbarbutton id="sidebar-close" class="close-icon tabbable" data-l10n-id="sidebar-close-button"/>
+    </box>
+    <stack class="sidebar-browser-stack">
+      <browser id="sidebar" autoscroll="false" disablehistory="true" disablefullscreen="true" tooltip="aHTMLTooltip"/>
+    </stack>
   </vbox>
-  <splitter id="vertical-tabs-splitter" class="chromeclass-extrachrome sidebar-splitter" resizebefore="sibling" resizeafter="none" hidden="true"/>
-
-  <!-- Main Web Content Viewport -->
+  <splitter id="sidebar-splitter" class="chromeclass-extrachrome sidebar-splitter" resizebefore="sibling" resizeafter="none" hidden="true" role="separator" aria-controls="sidebar-box" data-l10n-id="sidebar-resize-splitter"/>
   <tabbox id="tabbrowser-tabbox" flex="1" tabcontainer="tabbrowser-tabs">
     <tabpanels id="tabbrowser-tabpanels" flex="1" selectedIndex="0"/>
   </tabbox>
-
-  <!-- Right Sidebar Resizer Splitter -->
-  <splitter id="right-sidebar-splitter" class="chromeclass-extrachrome sidebar-splitter" resizebefore="none" resizeafter="sibling" hidden="true"/>
-
-  <!-- Right Sidebar Panel (Multi-webview persistent Edge-style panel) -->
-  <vbox id="right-sidebar-panel" hidden="true" class="chromeclass-extrachrome" persist="width">
-    <!-- Panel Header: Close [X] on the left, Title/Tab switcher center, Dismiss [-] on the right -->
-    <hbox id="right-sidebar-header" align="center">
-      <toolbarbutton id="right-sidebar-btn-close" class="close-icon tabbable" title="Close Sidebar (Terminates processes)" />
-      <spacer id="right-sidebar-header-spacer-start" />
-      <toolbarbutton id="right-sidebar-btn-newtab" class="tabbable" title="New Sidebar Tab">
-        <image class="toolbarbutton-icon" src="chrome://global/skin/icons/plus.svg" />
-      </toolbarbutton>
-      <arrowscrollbox id="right-sidebar-tab-strip" orient="horizontal" flex="1" />
-      <spacer id="right-sidebar-header-spacer-end" />
-      <toolbarbutton id="right-sidebar-btn-dismiss" class="tabbable" title="Dismiss Sidebar (Keeps running in background)">
-        <image class="toolbarbutton-icon" src="chrome://global/skin/icons/arrow-right-12.svg" />
-      </toolbarbutton>
-    </hbox>
-
-    <!-- Native Top-Level Multi-Webview Stack (No iframe restrictions: runs Google Auth, Gmail, etc.) -->
-    <stack id="right-sidebar-stack" flex="1">
+  <splitter id="ai-window-splitter" class="chromeclass-extrachrome sidebar-splitter" resizebefore="sibling" resizeafter="sibling" collapsed="true"/>
+  <vbox id="ai-window-box" collapsed="true" class="chromeclass-extrachrome ai-window-right-sidebar">
+    <stack class="ai-window-browser-stack" flex="1">
     </stack>
-  </vbox>
-
-  <!-- Right Sidebar Rail (Far-right slim icon dock) -->
-  <vbox id="right-sidebar-rail" class="chromeclass-extrachrome">
-    <vbox id="right-sidebar-pinned-icons" flex="1" align="center">
-    </vbox>
-    <vbox id="right-sidebar-bottom-rail" align="center">
-      <toolbarbutton id="right-sidebar-rail-add" class="tabbable right-sidebar-rail-btn" title="Add Page to Sidebar">
-        <image class="toolbarbutton-icon" src="chrome://global/skin/icons/plus.svg" />
-      </toolbarbutton>
-      <toolbarbutton id="right-sidebar-rail-toggle" class="tabbable right-sidebar-rail-btn" title="Toggle Sidebar">
-        <image class="toolbarbutton-icon" src="chrome://browser/skin/sidebar-collapsed-right.svg" />
-      </toolbarbutton>
-    </vbox>
   </vbox>
 </hbox>

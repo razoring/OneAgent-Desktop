@@ -29,7 +29,6 @@
   skin/classic/browser/setDesktopBackground.css                (../shared/setDesktopBackground.css)
   skin/classic/browser/sharePanel.css                          (../shared/sharePanel.css)
   skin/classic/browser/sidebar.css                             (../shared/sidebar.css)
-  skin/classic/browser/right-sidebar.css                       (../shared/right-sidebar.css)
   skin/classic/browser/smartbar.css                            (../shared/smartbar.css)
   skin/classic/browser/smartwindowGroupTabs.css                (../shared/smartwindowGroupTabs.css)
   skin/classic/browser/smartwindowMonitor.css                  (../shared/smartwindowMonitor.css)

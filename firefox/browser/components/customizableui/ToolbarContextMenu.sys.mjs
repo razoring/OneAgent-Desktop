@@ -252,27 +252,21 @@ export var ToolbarContextMenu = {
     let toggleVerticalTabsItem = document.getElementById(
       "toolbar-context-toggle-vertical-tabs"
     );
-    if (toggleVerticalTabsItem) {
-      toggleVerticalTabsItem.hidden = false;
-      document.l10n.setAttributes(
-        toggleVerticalTabsItem,
-        gBrowser.tabContainer?.verticalMode
-          ? "toolbar-context-turn-off-vertical-tabs"
-          : "toolbar-context-turn-on-vertical-tabs"
-      );
-    }
-    let customizeSidebarItem = document.getElementById(
-      "toolbar-context-customize-sidebar"
+    toggleVerticalTabsItem.hidden = !showSidebarActions;
+    document.l10n.setAttributes(
+      toggleVerticalTabsItem,
+      gBrowser.tabContainer?.verticalMode
+        ? "toolbar-context-turn-off-vertical-tabs"
+        : "toolbar-context-turn-on-vertical-tabs"
     );
-    if (customizeSidebarItem) {
-      customizeSidebarItem.hidden = true;
-    }
-    let sidebarRevampSeparator = document.getElementById(
-      "sidebarRevampSeparator"
-    );
-    if (sidebarRevampSeparator) {
-      sidebarRevampSeparator.hidden = false;
-    }
+    document.getElementById("toolbar-context-customize-sidebar").hidden =
+      !sidebarRevampEnabled ||
+      (toolbarItem?.id != "sidebar-button" &&
+        !gBrowser.tabContainer?.verticalMode) ||
+      (!["tabbrowser-tabs", "sidebar-button"].includes(toolbarItem?.id) &&
+        gBrowser.tabContainer?.verticalMode);
+    document.getElementById("sidebarRevampSeparator").hidden =
+      !showSidebarActions || isVerticalTabStripMenu;
     document.getElementById("customizationMenuSeparator").hidden =
       toolbarItem?.id == "tabbrowser-tabs" ||
       (toolbarItem?.localName == "toolbarspring" &&

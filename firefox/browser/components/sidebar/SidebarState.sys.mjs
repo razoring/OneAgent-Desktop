@@ -195,11 +195,7 @@ export class SidebarState {
    * Get window object from the controller.
    */
   get #controllerGlobal() {
-    return (
-      this.#launcherContainerEl?.documentGlobal ||
-      this.#controller.window ||
-      this.#controller.contentArea?.ownerGlobal
-    );
+    return this.#launcherContainerEl.documentGlobal;
   }
 
   /**
@@ -531,35 +527,25 @@ export class SidebarState {
     if (!this.revampEnabled) {
       // Launcher not supported in legacy sidebar.
       this.#props.launcherVisible = false;
-      if (this.#launcherSplitterEl) {
-        this.#launcherSplitterEl.hidden = true;
-      }
-      if (this.#launcherContainerEl) {
-        this.#launcherContainerEl.hidden = true;
-      }
+      this.#launcherSplitterEl.hidden = true;
+      this.#launcherContainerEl.hidden = true;
       this.#controller._disableLauncherDragging();
       this.#updateTabbrowser(false);
       return;
     }
     this.#props.launcherVisible = visible;
-    if (this.#launcherContainerEl) {
-      this.#launcherContainerEl.hidden = !visible;
-    }
-    if (this.#launcherSplitterEl) {
-      this.#launcherSplitterEl.hidden = !visible;
-    }
+    this.#launcherContainerEl.hidden = !visible;
+    this.#launcherSplitterEl.hidden = !visible;
     if (visible) {
       this.#launcherEverVisible = true;
       this.#controller._enableLauncherDragging();
     } else {
       this.#controller._disableLauncherDragging();
     }
-    this.#launcherEl?.requestUpdate();
+    this.#launcherEl.requestUpdate();
     this.#updateTabbrowser(visible);
-    if (this.#sidebarBoxEl) {
-      this.#sidebarBoxEl.style.paddingInlineStart =
-        this.panelOpen && !visible ? "var(--space-small)" : "unset";
-    }
+    this.#sidebarBoxEl.style.paddingInlineStart =
+      this.panelOpen && !visible ? "var(--space-small)" : "unset";
   }
 
   get launcherExpanded() {
@@ -574,9 +560,7 @@ export class SidebarState {
     }
     const previousExpanded = this.#props.launcherExpanded;
     this.#props.launcherExpanded = expanded;
-    if (this.#launcherEl) {
-      this.#launcherEl.expanded = expanded;
-    }
+    this.#launcherEl.expanded = expanded;
     if (expanded && !previousExpanded) {
       Glean.sidebar.expand.record();
     }
@@ -622,13 +606,12 @@ export class SidebarState {
         this.#controller.toggleExpandOnHover(false);
       }
 
-      this.#launcherEl?.toggleAttribute("customWidth", true);
+      this.#launcherEl.toggleAttribute("customWidth", true);
     } else {
-      this.launcherWidth = this.#launcherContainerEl
-        ? this.#controllerGlobal.windowUtils.getBoundsWithoutFlushing(
-            this.#launcherContainerEl
-          ).width
-        : 0;
+      this.launcherWidth =
+        this.#controllerGlobal.windowUtils.getBoundsWithoutFlushing(
+          this.#launcherContainerEl
+        ).width;
 
       // Re-enable expand on hover if necessary
       if (this.#controller.sidebarRevampVisibility === "expand-on-hover") {
@@ -698,9 +681,7 @@ export class SidebarState {
         buttonGroupHeight > maxToolsHeight &&
         this.#controller.sidebarRevampVisibility !== "expand-on-hover"
       ) {
-        if (this.#launcherEl) {
-          this.#launcherEl.shouldShowOverflowButton = false;
-        }
+        this.#launcherEl.shouldShowOverflowButton = false;
       }
       // Store the user-preferred tools height.
       if (this.#props.launcherExpanded) {
@@ -775,15 +756,12 @@ export class SidebarState {
    * width (if available). If it is collapsed, reset the launcher width.
    */
   #updateLauncherWidth() {
-    if (!this.#launcherContainerEl) {
-      return;
-    }
     if (this.launcherExpanded && this.expandedLauncherWidth) {
       this.#launcherContainerEl.style.width = `${this.expandedLauncherWidth}px`;
     } else if (!this.launcherExpanded) {
       this.#launcherContainerEl.style.width = "";
     }
-    this.#launcherEl?.toggleAttribute(
+    this.#launcherEl.toggleAttribute(
       "customWidth",
       !!this.expandedLauncherWidth
     );
@@ -935,10 +913,10 @@ export class SidebarState {
     if (id && id !== this.#props.command) {
       this.#props.command = id;
       // We need the attribute to mirror the command property as its used as a CSS hook
-      this.#controller._box?.setAttribute("sidebarcommand", id);
+      this.#controller._box.setAttribute("sidebarcommand", id);
     } else if (!id) {
       delete this.#props.command;
-      this.#controller._box?.setAttribute("sidebarcommand", "");
+      this.#controller._box.setAttribute("sidebarcommand", "");
     }
   }
 }

@@ -220,18 +220,24 @@ XPCOMUtils.defineLazyPreferenceGetter(
   "sidebar.revamp",
   false,
   (pref, oldVal, newVal) => {
+    if (!newVal) {
+      return;
+    }
     let navbarPlacements = CustomizableUI.getWidgetIdsInArea(
       CustomizableUI.AREA_NAVBAR
     );
     if (!navbarPlacements.includes("sidebar-button")) {
-      let downloadsIndex = navbarPlacements.indexOf("downloads-button");
-      let insertIndex = downloadsIndex !== -1 ? downloadsIndex + 1 : undefined;
       CustomizableUI.addWidgetToArea(
         "sidebar-button",
         CustomizableUI.AREA_NAVBAR,
-        insertIndex
+        Services.prefs.getBoolPref(kPrefSidebarPositionStartEnabled, true)
+          ? 0
+          : undefined // Adds to the end of navbar if position_start is false.
       );
     }
+    // Ensure CUI knows to not restore this button if the user later removes it
+    let prefId = "browser.toolbarbuttons.introduced.sidebar-button";
+    Services.prefs.setBoolPref(prefId, true);
   }
 );
 
@@ -352,6 +358,7 @@ var CustomizableUIInternal = {
     );
 
     let navbarPlacements = [
+      lazy.sidebarRevampEnabled ? "sidebar-button" : null,
       "back-button",
       "forward-button",
       "stop-reload-button",
@@ -363,7 +370,6 @@ var CustomizableUIInternal = {
       "urlbar-container",
       "spring",
       "downloads-button",
-      "sidebar-button",
       AppConstants.MOZ_DEV_EDITION ? "developer-button" : null,
       lazy.ippEnabled ? "ipprotection-button" : null,
       "fxa-toolbar-menu-button",
@@ -3762,25 +3768,6 @@ var CustomizableUIInternal = {
         gFuturePlacements.delete(aAreaId);
       }
 
-      if (aAreaId === CustomizableUI.AREA_NAVBAR) {
-        let areaPlacements = gPlacements.get(aAreaId);
-        if (areaPlacements) {
-          if (!areaPlacements.includes("sidebar-button")) {
-            let dlIdx = areaPlacements.indexOf("downloads-button");
-            let insertIdx = dlIdx !== -1 ? dlIdx + 1 : undefined;
-            this.addWidgetToArea("sidebar-button", aAreaId, insertIdx);
-          } else {
-            let sbIdx = areaPlacements.indexOf("sidebar-button");
-            let urlIdx = areaPlacements.indexOf("urlbar-container");
-            if (sbIdx !== -1 && urlIdx !== -1 && sbIdx < urlIdx) {
-              let dlIdx = areaPlacements.indexOf("downloads-button");
-              let targetIdx = dlIdx !== -1 ? dlIdx + 1 : areaPlacements.length - 1;
-              this.moveWidgetWithinArea("sidebar-button", targetIdx);
-            }
-          }
-        }
-      }
-
       lazy.log.debug(
         "Placements for " +
           aAreaId +
@@ -5468,18 +5455,43 @@ var CustomizableUIInternal = {
     );
     switch (prefChanged) {
       case kPrefSidebarVerticalTabsEnabled: {
-        // Vertical tabs operates independently from sidebar revamp
+        // We need to also enable sidebar.revamp if vertical tabs gets enabled
+        if (verticalTabsEnabled && !sidebarRevampEnabled) {
+          Services.prefs.setBoolPref(kPrefSidebarRevampEnabled, true);
+        }
         break;
       }
       case kPrefSidebarRevampEnabled: {
-        if (sidebarRevampEnabled) {
-          Services.prefs.setBoolPref(kPrefSidebarRevampEnabled, false);
+        // If we are changing the pref after startup, update the nav bar defaultPlacements to include/exclude sidebar-button
+        let props = gAreas.get(CustomizableUI.AREA_NAVBAR);
+        let defaults = props.get("defaultPlacements");
+        let sidebarButtonIndex = defaults.indexOf("sidebar-button");
+        if (sidebarRevampEnabled && sidebarButtonIndex < 0) {
+          defaults.unshift("sidebar-button");
+        } else if (!sidebarRevampEnabled && sidebarButtonIndex > -1) {
+          defaults.splice(sidebarButtonIndex, 1);
+        }
+        props.set("defaultPlacements", defaults);
+        gAreas.set(CustomizableUI.AREA_NAVBAR, props);
+        // We need to also disable vertical tabs if sidebar.revamp is no longer enabled
+        if (!sidebarRevampEnabled && verticalTabsEnabled) {
+          lazy.log.debug(
+            `{kPrefSidebarRevampEnabled} disabled, so also disabling ${kPrefSidebarVerticalTabsEnabled}`
+          );
+          Services.prefs.setBoolPref(kPrefSidebarVerticalTabsEnabled, false);
         }
         break;
       }
       case kPrefSidebarPositionStartEnabled: {
-        // Sidebar button stays on the right side of the address bar
-        break;
+        // If the sidebar moves to the left or right, move the toolbar button along with it.
+        const navbarPlacements = gPlacements.get(CustomizableUI.AREA_NAVBAR);
+        const index = navbarPlacements.indexOf("sidebar-button");
+        if (!positionStartEnabled && index === 0) {
+          this.moveWidgetWithinArea("sidebar-button", navbarPlacements.length);
+        }
+        if (positionStartEnabled && index === navbarPlacements.length - 1) {
+          this.moveWidgetWithinArea("sidebar-button", 0);
+        }
       }
     }
   },
@@ -5594,16 +5606,10 @@ var CustomizableUIInternal = {
           CustomizableUI.addWidgetToArea(id, CustomizableUI.AREA_NAVBAR, index);
         }
       });
-      let currentNav = gPlacements.get(CustomizableUI.AREA_NAVBAR);
-      if (currentNav) {
-        let sbIdx = currentNav.indexOf("sidebar-button");
-        let dlIdx = currentNav.indexOf("downloads-button");
-        if (sbIdx !== -1 && dlIdx !== -1 && sbIdx < dlIdx) {
-          this.moveWidgetWithinArea("sidebar-button", dlIdx + 1);
-        } else if (sbIdx === -1) {
-          let insertIdx = dlIdx !== -1 ? dlIdx + 1 : undefined;
-          this.addWidgetToArea("sidebar-button", CustomizableUI.AREA_NAVBAR, insertIdx);
-        }
+      // If sidebar was previously the last widget in navbar, carry it over to
+      // the end of the newly constructed navbar.
+      if (isSidebarLast) {
+        this.addWidgetToArea("sidebar-button", CustomizableUI.AREA_NAVBAR);
       }
       CustomizableUI.endBatchUpdate();
     } else {

@@ -110,13 +110,6 @@ var TabContextMenu = {
           ],
         },
         {
-          name: "vertical-tabs",
-          items: [
-            "#context_verticalTabsSeparator",
-            "#context_toggleVerticalTabs",
-          ],
-        },
-        {
           name: "fullscreen",
           items: [
             "#context_fullscreenSeparator",
@@ -270,13 +263,6 @@ var TabContextMenu = {
             "#context_closeTab",
             "#context_closeTabOptions",
             "#context_undoCloseTab",
-          ],
-        },
-        {
-          name: "vertical-tabs",
-          items: [
-            "#context_verticalTabsSeparator",
-            "#context_toggleVerticalTabs",
           ],
         },
         {
@@ -569,18 +555,6 @@ var TabContextMenu = {
         ? "tab-context-new-tab-open-vertical"
         : "tab-context-new-tab-open"
     );
-
-    let toggleVerticalTabsItem = document.getElementById(
-      "context_toggleVerticalTabs"
-    );
-    if (toggleVerticalTabsItem) {
-      document.l10n.setAttributes(
-        toggleVerticalTabsItem,
-        gBrowser.tabContainer?.verticalMode
-          ? "toolbar-context-turn-off-vertical-tabs"
-          : "toolbar-context-turn-on-vertical-tabs"
-      );
-    }
 
     // Session store
     let closedCount = SessionStore.getLastClosedTabCount(window);

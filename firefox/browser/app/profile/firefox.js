@@ -2330,7 +2330,7 @@ pref("pdfjs.handleOctetStream", true);
 
 // Is the sidebar positioned ahead of the content browser
 pref("sidebar.position_start", true);
-pref("sidebar.revamp", false);
+pref("sidebar.revamp", true);
 pref("sidebar.animation.enabled", true);
 pref("sidebar.animation.expand-on-hover.duration-ms", 200);
 pref("sidebar.animation.expand-on-hover.delay-duration-ms", 200);
@@ -2347,7 +2347,7 @@ pref("sidebar.verticalTabs.dragToPinPromo.dismissed", false);
 // "hide-on-close" (default) and "hide-launcher" (switcher-only). The default
 // here is the vertical default; SidebarManager normalizes to the right value
 // for the current orientation.
-pref("sidebar.visibility", "hide-sidebar");
+pref("sidebar.visibility", "always-show");
 // Sidebar UI state is stored per-window via session restore. Use this pref
 // as a backup to restore the sidebar UI state when a user has PPB mode on
 // or has history cleared on browser close.
