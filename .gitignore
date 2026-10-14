@@ -1,0 +1,12 @@
+# Build artifacts and caches
+firefox/obj*/
+firefox/.mozbuild/
+obj*/
+.mozbuild/
+*.pyc
+*.pyo
+__pycache__/
+*.log
+*.pdb
+.DS_Store
+Thumbs.db

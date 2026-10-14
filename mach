@@ -1,0 +1,15 @@
+#!/usr/bin/env python
+import os
+import sys
+import subprocess
+
+if not os.environ.get("MOZILLABUILD"):
+    os.environ["MOZILLABUILD"] = r"C:\mozilla-build"
+
+root_dir = os.path.dirname(os.path.abspath(__file__))
+firefox_dir = os.path.join(root_dir, "firefox")
+mach_path = os.path.join(firefox_dir, "mach")
+
+cmd = [sys.executable, mach_path] + sys.argv[1:]
+ret = subprocess.call(cmd, cwd=firefox_dir)
+sys.exit(ret)

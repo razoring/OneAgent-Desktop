@@ -1,0 +1,54 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+<hbox flex="1" id="browser">
+  <!-- Independent Vertical Tabs Strip (Left side, only tabs, decoupled from any sidebar) -->
+  <vbox id="vertical-tabs-box" hidden="true" class="chromeclass-extrachrome">
+    <box id="vertical-tabs" flex="1" customizable="true" contextmenu="toolbar-context-menu"></box>
+  </vbox>
+  <splitter id="vertical-tabs-splitter" class="chromeclass-extrachrome sidebar-splitter" resizebefore="sibling" resizeafter="none" hidden="true"/>
+
+  <!-- Main Web Content Viewport -->
+  <tabbox id="tabbrowser-tabbox" flex="1" tabcontainer="tabbrowser-tabs">
+    <tabpanels id="tabbrowser-tabpanels" flex="1" selectedIndex="0"/>
+  </tabbox>
+
+  <!-- Right Sidebar Resizer Splitter -->
+  <splitter id="right-sidebar-splitter" class="chromeclass-extrachrome sidebar-splitter" resizebefore="none" resizeafter="sibling" hidden="true"/>
+
+  <!-- Right Sidebar Panel (Multi-webview persistent Edge-style panel) -->
+  <vbox id="right-sidebar-panel" hidden="true" class="chromeclass-extrachrome" persist="width">
+    <!-- Panel Header: Close [X] on the left, Title/Tab switcher center, Dismiss [-] on the right -->
+    <hbox id="right-sidebar-header" align="center">
+      <toolbarbutton id="right-sidebar-btn-close" class="close-icon tabbable" title="Close Sidebar (Terminates processes)" />
+      <spacer id="right-sidebar-header-spacer-start" />
+      <toolbarbutton id="right-sidebar-btn-newtab" class="tabbable" title="New Sidebar Tab">
+        <image class="toolbarbutton-icon" src="chrome://global/skin/icons/plus.svg" />
+      </toolbarbutton>
+      <arrowscrollbox id="right-sidebar-tab-strip" orient="horizontal" flex="1" />
+      <spacer id="right-sidebar-header-spacer-end" />
+      <toolbarbutton id="right-sidebar-btn-dismiss" class="tabbable" title="Dismiss Sidebar (Keeps running in background)">
+        <image class="toolbarbutton-icon" src="chrome://global/skin/icons/arrow-right-12.svg" />
+      </toolbarbutton>
+    </hbox>
+
+    <!-- Native Top-Level Multi-Webview Stack (No iframe restrictions: runs Google Auth, Gmail, etc.) -->
+    <stack id="right-sidebar-stack" flex="1">
+    </stack>
+  </vbox>
+
+  <!-- Right Sidebar Rail (Far-right slim icon dock) -->
+  <vbox id="right-sidebar-rail" class="chromeclass-extrachrome">
+    <vbox id="right-sidebar-pinned-icons" flex="1" align="center">
+    </vbox>
+    <vbox id="right-sidebar-bottom-rail" align="center">
+      <toolbarbutton id="right-sidebar-rail-add" class="tabbable right-sidebar-rail-btn" title="Add Page to Sidebar">
+        <image class="toolbarbutton-icon" src="chrome://global/skin/icons/plus.svg" />
+      </toolbarbutton>
+      <toolbarbutton id="right-sidebar-rail-toggle" class="tabbable right-sidebar-rail-btn" title="Toggle Sidebar">
+        <image class="toolbarbutton-icon" src="chrome://browser/skin/sidebar-collapsed-right.svg" />
+      </toolbarbutton>
+    </vbox>
+  </vbox>
+</hbox>
