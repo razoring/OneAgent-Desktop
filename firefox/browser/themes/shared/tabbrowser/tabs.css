@@ -2668,7 +2668,8 @@ tab-group {
   appearance: none;
   min-height: var(--tab-min-height);
   line-height: var(--tab-label-line-height);
-  border-radius: var(--tab-border-radius);
+  border-radius: var(--border-radius-circle) !important;
+  transition: width var(--sidebar-expand-on-hover-duration, 200ms) var(--motion-ease-emphasized);
   padding: 0 calc(var(--tab-padding-inline) - var(--tab-margin-inline-inner));
   width: var(--tab-collapsed-background-width);
   margin-inline: var(--tab-margin-inline-inner);
@@ -2919,9 +2920,17 @@ tab-group {
 
   .tab-background {
     margin-inline: var(--tab-margin-inline-inner);
+    border-radius: var(--border-radius-circle) !important;
+    transition: width var(--sidebar-expand-on-hover-duration, 200ms) var(--motion-ease-emphasized);
     @media not -moz-pref("browser.nova.enabled") {
       /* Needed to flip the direction of the tab-context-line. */
       flex-direction: row-reverse;
+    }
+  }
+
+  &[expanded] {
+    .tab-background {
+      width: calc(100% - 2 * var(--tab-margin-inline-inner));
     }
   }
 

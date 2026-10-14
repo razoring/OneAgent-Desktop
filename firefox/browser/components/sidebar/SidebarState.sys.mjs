@@ -208,7 +208,7 @@ export class SidebarState {
       // Don't show launcher if we're in a popup window.
       this.launcherVisible = false;
     } else {
-      if (lazy.verticalTabsEnabled) {
+      if (lazy.verticalTabsEnabled && this.revampVisibility !== "expand-on-hover") {
         this.#props.launcherExpanded = true;
       }
       this.launcherVisible = showLauncher;

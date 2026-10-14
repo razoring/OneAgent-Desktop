@@ -249,6 +249,8 @@
 }
 
 #sidebar-button {
+  display: none !important;
+
   @media not -moz-pref("sidebar.revamp") {
     list-style-image: url("chrome://browser/skin/sidebar-collapsed.svg");
 

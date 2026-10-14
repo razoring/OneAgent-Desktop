@@ -183,6 +183,9 @@ document.addEventListener(
         case "context_selectAllTabs":
           gBrowser.selectAllTabs();
           break;
+        case "context_toggleVerticalTabs":
+          SidebarController.toggleVerticalTabs();
+          break;
         case "context_closeTab":
           TabContextMenu.closeContextTabs();
           break;

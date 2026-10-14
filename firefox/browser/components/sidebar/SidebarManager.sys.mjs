@@ -197,18 +197,8 @@ class SidebarManager extends EventTarget {
    *
    * @param {string} aWidgetId
    *   The widget being removed.
-   */
   async onWidgetRemoved(aWidgetId) {
-    if (aWidgetId == "sidebar-button") {
-      // Wait for JS to run to completion. Once that has happened, we'll
-      // know if we were _really_ removed or just moved elsewhere.
-      await Promise.resolve();
-      if (!lazy.CustomizableUI.getPlacementOfWidget(aWidgetId)) {
-        // Removing sidebar button should force horizontal tabs (Bug 1970015).
-        Services.prefs.setBoolPref(VERTICAL_TABS_PREF, false);
-        this.closeAllSidebars();
-      }
-    }
+    // No-op: removing sidebar button from navbar should not affect vertical tabs.
   }
 
   /**
@@ -252,15 +242,13 @@ class SidebarManager extends EventTarget {
           DEFAULT_HORIZONTAL_VISIBILITY
         );
       }
-    } else if (!VERTICAL_VISIBILITIES.includes(currentVisibility)) {
-      // Switching to (or initializing) vertical tabs: restore a preserved
-      // choice (always-show, expand-on-hover, hide-sidebar) otherwise fall
-      // back to the vertical default.
+    } else {
+      // Switching to (or initializing) vertical tabs:
+      // Automatically enable "Expand sidebar on hover"
       Services.prefs.setStringPref(
         VISIBILITY_SETTING_PREF,
-        this.#savedVisibility ?? DEFAULT_VERTICAL_VISIBILITY
+        "expand-on-hover"
       );
-      this.#savedVisibility = null;
     }
   }
 

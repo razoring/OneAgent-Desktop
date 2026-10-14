@@ -88,6 +88,8 @@ var TabContextMenu = {
             { selector: ".share-tab-url-item", optional: true },
             "#context_reopenInContainer",
             "#context_selectAllTabs",
+            "#context_verticalTabsSeparator",
+            "#context_toggleVerticalTabs",
             "#context_tabToolsSeparator",
           ],
         },
@@ -222,6 +224,8 @@ var TabContextMenu = {
               "#context_ungroupSplitView",
             ],
             "#context_reopenInContainer",
+            "#context_verticalTabsSeparator",
+            "#context_toggleVerticalTabs",
             /*
              * The AI submenu separator is unused in this layout (the AI feature is
              * the flat "Summarize Page" item in remembering-items), so reuse it
@@ -555,6 +559,18 @@ var TabContextMenu = {
         ? "tab-context-new-tab-open-vertical"
         : "tab-context-new-tab-open"
     );
+
+    let toggleVerticalTabs = document.getElementById(
+      "context_toggleVerticalTabs"
+    );
+    if (toggleVerticalTabs) {
+      document.l10n.setAttributes(
+        toggleVerticalTabs,
+        gBrowser.tabContainer?.verticalMode
+          ? "toolbar-context-turn-off-vertical-tabs"
+          : "toolbar-context-turn-on-vertical-tabs"
+      );
+    }
 
     // Session store
     let closedCount = SessionStore.getLastClosedTabCount(window);

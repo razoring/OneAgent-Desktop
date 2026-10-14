@@ -206,15 +206,7 @@ export default class SidebarMain extends MozLitElement {
             if (!newCopyButton) {
               continue;
             }
-            // The Customize button stays last in the panel.
-            const customizeCopy = panelButtonGroup.querySelector(
-              '[view="viewCustomizeSidebar"]'
-            );
-            if (customizeCopy && view !== "viewCustomizeSidebar") {
-              panelButtonGroup.insertBefore(newCopyButton, customizeCopy);
-            } else {
-              panelButtonGroup.appendChild(newCopyButton);
-            }
+            panelButtonGroup.appendChild(newCopyButton);
 
             // Hide original button
             entry.target.style.visibility = "hidden";
@@ -266,12 +258,7 @@ export default class SidebarMain extends MozLitElement {
   }
 
   createCopyButton(view) {
-    let newButtonAction;
-    if (view === "viewCustomizeSidebar") {
-      newButtonAction = this.bottomActions[0];
-    } else {
-      newButtonAction = this.getToolsAndExtensions().get(view);
-    }
+    let newButtonAction = this.getToolsAndExtensions().get(view);
     if (!newButtonAction) {
       // We can't make a button without an action.
       // This can happen if an extension or other tool was just removed
@@ -528,30 +515,11 @@ export default class SidebarMain extends MozLitElement {
   }
 
   getLauncherActions() {
-    const actions = [...this.getToolsAndExtensions().values()];
-    if (!window.SidebarController.sidebarVerticalTabsEnabled) {
-      return actions;
-    }
-    const settingsFirst =
-      this.expanded && !window.SidebarController._positionStart;
-    actions.splice(
-      settingsFirst ? 0 : actions.length,
-      0,
-      ...this.bottomActions
-    );
-    return actions;
+    return [...this.getToolsAndExtensions().values()];
   }
 
   setCustomize() {
-    const view = "viewCustomizeSidebar";
-    const customizeSidebar = window.SidebarController.sidebars.get(view);
-    this.bottomActions = [
-      {
-        l10nId: customizeSidebar.revampL10nId,
-        iconUrl: customizeSidebar.iconUrl,
-        view,
-      },
-    ];
+    this.bottomActions = [];
   }
 
   async handleEvent(e) {
@@ -908,59 +876,45 @@ export default class SidebarMain extends MozLitElement {
       <div class="wrapper">
         <slot name="tabstrip"></slot>
         ${when(
-          ((enabledToolsAndExtensionsCount > 2 && !this.expanded) ||
-            this.expanded) &&
-            window.SidebarController.sidebarRevampVisibility !==
-              "expand-on-hover" &&
-            window.SidebarController.sidebarVerticalTabsEnabled,
-          () => html`${this.toolsSplitter}`
-        )}
-        <div
-          class="buttons-wrapper"
-          ?overflowing=${this.shouldShowOverflowButton}
-        >
-          <button-group
-            class="tools-and-extensions actions-list"
-            orientation=${this.isToolsOverflowing() ? "horizontal" : "vertical"}
-            overflowing=${ifDefined(this.shouldShowOverflowButton)}
-          >
-            ${repeat(
-              this.getLauncherActions(),
-              action => action.view,
-              action => this.entrypointTemplate(action)
-            )}
-          </button-group>
-          ${when(
-            !window.SidebarController.sidebarVerticalTabsEnabled,
-            () =>
-              html` <div class="bottom-actions actions-list">
+          !window.SidebarController.sidebarVerticalTabsEnabled,
+          () => html`
+            <div
+              class="buttons-wrapper"
+              ?overflowing=${this.shouldShowOverflowButton}
+            >
+              <button-group
+                class="tools-and-extensions actions-list"
+                orientation=${this.isToolsOverflowing() ? "horizontal" : "vertical"}
+                overflowing=${ifDefined(this.shouldShowOverflowButton)}
+              >
                 ${repeat(
-                  this.bottomActions,
+                  this.getLauncherActions(),
                   action => action.view,
                   action => this.entrypointTemplate(action)
                 )}
-              </div>`
-          )}
-          <button-group
-            class="tools-and-extensions actions-list overflow-button"
-            orientation="vertical"
-            part="overflow-button"
-            ?hidden=${!this.shouldShowOverflowButton}
-          >
-            <moz-button
-              class="more-tools-button"
-              type=${this.isOverflowMenuOpen ? "icon" : "icon ghost"}
-              aria-pressed=${this.isOverflowMenuOpen}
-              @click=${window.SidebarController.sidebarRevampVisibility ===
-              "expand-on-hover"
-                ? nothing
-                : this.showOverflowMenu}
-              title=${moreToolsTooltip}
-              .iconSrc=${"chrome://global/skin/icons/chevron.svg"}
-            >
-            </moz-button>
-          </button-group>
-        </div>
+              </button-group>
+              <button-group
+                class="tools-and-extensions actions-list overflow-button"
+                orientation="vertical"
+                part="overflow-button"
+                ?hidden=${!this.shouldShowOverflowButton}
+              >
+                <moz-button
+                  class="more-tools-button"
+                  type=${this.isOverflowMenuOpen ? "icon" : "icon ghost"}
+                  aria-pressed=${this.isOverflowMenuOpen}
+                  @click=${window.SidebarController.sidebarRevampVisibility ===
+                  "expand-on-hover"
+                    ? nothing
+                    : this.showOverflowMenu}
+                  title=${moreToolsTooltip}
+                  .iconSrc=${"chrome://global/skin/icons/chevron.svg"}
+                >
+                </moz-button>
+              </button-group>
+            </div>
+          `
+        )}
       </div>
     `;
   }

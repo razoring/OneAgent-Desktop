@@ -705,6 +705,10 @@ var SidebarController = {
     this._splitter.removeEventListener("command", this._browserResizeObserver);
     this._splitterAriaUpdateTask.finalize();
     this._splitterAriaUpdateTask = null;
+    if (this._mouseLeaveTask) {
+      this._mouseLeaveTask.finalize();
+      this._mouseLeaveTask = null;
+    }
     this._disableLauncherDragging();
     this._disablePinnedTabsDragging();
   },
@@ -722,6 +726,10 @@ var SidebarController = {
     if (this._launcherCollapsedWidthStale) {
       this.refreshLauncherCollapsedWidth();
     }
+    document.documentElement.style.setProperty(
+      "--sidebar-launcher-width",
+      `${entry.borderBoxSize[0].inlineSize}px`
+    );
   },
 
   requestMaxWidthUpdate() {
@@ -807,10 +815,11 @@ var SidebarController = {
    * Toggle the vertical tabs preference.
    */
   toggleVerticalTabs() {
-    Services.prefs.setBoolPref(
-      "sidebar.verticalTabs",
-      !this.sidebarVerticalTabsEnabled
-    );
+    let nextValue = !this.sidebarVerticalTabsEnabled;
+    Services.prefs.setBoolPref("sidebar.verticalTabs", nextValue);
+    if (nextValue) {
+      Services.prefs.setStringPref("sidebar.visibility", "expand-on-hover");
+    }
   },
 
   /**
@@ -2520,6 +2529,7 @@ var SidebarController = {
   },
 
   _collapseLauncher() {
+    this._mouseLeaveTask?.disarm();
     this.mouseEnterTask?.disarm();
     this._mouseEnterDeferred?.resolve();
     const contentArea = document.getElementById("tabbrowser-tabbox");
@@ -2549,6 +2559,9 @@ var SidebarController = {
     if (this._activeViewTransition || this._isMenuPopupOpen()) {
       return;
     }
+    if (this.isLauncherDragging || this._state?.launcherDragActive) {
+      return;
+    }
     if (this._escapedWhileHovered) {
       this._mouseLeftSinceEscape = true;
       return;
@@ -2556,10 +2569,23 @@ var SidebarController = {
     if (!this._state.launcherExpanded) {
       return;
     }
-    this._collapseLauncher();
+    if (!this._mouseLeaveTask) {
+      this._mouseLeaveTask = new DeferredTask(() => {
+        if (
+          !this._checkIsHoveredOverLauncher() &&
+          !this.isLauncherDragging &&
+          !this._state?.launcherDragActive &&
+          !this._isMenuPopupOpen()
+        ) {
+          this._collapseLauncher();
+        }
+      }, 350);
+    }
+    this._mouseLeaveTask.arm();
   },
 
   onMouseEnter() {
+    this._mouseLeaveTask?.disarm();
     if (this._state.launcherExpanded) {
       return;
     }
@@ -2651,14 +2677,15 @@ var SidebarController = {
     let launcherRect = window.windowUtils.getBoundsWithoutFlushing(
       SidebarController.sidebarMain
     );
+    const TOLERANCE_ZONE = this._state?.launcherExpanded ? 24 : 0;
     return {
       top: launcherRect.top,
       bottom: launcherRect.bottom,
       left: this._positionStart
         ? launcherRect.left
-        : launcherRect.left + LAUNCHER_SPLITTER_WIDTH,
+        : launcherRect.left - TOLERANCE_ZONE,
       right: this._positionStart
-        ? launcherRect.right - LAUNCHER_SPLITTER_WIDTH
+        ? launcherRect.right + TOLERANCE_ZONE
         : launcherRect.right,
     };
   },

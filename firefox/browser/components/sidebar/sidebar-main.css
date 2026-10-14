@@ -44,6 +44,10 @@
       );
     }
 
+    :host(:not([expanded])) & {
+      width: var(--tab-collapsed-width, 42px);
+    }
+
     :host([customWidth]) & {
       width: 100%;
     }

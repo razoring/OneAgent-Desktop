@@ -220,24 +220,7 @@ XPCOMUtils.defineLazyPreferenceGetter(
   "sidebar.revamp",
   false,
   (pref, oldVal, newVal) => {
-    if (!newVal) {
-      return;
-    }
-    let navbarPlacements = CustomizableUI.getWidgetIdsInArea(
-      CustomizableUI.AREA_NAVBAR
-    );
-    if (!navbarPlacements.includes("sidebar-button")) {
-      CustomizableUI.addWidgetToArea(
-        "sidebar-button",
-        CustomizableUI.AREA_NAVBAR,
-        Services.prefs.getBoolPref(kPrefSidebarPositionStartEnabled, true)
-          ? 0
-          : undefined // Adds to the end of navbar if position_start is false.
-      );
-    }
-    // Ensure CUI knows to not restore this button if the user later removes it
-    let prefId = "browser.toolbarbuttons.introduced.sidebar-button";
-    Services.prefs.setBoolPref(prefId, true);
+    // Sidebar button is intentionally omitted from navbar.
   }
 );
 
@@ -358,7 +341,6 @@ var CustomizableUIInternal = {
     );
 
     let navbarPlacements = [
-      lazy.sidebarRevampEnabled ? "sidebar-button" : null,
       "back-button",
       "forward-button",
       "stop-reload-button",
@@ -603,10 +585,6 @@ var CustomizableUIInternal = {
         if (!newPlacements.includes(button)) {
           newPlacements.push(button);
         }
-      }
-
-      if (!newPlacements.includes("sidebar-button")) {
-        newPlacements.unshift("sidebar-button");
       }
 
       gSavedState.placements[CustomizableUI.AREA_NAVBAR] = newPlacements;

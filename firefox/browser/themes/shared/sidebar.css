@@ -310,6 +310,16 @@ menuseparator + #sidebar-extensions-separator {
 
 #sidebar-container {
   view-transition-name: sidebar-launcher;
+
+  :root[sidebar-expand-on-hover] & {
+    view-transition-name: none !important;
+  }
+
+  @media not -moz-pref("sidebar.verticalTabs") {
+    &:not([sidebar-panel-open]) {
+      display: none !important;
+    }
+  }
 }
 
 #sidebar-box {
@@ -479,6 +489,15 @@ menuseparator + #sidebar-extensions-separator {
     position: relative;
     inset: 0;
     inset-inline-end: unset;
+    view-transition-name: none !important;
+    transition: width var(--sidebar-expand-on-hover-duration, 200ms) var(--motion-ease-emphasized);
+
+    @media -moz-pref("sidebar.verticalTabs") {
+      &:not([sidebar-launcher-expanded]) {
+        width: var(--tab-collapsed-width, 42px);
+        min-width: var(--tab-collapsed-width, 42px);
+      }
+    }
 
     &[sidebar-positionend] {
       inset-inline-start: unset;
@@ -526,8 +545,27 @@ menuseparator + #sidebar-extensions-separator {
     }
   }
 
+  /* Do not allow resizing when minimized in strip state */
+  #sidebar-launcher-splitter:not([sidebar-launcher-expanded]) {
+    display: none !important;
+  }
+
+  /* When expanded, position the splitter at the outer trailing edge to allow resizing */
   #sidebar-launcher-splitter[sidebar-launcher-expanded] {
-    visibility: hidden;
+    display: block !important;
+    visibility: visible !important;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    z-index: calc(var(--browser-area-z-index-sidebar-expand-on-hover) + 1);
+  }
+
+  &:not([sidebar-positionend]) #sidebar-launcher-splitter[sidebar-launcher-expanded] {
+    left: calc(var(--sidebar-launcher-width, 240px) - var(--splitter-width));
+  }
+
+  &[sidebar-positionend] #sidebar-launcher-splitter[sidebar-launcher-expanded] {
+    right: calc(var(--sidebar-launcher-width, 240px) - var(--splitter-width));
   }
 
   /* We add margin to compensate for the launcher width to the element next to it.
