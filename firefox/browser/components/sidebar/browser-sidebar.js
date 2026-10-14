@@ -2521,10 +2521,15 @@ var SidebarController = {
     const contentArea = document.getElementById("tabbrowser-tabbox");
     this._box.toggleAttribute("sidebar-launcher-hovered", true);
     contentArea.toggleAttribute("sidebar-launcher-hovered", true);
-    this._maybeAnimate(() => {
+    if (this.sidebarRevampVisibility === "expand-on-hover") {
       this._state.launcherHoverActive = true;
       this._state.launcherExpanded = true;
-    });
+    } else {
+      this._maybeAnimate(() => {
+        this._state.launcherHoverActive = true;
+        this._state.launcherExpanded = true;
+      });
+    }
     this._mouseEnterDeferred.resolve();
   },
 
@@ -2535,10 +2540,15 @@ var SidebarController = {
     const contentArea = document.getElementById("tabbrowser-tabbox");
     this._box.toggleAttribute("sidebar-launcher-hovered", false);
     contentArea.toggleAttribute("sidebar-launcher-hovered", false);
-    this._maybeAnimate(() => {
+    if (this.sidebarRevampVisibility === "expand-on-hover") {
       this._state.launcherHoverActive = false;
       this._state.launcherExpanded = false;
-    });
+    } else {
+      this._maybeAnimate(() => {
+        this._state.launcherHoverActive = false;
+        this._state.launcherExpanded = false;
+      });
+    }
   },
 
   collapseOnEscape() {

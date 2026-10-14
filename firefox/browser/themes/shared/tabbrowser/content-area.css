@@ -52,6 +52,10 @@
    * split-view is fully dissolved. */
   #tabbrowser-tabpanels > :not(.split-view-panel) .browserContainer {
     --content-area-start-radius: var(--border-radius-medium);
+    border-start-end-radius: var(--urlbar-container-padding-block, 4px) !important;
+    border-end-start-radius: var(--urlbar-container-padding-block, 4px) !important;
+    border-end-end-radius: var(--urlbar-container-padding-block, 4px) !important;
+    overflow: clip !important;
 
     @media (-moz-platform: macos) {
       --content-scrollbar-inset-block: 0 var(--border-radius-medium);

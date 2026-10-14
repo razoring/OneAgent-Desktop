@@ -482,15 +482,35 @@ menuseparator + #sidebar-extensions-separator {
 
 :root[sidebar-expand-on-hover] {
   #sidebar-container {
-    /* The launcher sits on body while collapsed and covers it while expanded,
-     * so it has to paint whichever surface body does. Nova hands body the
-     * toolbar color when there's no theme accent for it to defer to, see
-     * browser-shared.css. */
+    /* The launcher sits on body while collapsed and covers it while expanded.
+     * Keep it consistently layered and styled to eliminate pop-in, snap, and z-index desync. */
     position: relative;
     inset: 0;
     inset-inline-end: unset;
     view-transition-name: none !important;
     transition: width var(--sidebar-expand-on-hover-duration, 200ms) var(--motion-ease-emphasized);
+    overflow: clip;
+
+    /* Always apply toolbox colors and opaque backdrop */
+    color: var(--toolbox-text-color);
+    background-image: var(--toolbox-background-gradient), image(var(--toolbox-background-color));
+    background-size:
+      100vw 100vh,
+      auto;
+    background-color: light-dark(#e8e8e8, #202020);
+
+    &[sidebar-positionend]:-moz-locale-dir(ltr),
+    &:not([sidebar-positionend]):-moz-locale-dir(rtl) {
+      background-position-x: 100%;
+    }
+
+    &:not([sidebar-positionend]) {
+      border-inline-end: 0.01px solid var(--sidebar-border-color);
+    }
+
+    &[sidebar-positionend] {
+      border-inline-start: 0.01px solid var(--sidebar-border-color);
+    }
 
     @media -moz-pref("sidebar.verticalTabs") {
       &:not([sidebar-launcher-expanded]) {
@@ -504,37 +524,10 @@ menuseparator + #sidebar-extensions-separator {
       inset-inline-end: 0;
     }
 
-    /* We only want to apply these styles when the sidebar is expanded */
+    /* Out of flow overlay when expanded */
     &[sidebar-launcher-expanded] {
       z-index: var(--browser-area-z-index-sidebar-expand-on-hover);
       position: absolute;
-
-      /* Make sure the colors match the toolbox and they are opaque.
-       * TODO(bug 2070647): Consider moving this to the
-       * launcher-expanded/ongoing-animations block. */
-      color: var(--toolbox-text-color);
-      background-image: var(--toolbox-background-gradient), image(var(--toolbox-background-color));
-      background-size:
-        100vw 100vh,
-        auto;
-      /* With Windows Mica, the toolbox background is not guaranteed to be opaque.
-       * Make sure there's some opaque backdrop that matches our color scheme.
-       * These colors match the "transparency effects disabled" mica backdrop on
-       * Windows 11, which is as good as we can make it. */
-      background-color: light-dark(#e8e8e8, #202020);
-
-      &[sidebar-positionend]:-moz-locale-dir(ltr),
-      &:not([sidebar-positionend]):-moz-locale-dir(rtl) {
-        background-position-x: 100%;
-      }
-
-      &:not([sidebar-positionend]) {
-        border-inline-end: 0.01px solid var(--sidebar-border-color);
-      }
-
-      &[sidebar-positionend] {
-        border-inline-start: 0.01px solid var(--sidebar-border-color);
-      }
     }
 
     @media not -moz-pref("browser.nova.enabled") {
@@ -557,15 +550,27 @@ menuseparator + #sidebar-extensions-separator {
     position: absolute;
     top: 0;
     bottom: 0;
+    width: 6px;
+    box-sizing: border-box;
+    cursor: ew-resize;
     z-index: calc(var(--browser-area-z-index-sidebar-expand-on-hover) + 1);
+    background-color: transparent;
+    transition: background-color 0.2s ease;
+
+    &:hover,
+    &[state="dragging"] {
+      background-color: var(--focus-outline-color) !important;
+    }
   }
 
   &:not([sidebar-positionend]) #sidebar-launcher-splitter[sidebar-launcher-expanded] {
-    left: calc(var(--sidebar-launcher-width, 240px) - var(--splitter-width));
+    left: calc(var(--sidebar-launcher-width, 240px) - 3px);
+    border-inline-start: 1px solid var(--sidebar-border-color);
   }
 
   &[sidebar-positionend] #sidebar-launcher-splitter[sidebar-launcher-expanded] {
-    right: calc(var(--sidebar-launcher-width, 240px) - var(--splitter-width));
+    right: calc(var(--sidebar-launcher-width, 240px) - 3px);
+    border-inline-end: 1px solid var(--sidebar-border-color);
   }
 
   /* We add margin to compensate for the launcher width to the element next to it.

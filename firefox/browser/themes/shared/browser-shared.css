@@ -468,19 +468,53 @@ body {
   }
 }
 
-/* Hide the TabsToolbar/nav-bar titlebar controls if the menubar is permanently shown.
+/* Hide the TabsToolbar/titlebar-header/nav-bar titlebar controls if the menubar is permanently shown.
  * (That is, if the menu bar doesn't autohide, and we're not in a fullscreen or
  * popup window.) */
 :root:not([popup-window], [inFullscreen], [taskbartab])
   #toolbar-menubar:not([autohide], [collapsed])
-  ~ :is(#TabsToolbar, #nav-bar)
+  ~ :is(#TabsToolbar, #titlebar-header, #nav-bar)
   > :is(.titlebar-buttonbox-container, .titlebar-spacer) {
   display: none;
 }
 
 /* Only show the titlebar buttons and spacers in the first visible toolbar. */
-#navigator-toolbox:not([tabs-hidden]) > #nav-bar > :is(.titlebar-buttonbox-container, .titlebar-spacer) {
+#navigator-toolbox:not([tabs-hidden]) > :is(#titlebar-header, #nav-bar) > :is(.titlebar-buttonbox-container, .titlebar-spacer) {
   display: none;
+}
+
+#titlebar-header:not([collapsed]) ~ #nav-bar > :is(.titlebar-buttonbox-container, .titlebar-spacer) {
+  display: none;
+}
+
+#titlebar-header {
+  min-height: 30px;
+  max-height: 34px;
+  padding-inline: 8px;
+  gap: 8px;
+  -moz-window-dragging: drag;
+
+  &[collapsed] {
+    display: none !important;
+  }
+
+  #titlebar-header-favicon {
+    width: 16px;
+    height: 16px;
+    pointer-events: none;
+    -moz-context-properties: fill;
+    fill: currentColor;
+  }
+
+  #titlebar-header-title {
+    margin: 0;
+    padding: 0;
+    font-size: 12px;
+    font-weight: 500;
+    pointer-events: none;
+    user-select: none;
+    opacity: 0.85;
+  }
 }
 
 :root:not([sizemode="maximized"], [sizemode="fullscreen"]) .titlebar-restore,

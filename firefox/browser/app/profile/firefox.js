@@ -2342,6 +2342,7 @@ pref("sidebar.main.tools", "");
 pref("sidebar.installed.extensions", "");
 pref("sidebar.verticalTabs", false);
 pref("sidebar.verticalTabs.dragToPinPromo.dismissed", false);
+pref("browser.titlebar.header.enabled", true);
 // One value per behavior, none shared across tab orientations. Vertical tabs:
 // "always-show", "expand-on-hover", "hide-sidebar". Horizontal tabs:
 // "hide-on-close" (default) and "hide-launcher" (switcher-only). The default

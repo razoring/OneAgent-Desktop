@@ -34,6 +34,10 @@ toolbar-context-turn-on-vertical-tabs =
     .label = Turn on Vertical Tabs
 toolbar-context-turn-off-vertical-tabs =
     .label = Turn off Vertical Tabs
+toolbar-context-turn-on-title-bar =
+    .label = Turn on Title Bar
+toolbar-context-turn-off-title-bar =
+    .label = Turn off Title Bar
 toolbar-context-customize-sidebar =
     .label = Customize Sidebar
 

@@ -2560,6 +2560,7 @@ var XULBrowserWindow = {
 
   asyncUpdateUI() {
     OpenSearchManager.updateOpenSearchBadge(window);
+    TitleBarHeader.updateContent();
   },
 
   onStatusChange(aWebProgress, aRequest, aStatus, aMessage) {
@@ -5269,6 +5270,87 @@ var FirefoxViewHandler = {
       buttonClicksData.lastCountTime = Math.round(Date.now());
       buttonClicksData.count = count;
       Services.prefs.setStringPref(PREF_NAME, JSON.stringify(buttonClicksData));
+    }
+  },
+};
+
+var TitleBarHeader = {
+  _pref: "browser.titlebar.header.enabled",
+  _initialized: false,
+
+  init() {
+    if (this._initialized) {
+      return;
+    }
+    this._initialized = true;
+
+    Services.prefs.addObserver(this._pref, this);
+    this.updateVisibility();
+    this.updateContent();
+
+    window.addEventListener("TabSelect", () => this.updateContent());
+    if (window.gBrowser?.tabContainer) {
+      window.gBrowser.tabContainer.addEventListener("TabAttrModified", e => {
+        if (
+          e.target == window.gBrowser.selectedTab &&
+          e.detail.changed.some(prop => ["label", "image", "busy"].includes(prop))
+        ) {
+          this.updateContent();
+        }
+      });
+    }
+  },
+
+  observe(subject, topic, data) {
+    if (data === this._pref) {
+      this.updateVisibility();
+    }
+  },
+
+  toggle() {
+    let current = Services.prefs.getBoolPref(this._pref, true);
+    Services.prefs.setBoolPref(this._pref, !current);
+  },
+
+  updateVisibility() {
+    let enabled = Services.prefs.getBoolPref(this._pref, true);
+    let bar = document.getElementById("titlebar-header");
+    if (bar) {
+      bar.collapsed = !enabled;
+      if (window.TabBarVisibility) {
+        window.TabBarVisibility.update();
+      }
+    }
+  },
+
+  updateContent() {
+    let bar = document.getElementById("titlebar-header");
+    if (!bar || bar.collapsed) {
+      return;
+    }
+
+    let favicon = document.getElementById("titlebar-header-favicon");
+    let title = document.getElementById("titlebar-header-title");
+    let tab = window.gBrowser?.selectedTab;
+
+    if (favicon && tab) {
+      let iconUrl = tab.getAttribute("image");
+      if (!iconUrl) {
+        iconUrl = "chrome://global/skin/icons/defaultFavicon.svg";
+      }
+      if (favicon.getAttribute("src") !== iconUrl) {
+        favicon.setAttribute("src", iconUrl);
+      }
+    }
+
+    if (title && tab) {
+      let label =
+        tab.getAttribute("label") ||
+        window.gBrowser?.selectedBrowser?.contentTitle ||
+        "";
+      if (title.value !== label) {
+        title.value = label;
+      }
     }
   },
 };

@@ -259,6 +259,22 @@ export var ToolbarContextMenu = {
         ? "toolbar-context-turn-off-vertical-tabs"
         : "toolbar-context-turn-on-vertical-tabs"
     );
+
+    let toggleTitleBarItem = document.getElementById(
+      "toolbar-context-toggle-title-bar"
+    );
+    if (toggleTitleBarItem) {
+      let titleBarEnabled = Services.prefs.getBoolPref(
+        "browser.titlebar.header.enabled",
+        true
+      );
+      document.l10n.setAttributes(
+        toggleTitleBarItem,
+        titleBarEnabled
+          ? "toolbar-context-turn-off-title-bar"
+          : "toolbar-context-turn-on-title-bar"
+      );
+    }
     document.getElementById("toolbar-context-customize-sidebar").hidden =
       !sidebarRevampEnabled ||
       (toolbarItem?.id != "sidebar-button" &&

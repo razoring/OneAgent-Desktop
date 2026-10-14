@@ -253,6 +253,9 @@ var gBrowserInit = {
       window
     );
     gURLBar.addGBrowserListeners();
+    if (window.TitleBarHeader) {
+      window.TitleBarHeader.init();
+    }
     if (Services.prefs.getBoolPref("browser.search.widget.new", false)) {
       document.getElementById("searchbar-new")?.addGBrowserListeners();
     }

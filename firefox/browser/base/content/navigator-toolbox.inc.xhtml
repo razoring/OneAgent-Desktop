@@ -106,6 +106,17 @@
 
   </toolbar>
 
+  <toolbar id="titlebar-header"
+           class="browser-toolbar browser-titlebar"
+           context="toolbar-context-menu"
+           align="center">
+    <hbox class="titlebar-spacer" type="pre-tabs"/>
+    <image id="titlebar-header-favicon" class="urlbar-icon"/>
+    <label id="titlebar-header-title" crop="end" flex="1"/>
+    <spacer flex="1"/>
+#include titlebar-items.inc.xhtml
+  </toolbar>
+
   <toolbar id="nav-bar"
            class="browser-toolbar"
            data-l10n-id="navbar-accessible"

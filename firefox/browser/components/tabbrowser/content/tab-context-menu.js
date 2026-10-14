@@ -572,6 +572,20 @@ var TabContextMenu = {
       );
     }
 
+    let toggleTitleBar = document.getElementById("context_toggleTitleBar");
+    if (toggleTitleBar) {
+      let titleBarEnabled = Services.prefs.getBoolPref(
+        "browser.titlebar.header.enabled",
+        true
+      );
+      document.l10n.setAttributes(
+        toggleTitleBar,
+        titleBarEnabled
+          ? "toolbar-context-turn-off-title-bar"
+          : "toolbar-context-turn-on-title-bar"
+      );
+    }
+
     // Session store
     let closedCount = SessionStore.getLastClosedTabCount(window);
     document

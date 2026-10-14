@@ -39,12 +39,12 @@ var TabBarVisibility = {
     // window, so they share the titlebar's background and inactive styling.
     let isTitlebar = CustomTitlebar.enabled && hideTabsToolbar;
     let titlebarIds = Services.prefs.getBoolPref("browser.nova.enabled")
-      ? ["nav-bar", "PersonalToolbar"]
-      : ["nav-bar"];
+      ? ["titlebar-header", "nav-bar", "PersonalToolbar"]
+      : ["titlebar-header", "nav-bar"];
     for (let id of titlebarIds) {
       document
         .getElementById(id)
-        .classList.toggle("browser-titlebar", isTitlebar);
+        ?.classList.toggle("browser-titlebar", isTitlebar);
     }
 
     if (

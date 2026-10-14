@@ -186,6 +186,9 @@ document.addEventListener(
         case "context_toggleVerticalTabs":
           SidebarController.toggleVerticalTabs();
           break;
+        case "context_toggleTitleBar":
+          TitleBarHeader.toggle();
+          break;
         case "context_closeTab":
           TabContextMenu.closeContextTabs();
           break;
@@ -406,6 +409,9 @@ document.addEventListener(
           break;
         case "toolbar-context-toggle-vertical-tabs":
           SidebarController.toggleVerticalTabs();
+          break;
+        case "toolbar-context-toggle-title-bar":
+          TitleBarHeader.toggle();
           break;
         case "toolbar-context-customize-sidebar":
           SidebarController.show("viewCustomizeSidebar");
