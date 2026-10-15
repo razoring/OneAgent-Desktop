@@ -641,18 +641,6 @@ var SidebarController = {
       this._disableLauncherDragging();
       this._disablePinnedTabsDragging();
     }
-    // Taskbar (right-side tabs mirror) is independent of the sidebar revamp.
-    // Isolated so a missing/failed Taskbar module can never break sidebar init.
-    try {
-      if (!customElements.get("sidebar-taskbar")) {
-        ChromeUtils.importESModule(
-          "chrome://browser/content/sidebar/sidebar-taskbar.mjs",
-          { global: "current" }
-        );
-      }
-    } catch (e) {
-      console.error("Taskbar failed to load:", e);
-    }
     // We need to update the tab strip for vertical tabs during init
     // as there will be no tabstrip-orientation-change event
     if (CustomizableUI.verticalTabsEnabled) {
@@ -1064,12 +1052,6 @@ var SidebarController = {
     [...browser.children].forEach((node, i, children) => {
       node.style.order = this._positionStart ? i + 1 : children.length - i;
     });
-    // The Taskbar is always docked at the end side, regardless of where the
-    // sidebar itself is positioned.
-    let taskbarContainer = document.getElementById("taskbar-container");
-    if (taskbarContainer) {
-      taskbarContainer.style.order = [...browser.children].length + 1;
-    }
     let sidebarContainer = document.getElementById("sidebar-container");
     let sidebarMain = document.querySelector("sidebar-main");
 

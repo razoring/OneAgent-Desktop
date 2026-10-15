@@ -401,10 +401,37 @@
     <menuitem id="sidebar-context-menu-hide-sidebar"
               data-l10n-id="sidebar-context-menu-hide-sidebar"/>
     <menuitem id="sidebar-context-menu-customize-sidebar"
-              data-l10n-id="sidebar-context-menu-customize-sidebar"
-              hidden="true"/>
+              data-l10n-id="sidebar-context-menu-customize-sidebar"/>
     <menuitem id="sidebar-context-menu-enable-vertical-tabs"
               data-l10n-id="sidebar-context-menu-enable-vertical-tabs"/>
+  </menupopup>
+
+  <menupopup id="appbar-context-menu">
+    <menuitem id="appbar-context-menu-reload-tab"
+              label="Reload"
+              contexttype="appbar-tab"/>
+    <menuitem id="appbar-context-menu-close-tab"
+              label="Close Tab"
+              contexttype="appbar-tab"/>
+    <menuseparator id="appbar-context-menu-tab-separator"
+                   contexttype="appbar-tab"/>
+    <menuitem data-l10n-id="sidebar-context-menu-manage-extension"
+              id="appbar-context-menu-manage-extension"
+              contexttype="extension-action"/>
+    <menuitem data-l10n-id="sidebar-context-menu-remove-extension2"
+              id="appbar-context-menu-remove-extension"
+              contexttype="extension-action"/>
+    <menuitem data-l10n-id="sidebar-context-menu-report-extension"
+              id="appbar-context-menu-report-extension"
+              contexttype="extension-action"/>
+    <menuseparator id="appbar-context-menu-extension-separator"/>
+    <menuitem data-l10n-id="sidebar-context-menu-unpin-extension"
+              id="appbar-context-menu-unpin-extension"
+              contexttype="extension-action"/>
+    <menuitem id="appbar-context-menu-hide-appbar"
+              label="Hide Appbar"/>
+    <menuitem id="appbar-context-menu-customize-appbar"
+              label="Customize Appbar"/>
   </menupopup>
 
   <menupopup id="sidebar-history-menu">

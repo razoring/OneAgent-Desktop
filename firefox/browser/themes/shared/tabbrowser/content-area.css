@@ -109,7 +109,7 @@
       }
     }
 
-    :root:not([inDOMFullscreen]) #tabbrowser-tabbox:is([sidebar-positionend]:is([sidebar-shown], [sidebar-panel-open]), [ai-window-open]) & {
+    :root:not([inDOMFullscreen]) #tabbrowser-tabbox:is([sidebar-positionend]:is([sidebar-shown], [sidebar-panel-open]), [ai-window-open], [appbar-shown], [appbar-panel-open]) & {
       border-inline-end: var(--border-width) solid var(--chrome-content-separator-color);
       border-start-end-radius: var(--content-area-start-radius);
 
@@ -1081,7 +1081,7 @@ split-view-footer {
       border-start-start-radius: calc(var(--border-radius-medium) - var(--border-width));
     }
 
-    #tabbrowser-tabbox:is([sidebar-positionend]:is([sidebar-shown], [sidebar-panel-open]), [ai-window-open])
+    #tabbrowser-tabbox:is([sidebar-positionend]:is([sidebar-shown], [sidebar-panel-open]), [ai-window-open], [appbar-shown], [appbar-panel-open])
       #tabbrowser-tabpanels
       > :not(.split-view-panel)
       .dialogOverlay[topmost="true"] {

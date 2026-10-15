@@ -28,12 +28,29 @@
   <tabbox id="tabbrowser-tabbox" flex="1" tabcontainer="tabbrowser-tabs">
     <tabpanels id="tabbrowser-tabpanels" flex="1" selectedIndex="0"/>
   </tabbox>
-  <box id="taskbar-container" class="chromeclass-extrachrome" hidden="true">
-    <html:sidebar-taskbar flex="1"/>
-  </box>
   <splitter id="ai-window-splitter" class="chromeclass-extrachrome sidebar-splitter" resizebefore="sibling" resizeafter="sibling" collapsed="true"/>
   <vbox id="ai-window-box" collapsed="true" class="chromeclass-extrachrome ai-window-right-sidebar">
     <stack class="ai-window-browser-stack" flex="1">
     </stack>
   </vbox>
+  <splitter id="appbar-splitter" class="chromeclass-extrachrome sidebar-splitter appbar-splitter" resizebefore="sibling" resizeafter="none" hidden="true" role="separator" aria-controls="appbar-box"/>
+  <vbox id="appbar-box" hidden="true" class="chromeclass-extrachrome">
+    <box id="appbar-header" align="center">
+      <toolbarbutton id="appbar-switcher-target" class="tabbable" aria-expanded="false">
+        <image id="appbar-icon" consumeanchor="appbar-switcher-target"/>
+        <label id="appbar-title" crop="end" control="appbar"/>
+      </toolbarbutton>
+      <spacer id="appbar-spacer"/>
+      <toolbarbutton id="appbar-close" class="close-icon tabbable" data-l10n-id="sidebar-close-button"/>
+    </box>
+    <stack id="appbar-browser-stack" class="sidebar-browser-stack appbar-browser-stack" flex="1">
+      <browser id="appbar" autoscroll="false" disablehistory="false" disablefullscreen="true" type="content" remote="true" messagemanagergroup="browsers" tooltip="aHTMLTooltip"/>
+    </stack>
+  </vbox>
+  <box id="appbar-launcher-splitter" class="chromeclass-extrachrome sidebar-splitter appbar-splitter"/>
+  <box context="appbar-context-menu" id="appbar-container">
+    <html:appbar-main flex="1">
+      <box id="appbar-vertical-tabs" slot="tabstrip"></box>
+    </html:appbar-main>
+  </box>
 </hbox>

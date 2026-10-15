@@ -1,0 +1,104 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
+
+[hidden] {
+  display: none !important;
+}
+
+:host {
+  display: flex;
+  flex-direction: column;
+  width: var(--appbar-width, 44px);
+  min-width: var(--appbar-width, 44px);
+  max-width: var(--appbar-width, 44px);
+  height: 100%;
+  box-sizing: border-box;
+  --button-size-icon: 36px;
+  --button-min-height: 36px;
+  --focus-ring-clip-margin: max(0px, calc(var(--focus-outline-offset, 0px) + var(--focus-outline-width, 2px)));
+}
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  box-sizing: border-box;
+  padding: var(--space-xxsmall, 4px) var(--space-xxsmall, 4px);
+  gap: var(--space-xxsmall, 4px);
+  align-items: center;
+  overflow: hidden;
+}
+
+.scroll-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  gap: var(--space-xxsmall, 4px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.scroll-section::-webkit-scrollbar {
+  display: none;
+}
+
+.appbar-tabs-list,
+.tools-and-extensions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  gap: var(--space-xxsmall, 4px);
+}
+
+.appbar-tab-button,
+.tools-and-extensions moz-button,
+.bottom-actions moz-button,
+.appbar-add-tab-button {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  min-height: 36px;
+  border-radius: var(--border-radius-medium, 4px);
+  --button-icon-fill: var(--toolbarbutton-icon-fill);
+}
+
+/* Active tab / tool outline */
+.appbar-tab-button[aria-selected="true"]::part(button),
+.tools-and-extensions moz-button[aria-selected="true"]::part(button),
+.bottom-actions moz-button[aria-selected="true"]::part(button) {
+  background-color: var(--button-background-color-active, color-mix(in srgb, currentColor 14%, transparent));
+  outline: 2px solid var(--focus-outline-color, #0060df);
+  outline-offset: -1px;
+  border-radius: var(--border-radius-medium, 4px);
+}
+
+.appbar-separator {
+  width: 24px;
+  height: 1px;
+  background-color: var(--chrome-content-separator-color, color-mix(in srgb, currentColor 15%, transparent));
+  margin-block: 4px;
+  flex-shrink: 0;
+}
+
+.bottom-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  margin-top: auto;
+  padding-block-start: var(--space-xxsmall, 4px);
+  flex-shrink: 0;
+}
+
+/* Drag hover feedback */
+:host([dragover]) {
+  outline: 2px dashed var(--focus-outline-color, #0060df);
+  outline-offset: -2px;
+}

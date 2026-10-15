@@ -248,10 +248,6 @@
   list-style-image: url("chrome://browser/skin/share.svg");
 }
 
-#taskbar-toggle {
-  list-style-image: url("chrome://browser/skin/sidebar-expanded-right.svg");
-}
-
 #sidebar-button {
   display: none !important;
 

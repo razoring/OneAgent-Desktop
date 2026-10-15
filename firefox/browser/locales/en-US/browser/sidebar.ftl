@@ -356,16 +356,3 @@ sidebar-widget-hide-sidebar2 =
 # users who do not have any pinned tabs. Indicates that they can drop tabs in
 # this area to pin them.
 sidebar-pins-promo-text = Drag important tabs here to keep them within reach
-
-# Tooltip and accessible label for the Taskbar toggle toolbar button.
-taskbar-toggle =
-  .tooltiptext = Show or hide the Taskbar
-  .label = Taskbar
-
-# Accessible label for the Taskbar strip showing open tabs.
-taskbar-strip =
-  .aria-label = Taskbar
-
-# Tooltip for the Taskbar new tab button.
-taskbar-new-tab-button =
-  .title = Open a new tab

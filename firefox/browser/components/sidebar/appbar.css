@@ -1,0 +1,102 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
+
+:root {
+  --appbar-width: 44px;
+}
+
+#appbar-container {
+  order: 103 !important;
+  width: var(--appbar-width, 44px) !important;
+  min-width: var(--appbar-width, 44px) !important;
+  max-width: var(--appbar-width, 44px) !important;
+  background-color: var(--toolbar-bgcolor);
+  border-inline-start: 1px solid var(--chrome-content-separator-color, rgba(0, 0, 0, 0.12));
+  position: relative;
+  z-index: 10;
+  box-sizing: border-box;
+}
+
+#appbar-container[hidden="true"] {
+  display: none !important;
+}
+
+#appbar-launcher-splitter {
+  order: 102 !important;
+  display: none !important;
+}
+
+#appbar-box {
+  order: 101 !important;
+  min-width: 220px;
+  max-width: 65vw;
+  width: var(--appbar-panel-width, 360px);
+  background-color: var(--toolbar-bgcolor);
+  border-inline-start: 1px solid var(--chrome-content-separator-color, rgba(0, 0, 0, 0.12));
+  position: relative;
+  z-index: 9;
+  box-sizing: border-box;
+}
+
+#appbar-box[hidden="true"] {
+  display: none !important;
+}
+
+#appbar-splitter {
+  order: 100 !important;
+  cursor: ew-resize;
+  width: 4px;
+  position: relative;
+  z-index: 10;
+}
+
+#appbar-splitter[hidden="true"] {
+  display: none !important;
+}
+
+#appbar-header {
+  display: flex;
+  align-items: center;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--chrome-content-separator-color, rgba(0, 0, 0, 0.12));
+  min-height: 38px;
+  box-sizing: border-box;
+}
+
+#appbar-switcher-target {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  font-size: 13px;
+  background: transparent;
+  border: none;
+  cursor: default;
+}
+
+#appbar-icon {
+  width: 16px;
+  height: 16px;
+}
+
+#appbar-close {
+  cursor: pointer;
+}
+
+.appbar-browser-stack {
+  position: relative;
+  flex: 1 1 auto;
+  width: 100%;
+  height: 100%;
+}
+
+.appbar-browser-stack > browser {
+  width: 100%;
+  height: 100%;
+  background-color: var(--in-content-page-background, #ffffff);
+}
+
+.appbar-browser-stack > browser:not([selected="true"]) {
+  display: none !important;
+}
