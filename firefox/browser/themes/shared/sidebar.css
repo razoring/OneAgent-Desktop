@@ -538,6 +538,14 @@ menuseparator + #sidebar-extensions-separator {
       border-radius: 0 !important;
     }
 
+    /* Mid-collapse state (see _beginLauncherCollapse): keep the overlay
+    positioning while the width animates down to the strip width, so the
+    collapse animation never reflows the content area. Placed after the
+    expanded-width rule so it wins while both attributes are present. */
+    &[sidebar-launcher-collapsing] {
+      width: var(--tab-collapsed-width, 42px) !important;
+    }
+
     &[sidebar-launcher-dragging] {
       transition: none !important;
     }
@@ -554,6 +562,12 @@ menuseparator + #sidebar-extensions-separator {
   #sidebar-launcher-splitter:not([sidebar-launcher-expanded]) {
     display: none !important;
     pointer-events: none !important;
+  }
+
+  /* Hide the resize splitter for the duration of the collapse animation; its
+  parked position is derived from the full expanded width, not the live one. */
+  #sidebar-container[sidebar-launcher-collapsing] + #sidebar-launcher-splitter {
+    display: none !important;
   }
 
   /* When expanded, position the splitter at the outer trailing edge to allow resizing */
@@ -681,10 +695,10 @@ menuseparator + #sidebar-extensions-separator {
     @media -moz-pref("browser.nova.enabled") {
       &[sidebar-launcher-expanded][sidebar-panel-open] {
         &:not([sidebar-positionend]) {
-          margin-inline-start: var(--sidebar-launcher-collapsed-width);
+          margin-inline-start: var(--tab-collapsed-width, var(--sidebar-launcher-collapsed-width, 42px));
         }
         &[sidebar-positionend] {
-          margin-inline-end: var(--sidebar-launcher-collapsed-width);
+          margin-inline-end: var(--tab-collapsed-width, var(--sidebar-launcher-collapsed-width, 42px));
         }
       }
     }
@@ -696,7 +710,25 @@ menuseparator + #sidebar-extensions-separator {
   cursor: grabbing !important;
 }
 
+/* In hover mode the expanded launcher is an out-of-flow overlay, so hold the
+content area in place with the collapsed width. Otherwise the viewport grows
+every time the user hovers and shrinks back on leave. Written as a flat rule:
+a nested `:root … &` selector would resolve to `:root` descended from `:root`
+and never match. */
+@media -moz-pref("browser.nova.enabled") {
+  :root[sidebar-expand-on-hover]:not([fullscreenNavToolboxHidden]) #tabbrowser-tabbox[sidebar-launcher-expanded]:not([sidebar-panel-open]):not([sidebar-positionend]) {
+    margin-inline-start: var(--tab-collapsed-width, var(--sidebar-launcher-collapsed-width, 42px));
+  }
+  :root[sidebar-expand-on-hover]:not([fullscreenNavToolboxHidden]) #tabbrowser-tabbox[sidebar-launcher-expanded][sidebar-positionend]:not([sidebar-panel-open]) {
+    margin-inline-end: var(--tab-collapsed-width, var(--sidebar-launcher-collapsed-width, 42px));
+  }
+}
+
 :root:not([sidebar-expand-on-hover]) #sidebar-launcher-splitter {
+  display: none !important;
+}
+
+:root:not([sidebar-expand-on-hover]) #sidebar-container:not([hidden]) + #sidebar-launcher-splitter {
   display: block !important;
   visibility: visible !important;
   width: 6px;
@@ -718,6 +750,12 @@ menuseparator + #sidebar-extensions-separator {
 
   &[state="dragging"] {
     cursor: grabbing !important;
+  }
+}
+
+@media not -moz-pref("sidebar.verticalTabs") {
+  :root:not([sidebar-expand-on-hover]) #sidebar-container:not([sidebar-panel-open]) + #sidebar-launcher-splitter {
+    display: none !important;
   }
 }
 

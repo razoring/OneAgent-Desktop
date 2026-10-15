@@ -731,6 +731,7 @@ var SidebarController = {
       this._mouseLeaveTask.finalize();
       this._mouseLeaveTask = null;
     }
+    this._cancelLauncherCollapse();
     this._disableLauncherDragging();
     this._disablePinnedTabsDragging();
   },
@@ -2674,13 +2675,88 @@ var SidebarController = {
     contentArea.toggleAttribute("sidebar-launcher-hovered", false);
     if (this.sidebarRevampVisibility === "expand-on-hover") {
       this._state.launcherHoverActive = false;
-      this._state.launcherExpanded = false;
+      // Keep the launcher expanded (absolute overlay + content-area
+      // compensation) while its width animates down; only flip it back to
+      // in-flow once narrowed, so the animation never squeezes the viewport.
+      this._beginLauncherCollapse();
     } else {
       this._maybeAnimate(() => {
         this._state.launcherHoverActive = false;
         this._state.launcherExpanded = false;
       });
     }
+  },
+
+  _beginLauncherCollapse() {
+    const container = this.sidebarContainer;
+    if (!container || !this._state.launcherExpanded) {
+      this._state.launcherExpanded = false;
+      return;
+    }
+    if (container.hasAttribute("sidebar-launcher-collapsing")) {
+      return;
+    }
+    // Collapse inner visuals right away so tab pills morph back and the pin
+    // hides the moment the mouse leaves. Layout attributes stay expanded
+    // until the overlay has narrowed (see _finalizeLauncherCollapse).
+    if (this.sidebarMain) {
+      this.sidebarMain.expanded = false;
+    }
+    gBrowser.tabContainer?.toggleAttribute("expanded", false);
+    this._collapseHadPanelOpen = this._state.panelOpen;
+    container.setAttribute("sidebar-launcher-collapsing", "true");
+    this._collapseTransitionHandler = e => {
+      if (e.target === container && e.propertyName === "width") {
+        this._finalizeLauncherCollapse();
+      }
+    };
+    container.addEventListener("transitionend", this._collapseTransitionHandler);
+    this._collapseFallbackTimer = setTimeout(
+      () => this._finalizeLauncherCollapse(),
+      (this._animationExpandOnHoverDurationMs || 200) + 100
+    );
+  },
+
+  _finalizeLauncherCollapse() {
+    const container = this.sidebarContainer;
+    if (!container?.hasAttribute("sidebar-launcher-collapsing")) {
+      return;
+    }
+    this._cancelLauncherCollapse();
+    if (
+      this.sidebarRevampVisibility === "expand-on-hover" &&
+      (this._checkIsHoveredOverLauncher() ||
+        (this._state.panelOpen && !this._collapseHadPanelOpen))
+    ) {
+      return;
+    }
+    this._state.launcherExpanded = false;
+  },
+
+  _cancelLauncherCollapse() {
+    const container = this.sidebarContainer;
+    const wasCollapsing = !!container?.hasAttribute("sidebar-launcher-collapsing");
+    if (this._collapseTransitionHandler) {
+      container?.removeEventListener(
+        "transitionend",
+        this._collapseTransitionHandler
+      );
+      this._collapseTransitionHandler = null;
+    }
+    if (this._collapseFallbackTimer) {
+      clearTimeout(this._collapseFallbackTimer);
+      this._collapseFallbackTimer = null;
+    }
+    container?.removeAttribute("sidebar-launcher-collapsing");
+    if (wasCollapsing && this._state?.launcherExpanded) {
+      // _beginLauncherCollapse pre-collapsed the inner visuals; bring them
+      // back since the overlay is staying expanded.
+      if (this.sidebarMain && !this.sidebarMain.expanded) {
+        this.sidebarMain.expanded = true;
+      }
+      gBrowser.tabContainer?.toggleAttribute("expanded", true);
+    }
+    return wasCollapsing;
   },
 
   collapseOnEscape() {
@@ -2736,6 +2812,7 @@ var SidebarController = {
 
   onMouseEnter() {
     this._mouseLeaveTask?.disarm();
+    this._cancelLauncherCollapse();
     if (this._state.launcherExpanded) {
       return;
     }
@@ -2880,6 +2957,7 @@ var SidebarController = {
 
   async toggleExpandOnHover(isEnabled, isDragEnded) {
     const toggleID = ++this._expandOnHoverToggleID;
+    this._cancelLauncherCollapse();
     if (isEnabled) {
       this._updateExpandOnHoverDuration();
     }
