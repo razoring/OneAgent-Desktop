@@ -93,7 +93,7 @@
      * The AI sidebar always docks opposite the browser sidebar. */
     :root:not([inDOMFullscreen]) #tabbrowser-tabbox:not([sidebar-positionend]):is([sidebar-shown], [sidebar-panel-open]) &,
     :root:not([inDOMFullscreen]) #tabbrowser-tabbox[sidebar-positionend][ai-window-open] & {
-      border-inline-start: var(--border-width) solid var(--chrome-content-separator-color);
+      border-inline-start: none;
       border-start-start-radius: var(--content-area-start-radius);
 
       @media (-moz-platform: macos) {

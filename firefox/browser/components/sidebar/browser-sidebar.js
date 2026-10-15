@@ -609,6 +609,17 @@ var SidebarController = {
         `${initialLauncherWidth}px`
       );
 
+      const visibility = Services.prefs.getStringPref(
+        "sidebar.visibility",
+        "expand-on-hover"
+      );
+      if (visibility === "expand-on-hover") {
+        document.documentElement.setAttribute("sidebar-expand-on-hover", "true");
+        this.toggleExpandOnHover(true);
+      } else {
+        document.documentElement.removeAttribute("sidebar-expand-on-hover");
+      }
+
       // Record Glean metrics.
       this.recordVisibilitySetting();
       this.recordPositionSetting();
@@ -737,10 +748,13 @@ var SidebarController = {
     if (this._launcherCollapsedWidthStale) {
       this.refreshLauncherCollapsedWidth();
     }
-    document.documentElement.style.setProperty(
-      "--sidebar-launcher-width",
-      `${entry.borderBoxSize[0].inlineSize}px`
-    );
+    const width = entry.borderBoxSize[0].inlineSize;
+    if (this._state.launcherExpanded && width >= 150) {
+      document.documentElement.style.setProperty(
+        "--sidebar-launcher-width",
+        `${width}px`
+      );
+    }
   },
 
   requestMaxWidthUpdate() {
@@ -1661,10 +1675,17 @@ var SidebarController = {
       isDragging = true;
       this._launcherDragging = true;
       startX = e.clientX;
-      startWidth =
+      startWidth = Math.max(
+        150,
         this.sidebarContainer.getBoundingClientRect().width ||
-        this._state.expandedLauncherWidth ||
-        240;
+          this._state.expandedLauncherWidth ||
+          240
+      );
+      if (this.sidebarRevampVisibility === "always-show") {
+        // Without an explicit width, customWidth makes sidebar-main 100% of a
+        // content-sized container, collapsing it to 0 on the first drag.
+        this.sidebarContainer.style.setProperty("width", `${startWidth}px`);
+      }
       try {
         this._launcherSplitter.setPointerCapture(e.pointerId);
       } catch (err) {}
@@ -1696,7 +1717,9 @@ var SidebarController = {
         "--sidebar-expanded-launcher-width",
         `${newWidth}px`
       );
-      this.sidebarContainer.style.setProperty("width", `${newWidth}px`, "important");
+      if (this.sidebarRevampVisibility === "always-show") {
+        this.sidebarContainer.style.setProperty("width", `${newWidth}px`);
+      }
       this._state.expandedLauncherWidth = newWidth;
     };
 
@@ -1714,8 +1737,11 @@ var SidebarController = {
       this.sidebarContainer.removeAttribute("sidebar-launcher-dragging");
       this._state.launcherDragActive = false;
       this.updatePinnedTabsHeightOnResize();
-      if (!this._checkIsHoveredOverLauncher()) {
-        this.onMouseLeave();
+      if (this.sidebarRevampVisibility === "expand-on-hover") {
+        this.sidebarContainer.style.removeProperty("width");
+        if (!this._checkIsHoveredOverLauncher()) {
+          this.onMouseLeave();
+        }
       }
     };
 
@@ -2661,6 +2687,9 @@ var SidebarController = {
   },
 
   onMouseLeave() {
+    if (this.sidebarRevampVisibility !== "expand-on-hover") {
+      return;
+    }
     // Ignore hover changes while animating or while a popup is open; the state
     // is reconciled once the animation settles or the popup closes.
     if (this._activeViewTransition || this._isMenuPopupOpen()) {
@@ -2777,6 +2806,16 @@ var SidebarController = {
       // The launcher expanded again while we were waiting, so what we just
       // measured isn't a collapsed width.
       return;
+    }
+
+    const isVerticalTabs = Services.prefs.getBoolPref(
+      "sidebar.verticalTabs",
+      false
+    );
+    if (isVerticalTabs || collapsedWidth > 50) {
+      const isCompact =
+        document.documentElement.getAttribute("uidensity") === "compact";
+      collapsedWidth = isCompact ? 36 : 42;
     }
 
     browserEl.style.setProperty(
@@ -3033,6 +3072,15 @@ XPCOMUtils.defineLazyPreferenceGetter(
       !SidebarController.inSingleTabWindow &&
       !SidebarController.uninitializing
     ) {
+      if (newValue === "expand-on-hover") {
+        document.documentElement.setAttribute("sidebar-expand-on-hover", "true");
+        SidebarController.sidebarContainer?.style.removeProperty("width");
+        if (SidebarController._state) {
+          SidebarController._state.launcherExpanded = false;
+        }
+      } else {
+        document.documentElement.removeAttribute("sidebar-expand-on-hover");
+      }
       SidebarController.toggleExpandOnHover(newValue === "expand-on-hover");
       SidebarController.recordVisibilitySetting(newValue);
       if (SidebarController._state) {

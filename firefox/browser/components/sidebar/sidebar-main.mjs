@@ -884,6 +884,13 @@ export default class SidebarMain extends MozLitElement {
       "expand-on-hover"
     );
     let next = current === "always-show" ? "expand-on-hover" : "always-show";
+    if (next === "expand-on-hover") {
+      document.documentElement.setAttribute("sidebar-expand-on-hover", "true");
+      let container = document.getElementById("sidebar-container");
+      container?.style.removeProperty("width");
+    } else {
+      document.documentElement.removeAttribute("sidebar-expand-on-hover");
+    }
     Services.prefs.setStringPref("sidebar.visibility", next);
     this.requestUpdate();
   }
@@ -954,10 +961,12 @@ export default class SidebarMain extends MozLitElement {
           <moz-button
             id="sidebar-pin-button"
             class="sidebar-pin-button"
-            type=${this.isPinned ? "icon" : "icon ghost"}
+            type="icon ghost"
             aria-pressed=${this.isPinned}
             title=${this.isPinned ? "Unpin sidebar" : "Pin sidebar"}
-            .iconSrc=${"chrome://browser/skin/pin.svg"}
+            .iconSrc=${this.isPinned
+              ? "chrome://browser/skin/pin-filled.svg"
+              : "chrome://browser/skin/pin.svg"}
             @click=${this.togglePin}
           >
           </moz-button>

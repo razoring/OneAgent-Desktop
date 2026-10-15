@@ -611,7 +611,13 @@ export class SidebarState {
           this.#launcherContainerEl
         ).width;
 
-      if (this.launcherWidth < LAUNCHER_MINIMUM_WIDTH) {
+      if (this.#controller.sidebarRevampVisibility === "always-show") {
+        this.launcherExpanded = true;
+        this.expandedLauncherWidth = Math.max(
+          150,
+          this.launcherWidth || this.#props.expandedLauncherWidth || 240
+        );
+      } else if (this.launcherWidth < LAUNCHER_MINIMUM_WIDTH) {
         // Snap back to collapsed state when the new width is too narrow.
         this.launcherExpanded = false;
         if (this.revampVisibility === "hide-sidebar") {
@@ -728,7 +734,7 @@ export class SidebarState {
     const { document } = this.#controllerGlobal;
     if (!document.documentElement.hasAttribute("inDOMFullscreen")) {
       // Expand the launcher when it gets wide enough.
-      if (this.launcherDragActive) {
+      if (this.launcherDragActive && this.#controller.sidebarRevampVisibility !== "always-show") {
         this.launcherExpanded = width >= LAUNCHER_MINIMUM_WIDTH;
       }
       this.#controller.requestMaxWidthUpdate();
@@ -749,10 +755,14 @@ export class SidebarState {
    * width (if available). If it is collapsed, reset the launcher width.
    */
   #updateLauncherWidth() {
-    if (this.launcherExpanded && this.expandedLauncherWidth) {
+    if (
+      this.launcherExpanded &&
+      this.expandedLauncherWidth &&
+      this.#controller.sidebarRevampVisibility === "always-show"
+    ) {
       this.#launcherContainerEl.style.width = `${this.expandedLauncherWidth}px`;
-    } else if (!this.launcherExpanded) {
-      this.#launcherContainerEl.style.width = "";
+    } else if (!this.launcherExpanded || this.#controller.sidebarRevampVisibility === "expand-on-hover") {
+      this.#launcherContainerEl.style.removeProperty("width");
     }
     this.#launcherEl.toggleAttribute(
       "customWidth",

@@ -518,14 +518,21 @@ menuseparator + #sidebar-extensions-separator {
 
     /* Out of flow overlay when expanded - corners must not be rounded */
     &[sidebar-launcher-expanded] {
-      z-index: var(--browser-area-z-index-sidebar-expand-on-hover);
-      position: absolute;
+      z-index: 50 !important;
+      position: absolute !important;
+      top: 0;
+      bottom: 0;
+      inset-inline-start: 0;
+      inset-inline-end: unset;
       width: var(--sidebar-launcher-width, 240px) !important;
       border-inline-end: 1px solid var(--sidebar-border-color);
       border-radius: 0 !important;
+      overflow: visible !important;
     }
 
     &[sidebar-launcher-expanded][sidebar-positionend] {
+      inset-inline-start: unset;
+      inset-inline-end: 0;
       border-inline-start: 1px solid var(--sidebar-border-color);
       border-inline-end: none;
       border-radius: 0 !important;
@@ -559,7 +566,7 @@ menuseparator + #sidebar-extensions-separator {
     width: 10px;
     box-sizing: border-box;
     cursor: ew-resize !important;
-    z-index: calc(var(--browser-area-z-index-sidebar-expand-on-hover) + 2);
+    z-index: 52 !important;
     background-color: transparent;
     border: none !important;
     pointer-events: auto !important;
@@ -625,11 +632,9 @@ menuseparator + #sidebar-extensions-separator {
       }
     }
 
-    /* Only compensate while the launcher is out of flow. When it's collapsed it
-     * takes up its own width and gap in #browser, so adding the margin here as
-     * well would count the launcher twice. */
+    /* Only compensate while the launcher is out of flow in non-hover mode. */
     @media -moz-pref("browser.nova.enabled") {
-      &[sidebar-launcher-expanded]:not([sidebar-panel-open]) {
+      :root:not([sidebar-expand-on-hover]) &[sidebar-launcher-expanded]:not([sidebar-panel-open]) {
         &:not([sidebar-positionend]) {
           margin-inline-start: var(--sidebar-launcher-collapsed-width);
         }
@@ -695,6 +700,8 @@ menuseparator + #sidebar-extensions-separator {
   display: block !important;
   visibility: visible !important;
   width: 6px;
+  margin-inline-end: -6px;
+  position: relative;
   box-sizing: border-box;
   cursor: ew-resize !important;
   z-index: 10;

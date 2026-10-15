@@ -238,7 +238,5 @@
 }
 
 .sidebar-pin-button[aria-pressed="true"] {
-  background-color: var(--button-background-color-active, rgba(255, 255, 255, 0.15)) !important;
-  color: var(--focus-outline-color) !important;
-  --toolbarbutton-icon-fill: var(--focus-outline-color) !important;
+  --button-background-color-ghost-active: transparent;
 }
