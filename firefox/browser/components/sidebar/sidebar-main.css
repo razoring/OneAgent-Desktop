@@ -39,8 +39,11 @@
       --tab-pinned-horizontal-count: 5;
       /* TODO: These --space-* tokens should use semantic names shared with tabs.css */
       width: var(
-        --sidebar-expanded-launcher-width,
-        calc(var(--tab-pinned-horizontal-count) * var(--tab-pinned-min-width-expanded) + 2 * var(--tab-container-margin-inline-pinned-expanded) + 1px)
+        --sidebar-launcher-width,
+        var(
+          --sidebar-expanded-launcher-width,
+          calc(var(--tab-pinned-horizontal-count) * var(--tab-pinned-min-width-expanded) + 2 * var(--tab-container-margin-inline-pinned-expanded) + 1px)
+        )
       );
     }
 
@@ -215,4 +218,27 @@
 
 .bottom-actions {
   align-self: end;
+}
+
+.sidebar-pin-container {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: var(--space-small);
+  margin-top: auto;
+  box-sizing: border-box;
+}
+
+:host(:not([expanded])) .sidebar-pin-container {
+  display: none !important;
+}
+
+.sidebar-pin-button {
+  --button-border-radius: var(--border-radius-small, 4px);
+}
+
+.sidebar-pin-button[aria-pressed="true"] {
+  background-color: var(--button-background-color-active, rgba(255, 255, 255, 0.15)) !important;
+  color: var(--focus-outline-color) !important;
+  --toolbarbutton-icon-fill: var(--focus-outline-color) !important;
 }

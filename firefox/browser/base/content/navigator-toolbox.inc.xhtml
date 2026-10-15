@@ -103,8 +103,10 @@
            context="toolbar-context-menu"
            align="center">
     <hbox class="titlebar-spacer" type="pre-tabs"/>
-    <image id="titlebar-header-favicon" class="urlbar-icon"/>
-    <label id="titlebar-header-title" crop="end" flex="1"/>
+    <hbox id="titlebar-header-content" align="center">
+      <image id="titlebar-header-favicon" class="urlbar-icon"/>
+      <label id="titlebar-header-title" crop="end"/>
+    </hbox>
     <spacer flex="1"/>
 #include titlebar-items.inc.xhtml
   </toolbar>
@@ -135,6 +137,11 @@
                      data-l10n-id="tabs-toolbar-list-all-tabs-2"
                      closemenu="none"
                      removable="true"/>
+      <toolbarspring cui-areatype="toolbar"
+                   class="chromeclass-toolbar-additional titlebar-spacer"
+                   id="vertical-spacer"
+                   removable="false"
+                   overflows="false"/>
       <toolbarbutton id="back-button" class="toolbarbutton-1 chromeclass-toolbar-additional"
                      data-l10n-id="toolbar-button-back-3"
                      removable="false" overflows="false"
@@ -161,12 +168,6 @@
                        command="Browser:Stop"
                        tooltip="dynamic-shortcut-tooltip"/>
       </toolbaritem>
-      <toolbarspring cui-areatype="toolbar" class="chromeclass-toolbar-additional"/>
-      <toolbarspring cui-areatype="toolbar"
-                   class="chromeclass-toolbar-additional titlebar-spacer"
-                   id="vertical-spacer"
-                   removable="false"
-                   overflows="false"/>
       <toolbaritem id="urlbar-container"
                    class="urlbar-container"
                    removable="false"
@@ -452,7 +453,6 @@
                      overflows="false"
                      removable="false"/>
 
-      <toolbarspring cui-areatype="toolbar" class="chromeclass-toolbar-additional"/>
 
       <toolbarbutton id="downloads-button"
                      class="toolbarbutton-1 chromeclass-toolbar-additional"

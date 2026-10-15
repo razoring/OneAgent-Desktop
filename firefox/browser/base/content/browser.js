@@ -5276,6 +5276,7 @@ var FirefoxViewHandler = {
 
 var TitleBarHeader = {
   _pref: "browser.titlebar.header.enabled",
+  _verticalPref: "sidebar.verticalTabs",
   _initialized: false,
 
   init() {
@@ -5285,6 +5286,8 @@ var TitleBarHeader = {
     this._initialized = true;
 
     Services.prefs.addObserver(this._pref, this);
+    Services.prefs.addObserver(this._verticalPref, this);
+    Services.obs.addObserver(this, "tabstrip-orientation-change");
     this.updateVisibility();
     this.updateContent();
 
@@ -5302,21 +5305,45 @@ var TitleBarHeader = {
   },
 
   observe(subject, topic, data) {
-    if (data === this._pref) {
-      this.updateVisibility();
+    if (
+      data === this._pref ||
+      data === this._verticalPref ||
+      topic === "tabstrip-orientation-change"
+    ) {
+      let isVertical =
+        (topic === "tabstrip-orientation-change" && subject?.isVertical !== undefined)
+          ? subject.isVertical
+          : Services.prefs.getBoolPref(this._verticalPref, false);
+      this.updateVisibility(isVertical);
+      // Run once more after layout has settled
+      window.requestAnimationFrame(() => this.updateVisibility());
     }
   },
 
   toggle() {
+    let isVertical =
+      Services.prefs.getBoolPref(this._verticalPref, false) ||
+      !!window.gBrowser?.tabContainer?.verticalMode;
+    if (!isVertical) {
+      return;
+    }
     let current = Services.prefs.getBoolPref(this._pref, true);
     Services.prefs.setBoolPref(this._pref, !current);
   },
 
-  updateVisibility() {
-    let enabled = Services.prefs.getBoolPref(this._pref, true);
+  updateVisibility(overrideIsVertical) {
+    let isVertical =
+      overrideIsVertical !== undefined
+        ? !!overrideIsVertical
+        : (Services.prefs.getBoolPref(this._verticalPref, false) ||
+           !!window.gBrowser?.tabContainer?.verticalMode);
+    let enabled = isVertical && Services.prefs.getBoolPref(this._pref, true);
     let bar = document.getElementById("titlebar-header");
     if (bar) {
       bar.collapsed = !enabled;
+      if (enabled) {
+        this.updateContent();
+      }
       if (window.TabBarVisibility) {
         window.TabBarVisibility.update();
       }

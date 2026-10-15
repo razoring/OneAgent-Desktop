@@ -597,6 +597,17 @@ var SidebarController = {
         this._splitter.addEventListener("command", this._browserResizeObserver);
       }
       this._enablePinnedTabsSplitterDragging();
+      this._enableLauncherDragging();
+
+      const initialLauncherWidth = this._state.expandedLauncherWidth || 240;
+      document.documentElement.style.setProperty(
+        "--sidebar-launcher-width",
+        `${initialLauncherWidth}px`
+      );
+      document.documentElement.style.setProperty(
+        "--sidebar-expanded-launcher-width",
+        `${initialLauncherWidth}px`
+      );
 
       // Record Glean metrics.
       this.recordVisibilitySetting();
@@ -1632,25 +1643,97 @@ var SidebarController = {
    * Enable the splitter which can be used to resize the launcher.
    */
   _enableLauncherDragging() {
-    if (this._launcherDropHandler) {
-      // Already set up observers and handler.
+    if (this._launcherPointerDownHandler) {
       return;
     }
-    if (!this._panelResizeObserver) {
-      this._panelResizeObserver = new ResizeObserver(
-        ([entry]) =>
-          (this._state.panelWidth = entry.borderBoxSize[0].inlineSize)
-      );
-    }
-    this._panelResizeObserver.observe(this._box);
+    let isDragging = false;
+    let startX = 0;
+    let startWidth = 0;
 
-    this._launcherDropHandler = () => {
+    this._launcherPointerDownHandler = e => {
+      if (
+        e.button !== 0 ||
+        (!this._state?.launcherExpanded &&
+          !this.sidebarContainer?.hasAttribute("sidebar-launcher-expanded"))
+      ) {
+        return;
+      }
+      isDragging = true;
+      this._launcherDragging = true;
+      startX = e.clientX;
+      startWidth =
+        this.sidebarContainer.getBoundingClientRect().width ||
+        this._state.expandedLauncherWidth ||
+        240;
+      try {
+        this._launcherSplitter.setPointerCapture(e.pointerId);
+      } catch (err) {}
+      this._launcherSplitter.setAttribute("state", "dragging");
+      document.documentElement.setAttribute("sidebar-launcher-dragging", "true");
+      this.sidebarContainer.setAttribute("sidebar-launcher-dragging", "true");
+      this._state.launcherDragActive = true;
+      e.preventDefault();
+      e.stopPropagation();
+    };
+
+    this._launcherPointerMoveHandler = e => {
+      if (!isDragging) {
+        return;
+      }
+      const atStart = !document.documentElement.hasAttribute(
+        "sidebar-positionend"
+      );
+      const delta = atStart ? e.clientX - startX : startX - e.clientX;
+      const newWidth = Math.max(
+        150,
+        Math.min(600, Math.round(startWidth + delta))
+      );
+      document.documentElement.style.setProperty(
+        "--sidebar-launcher-width",
+        `${newWidth}px`
+      );
+      document.documentElement.style.setProperty(
+        "--sidebar-expanded-launcher-width",
+        `${newWidth}px`
+      );
+      this.sidebarContainer.style.setProperty("width", `${newWidth}px`, "important");
+      this._state.expandedLauncherWidth = newWidth;
+    };
+
+    this._launcherPointerUpHandler = e => {
+      if (!isDragging) {
+        return;
+      }
+      isDragging = false;
+      this._launcherDragging = false;
+      try {
+        this._launcherSplitter.releasePointerCapture(e.pointerId);
+      } catch (err) {}
+      this._launcherSplitter.removeAttribute("state");
+      document.documentElement.removeAttribute("sidebar-launcher-dragging");
+      this.sidebarContainer.removeAttribute("sidebar-launcher-dragging");
       this._state.launcherDragActive = false;
       this.updatePinnedTabsHeightOnResize();
+      if (!this._checkIsHoveredOverLauncher()) {
+        this.onMouseLeave();
+      }
     };
+
     this._launcherSplitter.addEventListener(
-      "command",
-      this._launcherDropHandler
+      "pointerdown",
+      this._launcherPointerDownHandler
+    );
+    window.addEventListener(
+      "pointermove",
+      this._launcherPointerMoveHandler
+    );
+    window.addEventListener(
+      "pointerup",
+      this._launcherPointerUpHandler
+    );
+    window.addEventListener(
+      "pointercancel",
+      this._launcherPointerUpHandler
     );
   },
 
@@ -1703,14 +1786,28 @@ var SidebarController = {
    * Disable the launcher splitter and remove any active observers.
    */
   _disableLauncherDragging() {
-    if (this._panelResizeObserver) {
-      this._panelResizeObserver.disconnect();
+    if (this._launcherPointerDownHandler) {
+      this._launcherSplitter.removeEventListener(
+        "pointerdown",
+        this._launcherPointerDownHandler
+      );
+      window.removeEventListener(
+        "pointermove",
+        this._launcherPointerMoveHandler
+      );
+      window.removeEventListener(
+        "pointerup",
+        this._launcherPointerUpHandler
+      );
+      window.removeEventListener(
+        "pointercancel",
+        this._launcherPointerUpHandler
+      );
+      delete this._launcherPointerDownHandler;
+      delete this._launcherPointerMoveHandler;
+      delete this._launcherPointerUpHandler;
+      this._launcherDragging = false;
     }
-    this._launcherSplitter.removeEventListener(
-      "command",
-      this._launcherDropHandler
-    );
-    delete this._launcherDropHandler;
   },
 
   /**
@@ -2569,7 +2666,11 @@ var SidebarController = {
     if (this._activeViewTransition || this._isMenuPopupOpen()) {
       return;
     }
-    if (this.isLauncherDragging || this._state?.launcherDragActive) {
+    if (
+      this.isLauncherDragging ||
+      this._launcherDragging ||
+      this._state?.launcherDragActive
+    ) {
       return;
     }
     if (this._escapedWhileHovered) {
@@ -2584,6 +2685,7 @@ var SidebarController = {
         if (
           !this._checkIsHoveredOverLauncher() &&
           !this.isLauncherDragging &&
+          !this._launcherDragging &&
           !this._state?.launcherDragActive &&
           !this._isMenuPopupOpen()
         ) {

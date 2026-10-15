@@ -264,16 +264,20 @@ export var ToolbarContextMenu = {
       "toolbar-context-toggle-title-bar"
     );
     if (toggleTitleBarItem) {
-      let titleBarEnabled = Services.prefs.getBoolPref(
-        "browser.titlebar.header.enabled",
-        true
-      );
-      document.l10n.setAttributes(
-        toggleTitleBarItem,
-        titleBarEnabled
-          ? "toolbar-context-turn-off-title-bar"
-          : "toolbar-context-turn-on-title-bar"
-      );
+      let isVertical = !!gBrowser.tabContainer?.verticalMode;
+      toggleTitleBarItem.hidden = !isVertical;
+      if (isVertical) {
+        let titleBarEnabled = Services.prefs.getBoolPref(
+          "browser.titlebar.header.enabled",
+          true
+        );
+        document.l10n.setAttributes(
+          toggleTitleBarItem,
+          titleBarEnabled
+            ? "toolbar-context-turn-off-title-bar"
+            : "toolbar-context-turn-on-title-bar"
+        );
+      }
     }
     let customizeSidebarItem = document.getElementById(
       "toolbar-context-customize-sidebar"

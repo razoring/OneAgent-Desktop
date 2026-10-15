@@ -150,6 +150,14 @@ export default class SidebarMain extends MozLitElement {
     this.setCustomize();
     this.createSplitter();
     this.createToolsObservers();
+
+    this._onVisibilityPrefChange = () => {
+      this.requestUpdate();
+    };
+    Services.prefs.addObserver(
+      "sidebar.visibility",
+      this._onVisibilityPrefChange
+    );
   }
 
   disconnectedCallback() {
@@ -163,6 +171,13 @@ export default class SidebarMain extends MozLitElement {
     this._toolsOverflowMenu.removeEventListener("popuphidden", this);
 
     window.removeEventListener("SidebarItemAdded", this);
+
+    if (this._onVisibilityPrefChange) {
+      Services.prefs.removeObserver(
+        "sidebar.visibility",
+        this._onVisibilityPrefChange
+      );
+    }
     window.removeEventListener("SidebarItemChanged", this);
     window.removeEventListener("SidebarItemRemoved", this);
 
@@ -855,6 +870,24 @@ export default class SidebarMain extends MozLitElement {
     return container && !container.hidden;
   }
 
+  get isPinned() {
+    return (
+      Services.prefs.getStringPref("sidebar.visibility", "expand-on-hover") ===
+      "always-show"
+    );
+  }
+
+  togglePin(e) {
+    e?.stopPropagation();
+    let current = Services.prefs.getStringPref(
+      "sidebar.visibility",
+      "expand-on-hover"
+    );
+    let next = current === "always-show" ? "expand-on-hover" : "always-show";
+    Services.prefs.setStringPref("sidebar.visibility", next);
+    this.requestUpdate();
+  }
+
   render() {
     /* Add 1 to tools and extensions count for "Customize sidebar" option */
     let enabledToolsAndExtensionsCount =
@@ -917,6 +950,18 @@ export default class SidebarMain extends MozLitElement {
             </div>
           `
         )}
+        <div class="sidebar-pin-container">
+          <moz-button
+            id="sidebar-pin-button"
+            class="sidebar-pin-button"
+            type=${this.isPinned ? "icon" : "icon ghost"}
+            aria-pressed=${this.isPinned}
+            title=${this.isPinned ? "Unpin sidebar" : "Pin sidebar"}
+            .iconSrc=${"chrome://browser/skin/pin.svg"}
+            @click=${this.togglePin}
+          >
+          </moz-button>
+        </div>
       </div>
     `;
   }

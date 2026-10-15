@@ -48,9 +48,11 @@ body {
      drag space, and the sidebar button. */
   --window-min-width-increase-for-vertical-tabs: calc(var(--window-controls-size) + 23px);
   --window-controls-size: 138px;
+
   @media (-moz-platform: macos) {
     --window-controls-size: 76px;
   }
+
   @media (-moz-platform: linux) {
     /* FIXME: Use --titlebar-button-* variables to calculate the window
               controls' size. */
@@ -169,6 +171,7 @@ body {
 
   --inactive-window-transition: 0.2s ease;
   --inactive-titlebar-opacity: var(--opacity-deemphasized-strong);
+
   /**
    * On macOS and Linux, fading the whole titlebar is the native behavior.
    *
@@ -180,6 +183,7 @@ body {
   @media (-moz-platform: windows) {
     --inactive-titlebar-opacity: 0.75;
   }
+
   @media (prefers-reduced-motion) {
     --inactive-window-transition: 0s;
   }
@@ -191,15 +195,19 @@ body {
   }
 
   --window-border-radius: 10px;
+
   @media (-moz-platform: linux) {
     --window-border-radius: env(-moz-gtk-csd-titlebar-radius);
   }
+
   @media (-moz-platform: windows) {
     --window-border-radius: 4px;
   }
+
   @media (-moz-windows-mica) {
     --window-border-radius: 8px;
   }
+
   @media (-moz-mac-tahoe-theme) {
     --window-border-radius: 16px;
   }
@@ -284,7 +292,7 @@ body {
  * keeps the window's full height throughout, so while the bar is up its last
  * few rows sit below the bottom of the window. */
 :root[mini-window] {
-  #navigator-toolbox:is(.mini-window-revealed, :hover, :focus-within:not(:-moz-window-inactive)) ~ #browser {
+  #navigator-toolbox:is(.mini-window-revealed, :hover, :focus-within:not(:-moz-window-inactive))~#browser {
     /* 0 until the bar has been measured, which happens before it is first revealed. */
     transform: translateY(var(--mini-window-toolbar-height, 0));
   }
@@ -336,6 +344,7 @@ body {
   }
 
   @media (-moz-platform: macos) and (-moz-native-theme) {
+
     /* This is conceptually a background, but putting this on a pseudo-element
      * avoids it from suppressing the chrome-content separator border, etc.
      *
@@ -379,6 +388,7 @@ body {
   border-style: none;
   background-color: transparent;
   color: inherit;
+
   &:not(.browser-titlebar) {
     background-color: var(--toolbar-background-color);
     color: var(--toolbar-text-color);
@@ -416,7 +426,7 @@ body {
     }
   }
 
-  #toolbar-menubar[autohide]:not([inactive]) ~ :is(#TabsToolbar, #nav-bar) > & {
+  #toolbar-menubar[autohide]:not([inactive])~ :is(#TabsToolbar, #nav-bar)>& {
     visibility: hidden;
   }
 
@@ -442,6 +452,7 @@ body {
   }
 
   @media (-moz-platform: linux) and (-moz-gtk-csd-reversed-placement: 0) {
+
     :root:not([sizemode="normal"]) &[type="pre-tabs"],
     :root[tiled] &[type="pre-tabs"] {
       display: none;
@@ -449,6 +460,7 @@ body {
   }
 
   @media (-moz-gtk-csd-reversed-placement) {
+
     :root:not([sizemode="normal"]) &[type="post-tabs"],
     :root[tiled] &[type="post-tabs"] {
       display: none;
@@ -471,50 +483,75 @@ body {
 /* Hide the TabsToolbar/titlebar-header/nav-bar titlebar controls if the menubar is permanently shown.
  * (That is, if the menu bar doesn't autohide, and we're not in a fullscreen or
  * popup window.) */
-:root:not([popup-window], [inFullscreen], [taskbartab])
-  #toolbar-menubar:not([autohide], [collapsed])
-  ~ :is(#TabsToolbar, #titlebar-header, #nav-bar)
-  > :is(.titlebar-buttonbox-container, .titlebar-spacer) {
+:root:not([popup-window], [inFullscreen], [taskbartab]) #toolbar-menubar:not([autohide], [collapsed])~ :is(#TabsToolbar, #titlebar-header, #nav-bar)> :is(.titlebar-buttonbox-container, .titlebar-spacer) {
   display: none;
 }
 
 /* Only show the titlebar buttons and spacers in the first visible toolbar. */
-#navigator-toolbox:not([tabs-hidden]) > :is(#titlebar-header, #nav-bar) > :is(.titlebar-buttonbox-container, .titlebar-spacer) {
+#navigator-toolbox:not([tabs-hidden])> :is(#titlebar-header, #nav-bar)> :is(.titlebar-buttonbox-container, .titlebar-spacer) {
   display: none;
 }
 
-#titlebar-header:not([collapsed]) ~ #nav-bar > :is(.titlebar-buttonbox-container, .titlebar-spacer) {
+#titlebar-header:not([collapsed])~#nav-bar> :is(.titlebar-buttonbox-container, .titlebar-spacer) {
   display: none;
+}
+
+/* Titlebar header is only for vertical tabs (when tabstrip is hidden). */
+#navigator-toolbox:not([tabs-hidden]) > #titlebar-header {
+  display: none !important;
 }
 
 #titlebar-header {
+  position: relative;
   min-height: 30px;
   max-height: 34px;
   padding-inline: 8px;
   gap: 8px;
   -moz-window-dragging: drag;
+  display: flex !important;
+  align-items: center;
 
   &[collapsed] {
     display: none !important;
   }
+}
 
-  #titlebar-header-favicon {
-    width: 16px;
-    height: 16px;
-    pointer-events: none;
-    -moz-context-properties: fill;
-    fill: currentColor;
-  }
+#titlebar-header-content {
+  position: absolute;
+  inset: 0;
+  margin-inline: auto;
+  margin-block: auto;
+  width: max-content;
+  max-width: calc(100vw - 320px);
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  pointer-events: none;
+  z-index: 1;
+}
 
-  #titlebar-header-title {
-    margin: 0;
-    padding: 0;
-    font-size: 12px;
-    font-weight: 500;
-    pointer-events: none;
-    user-select: none;
-    opacity: 0.85;
-  }
+#titlebar-header-favicon {
+  width: 16px;
+  height: 16px;
+  pointer-events: none;
+  -moz-context-properties: fill;
+  fill: currentColor;
+  flex-shrink: 0;
+}
+
+#titlebar-header-title {
+  margin: 0;
+  padding: 0;
+  font-size: 12px;
+  font-weight: 500;
+  pointer-events: none;
+  user-select: none;
+  opacity: 0.85;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
 }
 
 :root:not([sizemode="maximized"], [sizemode="fullscreen"]) .titlebar-restore,
@@ -545,14 +582,13 @@ body {
  * it keeps only back/forward/reload, the address bar, and the two mini-window
  * controls. Everything else in the bar goes. */
 :root[mini-window] {
-  .chromeclass-toolbar-additional:not(
-    #back-button,
+
+  .chromeclass-toolbar-additional:not(#back-button,
     #forward-button,
     #stop-reload-button,
     #mini-window-audio-button,
     #mini-window-restore-button,
-    #mini-window-close-button
-  ) {
+    #mini-window-close-button) {
     display: none;
   }
 
@@ -581,14 +617,15 @@ body {
        as tall as the tab toolbar such that the window controls don't appear to move up.
        For MacOS, autohide is never true on the menubar.
     */
-    :root[customtitlebar] #navigator-toolbox:not([tabs-hidden]) > & {
+    :root[customtitlebar] #navigator-toolbox:not([tabs-hidden])>& {
       /* --tabstrip-min-height is defined in tabs.css, which stylelint doesn't know about. */
       /* stylelint-disable-next-line stylelint-plugin-mozilla/use-design-tokens */
       min-height: var(--tabstrip-min-height);
     }
+
     /* adjust the height of the auto-hiding toolbar menubar when the tabstrip is
        hidden and we need to match the height of the nav-bar. */
-    :root[customtitlebar] #navigator-toolbox[tabs-hidden] > & {
+    :root[customtitlebar] #navigator-toolbox[tabs-hidden]>& {
       /* urlbar variables will be tokenized, see bug 2017983 */
       /* stylelint-disable-next-line stylelint-plugin-mozilla/use-design-tokens */
       min-height: calc(var(--urlbar-height) + 2 * var(--urlbar-padding-block));
@@ -632,7 +669,7 @@ body {
   /* stylelint-disable-next-line stylelint-plugin-mozilla/use-design-tokens */
   border-top: 0.01px var(--tabs-navbar-separator-style) var(--tabs-navbar-separator-color);
 
-  #navigator-toolbox[tabs-hidden] > & {
+  #navigator-toolbox[tabs-hidden]>& {
     border-top-style: none;
   }
 
@@ -653,7 +690,7 @@ body {
 
   /* Add space to beginning of toolbar and make that space click the first <toolbarbutton> */
   > :is(toolbarbutton, toolbaritem):first-child,
-  > toolbarpaletteitem:first-child > :is(toolbarbutton, toolbaritem) {
+  >toolbarpaletteitem:first-child> :is(toolbarbutton, toolbaritem) {
     padding-inline-start: var(--toolbar-padding-inline);
   }
 }
@@ -661,7 +698,10 @@ body {
 #vertical-spacer {
   /* Spacer widths are specific and shouldn't change if underlying token sizes change. */
   /* stylelint-disable-next-line stylelint-plugin-mozilla/use-design-tokens */
+  width: 20px;
   min-width: 20px;
+  max-width: 20px;
+  flex: none !important;
 
   @media not -moz-pref("sidebar.verticalTabs") {
     display: none;
@@ -715,7 +755,7 @@ body {
   /* Bookmarks toolbar empty message */
 
   /* If the toolbar is not initialized set a zero width, but retain height. */
-  &:not([collapsed], [initialized]) > #personal-toolbar-empty {
+  &:not([collapsed], [initialized])>#personal-toolbar-empty {
     visibility: hidden;
     width: 0;
     overflow-x: hidden;
@@ -742,8 +782,8 @@ body {
 }
 
 #fxms-bmb-button-wrapper,
-toolbarpaletteitem > #personal-bookmarks > #PlacesToolbar,
-#personal-bookmarks:is([overflowedItem="true"], [cui-areatype="panel"]) > #PlacesToolbar {
+toolbarpaletteitem>#personal-bookmarks>#PlacesToolbar,
+#personal-bookmarks:is([overflowedItem="true"], [cui-areatype="panel"])>#PlacesToolbar {
   display: none;
 }
 
@@ -782,14 +822,15 @@ notification-message img.inline-icon {
 }
 
 .bookmark-item[cutting] {
-  > .toolbarbutton-icon,
-  > .menu-icon {
+
+  >.toolbarbutton-icon,
+  >.menu-icon {
     /* stylelint-disable-next-line stylelint-plugin-mozilla/use-design-tokens -- to be addressed in 2033919 */
     opacity: 0.5;
   }
 
-  > .toolbarbutton-text,
-  > .menu-text {
+  >.toolbarbutton-text,
+  >.menu-text {
     /* stylelint-disable-next-line stylelint-plugin-mozilla/use-design-tokens -- to be addressed in 2033919 */
     opacity: 0.7;
   }
@@ -842,7 +883,7 @@ menupopup::part(drop-indicator) {
 
 /* Find bar */
 
-.browserContainer > findbar {
+.browserContainer>findbar {
   background-color: var(--toolbar-background-color);
   color: var(--toolbar-text-color);
   color-scheme: var(--toolbar-color-scheme);
@@ -851,7 +892,8 @@ menupopup::part(drop-indicator) {
   border-top-color: var(--chrome-content-separator-color);
 
   :root[lwtheme] & {
-    background-color: var(--lwt-accent-color); /* Known opaque */
+    background-color: var(--lwt-accent-color);
+    /* Known opaque */
     background-image: image(var(--toolbar-background-color)), var(--toolbox-background-image);
     background-repeat: no-repeat, var(--toolbox-background-repeat);
     /* stylelint-disable-next-line stylelint-plugin-mozilla/use-design-tokens */
@@ -875,16 +917,16 @@ menupopup::part(drop-indicator) {
   margin-inline: var(--space-small);
 
   :root:not([privatebrowsingmode="temporary"]) &,
-  #navigator-toolbox:not([tabs-hidden]) #nav-bar > & {
+  #navigator-toolbox:not([tabs-hidden]) #nav-bar>& {
     display: none;
   }
 
-  #navigator-toolbox[tabs-hidden] #nav-bar > & {
+  #navigator-toolbox[tabs-hidden] #nav-bar>& {
     margin-inline-end: var(--space-medium);
 
     /* Hide the private browsing indicator
     label when vertical tabs are enabled */
-    > .private-browsing-indicator-label {
+    >.private-browsing-indicator-label {
       display: none;
     }
   }
@@ -915,7 +957,7 @@ menupopup::part(drop-indicator) {
   }
 
   :root:not([privatebrowsingmode="temporary"]) &,
-  #navigator-toolbox:not([tabs-hidden]) #nav-bar > & {
+  #navigator-toolbox:not([tabs-hidden]) #nav-bar>& {
     display: none;
   }
 
@@ -923,7 +965,7 @@ menupopup::part(drop-indicator) {
     display: none;
   }
 
-  > .toolbarbutton-icon {
+  >.toolbarbutton-icon {
     padding: var(--toolbarbutton-padding-inner);
     /* The logo circle uses context-fill; set it here so it isn't washed out by
        the toolbar's default icon fill. */
@@ -934,12 +976,12 @@ menupopup::part(drop-indicator) {
     fill: #7338e2;
   }
 
-  &:is(:hover, [open]) > .toolbarbutton-icon {
+  &:is(:hover, [open])>.toolbarbutton-icon {
     /* stylelint-disable-next-line stylelint-plugin-mozilla/use-design-tokens */
     stroke: var(--border-color-interactive-hover);
   }
 
-  &:is(:hover:active, [open]) > .toolbarbutton-icon {
+  &:is(:hover:active, [open])>.toolbarbutton-icon {
     /* stylelint-disable-next-line stylelint-plugin-mozilla/use-design-tokens */
     stroke: var(--border-color-interactive-active);
   }
@@ -976,11 +1018,12 @@ menupopup::part(drop-indicator) {
     font-size: var(--font-size-root);
   }
 
-  .private-browsing-info-description > a {
+  .private-browsing-info-description>a {
     display: inline-block;
     margin-block-start: var(--space-xsmall);
 
     @media not (forced-colors) {
+
       /* Increase link text contrast in this specific panel for the in-app
          private window theme until it's possible to customize that value
          in a theme manifest. */
@@ -993,8 +1036,9 @@ menupopup::part(drop-indicator) {
 
 /* Content analysis indicator */
 .content-analysis-indicator {
+
   :root:not([contentanalysisactive]) &,
-  #navigator-toolbox:not([tabs-hidden]) > #nav-bar > & {
+  #navigator-toolbox:not([tabs-hidden])>#nav-bar>& {
     display: none;
   }
 }
@@ -1004,7 +1048,8 @@ menupopup::part(drop-indicator) {
 .screenshotsPagePanel {
   position: relative;
   max-height: 0;
-  z-index: var(--browser-stack-z-index-screenshots-panel); /* Above the web content in this stack. */
+  z-index: var(--browser-stack-z-index-screenshots-panel);
+  /* Above the web content in this stack. */
 }
 
 #widget-overflow .webextension-popup-browser {
@@ -1076,7 +1121,7 @@ menupopup::part(drop-indicator) {
   word-break: break-word;
   unicode-bidi: plaintext;
 
-  > description {
+  >description {
     max-width: var(--size-layout-medium);
   }
 }
@@ -1135,11 +1180,11 @@ menupopup::part(drop-indicator) {
 #sharing-tabs-warning-panel {
   max-width: var(--size-layout-large);
 
-  > hbox[type="window"] > vbox > label > #sharing-warning-screen-panel-header {
+  >hbox[type="window"]>vbox>label>#sharing-warning-screen-panel-header {
     display: none;
   }
 
-  > hbox[type="screen"] > vbox > label > #sharing-warning-window-panel-header {
+  >hbox[type="screen"]>vbox>label>#sharing-warning-window-panel-header {
     display: none;
   }
 }
@@ -1168,7 +1213,7 @@ menupopup::part(drop-indicator) {
   display: flex;
   align-items: center;
 
-  > menulist {
+  >menulist {
     flex: 1;
     min-width: 0;
   }
@@ -1237,7 +1282,7 @@ popupnotificationcontent {
   font-weight: var(--font-weight-semibold);
   margin-top: 0;
 
-  > b {
+  >b {
     font-weight: inherit;
   }
 }
@@ -1269,22 +1314,22 @@ popupnotificationcontent {
   /* stylelint-disable-next-line stylelint-plugin-mozilla/use-design-tokens */
   font-size: 2em;
 
-  > div:nth-of-type(1) {
+  >div:nth-of-type(1) {
     width: var(--icon-size-xlarge);
     height: var(--icon-size-xlarge);
     background-image: url("chrome://browser/content/logos/relay.svg");
     background-repeat: no-repeat;
   }
 
-  > div:nth-of-type(2) {
+  >div:nth-of-type(2) {
     direction: ltr;
     margin-inline: var(--space-small);
 
-    > span:first-of-type {
+    >span:first-of-type {
       font-weight: var(--font-weight-bold);
     }
 
-    > span:last-of-type {
+    >span:last-of-type {
       font-weight: normal;
     }
   }
@@ -1299,19 +1344,19 @@ popupnotificationcontent {
   font-size: 1.5em;
   margin: auto;
 
-  > p {
+  >p {
     margin-block: auto;
   }
 }
 
-.popup-notification-description[popupid="relay-integration-offer-notification"] > div:first-of-type {
+.popup-notification-description[popupid="relay-integration-offer-notification"]>div:first-of-type {
   font-weight: normal;
   display: grid;
   grid-template-columns: auto;
   grid-template-rows: auto auto auto auto;
 }
 
-#relay-integration-reuse-masks-notification > popupnotificationcontent > div {
+#relay-integration-reuse-masks-notification>popupnotificationcontent>div {
   font-weight: normal;
   display: grid;
   grid-template-columns: auto;
@@ -1322,14 +1367,14 @@ popupnotificationcontent {
   display: flex;
   flex-direction: column;
 
-  > button {
+  >button {
     padding: var(--space-xsmall);
     margin: var(--space-xsmall);
     display: flex;
     flex-direction: row;
     justify-content: space-between;
 
-    > span:first-child {
+    >span:first-child {
       margin-inline-end: var(--space-xlarge);
       overflow: hidden;
       text-overflow: ellipsis;
@@ -1338,7 +1383,7 @@ popupnotificationcontent {
       flex: 1;
     }
 
-    > span:last-child {
+    >span:last-child {
       opacity: var(--opacity-deemphasized-strong);
       flex-shrink: 0;
     }
@@ -1349,7 +1394,7 @@ popupnotificationcontent {
   .reusable-relay-masks {
     gap: var(--space-small);
 
-    > button {
+    >button {
       padding: var(--space-xsmall) var(--space-medium);
       margin: 0;
       align-items: center;
@@ -1385,7 +1430,7 @@ popupnotificationcontent {
     --swipe-nav-icon-accent-color: light-dark(white, black);
   }
 
-  > svg {
+  >svg {
     margin: auto 0;
   }
 }
@@ -1402,6 +1447,7 @@ popupnotificationcontent {
 }
 
 @media not (-moz-platform: macos) {
+
   /*
    * Styles for the swipe navigation SVG icon.
    *
@@ -1414,7 +1460,7 @@ popupnotificationcontent {
     fill: var(--swipe-nav-icon-accent-color);
     stroke: var(--swipe-nav-icon-primary-color);
 
-    .will-navigate > & {
+    .will-navigate>& {
       fill: var(--swipe-nav-icon-primary-color);
     }
   }
@@ -1423,10 +1469,11 @@ popupnotificationcontent {
     fill: var(--swipe-nav-icon-primary-color);
     stroke: var(--swipe-nav-icon-primary-color);
     transition: opacity 1s;
-    will-change: opacity; /* a workaround for bug 1804189 */
+    will-change: opacity;
+    /* a workaround for bug 1804189 */
     opacity: 0;
 
-    .will-navigate > & {
+    .will-navigate>& {
       transition-delay: 0.2s;
       /* stylelint-disable-next-line stylelint-plugin-mozilla/use-design-tokens -- to be addressed in 2033919 */
       opacity: 0.2;
@@ -1436,7 +1483,7 @@ popupnotificationcontent {
   .swipe-nav-icon-arrow {
     fill: var(--swipe-nav-icon-primary-color);
 
-    .will-navigate > & {
+    .will-navigate>& {
       fill: var(--swipe-nav-icon-accent-color);
       stroke: var(--swipe-nav-icon-accent-color);
     }
@@ -1444,6 +1491,7 @@ popupnotificationcontent {
 }
 
 @media (-moz-platform: macos) {
+
   /*
    * Styles for the swipe navigation SVG icon.
    *
@@ -1455,7 +1503,7 @@ popupnotificationcontent {
   .swipe-nav-icon-arrow {
     fill: var(--swipe-nav-icon-primary-color);
 
-    .will-navigate > & {
+    .will-navigate>& {
       fill: var(--swipe-nav-icon-accent-color);
     }
   }
@@ -1463,7 +1511,7 @@ popupnotificationcontent {
   .swipe-nav-icon-circle {
     fill: var(--swipe-nav-icon-accent-color);
 
-    .will-navigate > & {
+    .will-navigate>& {
       fill: var(--swipe-nav-icon-primary-color);
     }
   }
@@ -1495,16 +1543,17 @@ popupnotificationcontent {
   /* Add a border to the logo, but only outside of HCM so it's still consistent with the other buttons there */
   @media -moz-pref("browser.nova.enabled") and (not (forced-colors)) {
     &[cui-areatype="toolbar"]:not([overflowedItem]) {
-      > .toolbarbutton-badge-stack {
+      >.toolbarbutton-badge-stack {
         padding: var(--toolbarbutton-padding-inner-touch-narrow);
       }
 
-      &:not(:hover, [open="true"]) > .toolbarbutton-badge-stack::before {
+      &:not(:hover, [open="true"])>.toolbarbutton-badge-stack::before {
         display: block;
         position: absolute;
         content: "";
         /* stylelint-disable-next-line stylelint-plugin-mozilla/use-design-tokens */
-        inset: calc((100% - 26px) / 2); /* 26px is the expected width of this pseudo element */
+        inset: calc((100% - 26px) / 2);
+        /* 26px is the expected width of this pseudo element */
         /* stylelint-disable-next-line stylelint-plugin-mozilla/use-design-tokens */
         border: var(--border-width) solid var(--toolbarbutton-background-color-hover);
         border-radius: var(--border-radius-circle);
@@ -1513,7 +1562,7 @@ popupnotificationcontent {
   }
 
   @media not -moz-pref("browser.nova.enabled") {
-    &[cui-areatype="toolbar"]:not([overflowedItem]) > .toolbarbutton-badge-stack {
+    &[cui-areatype="toolbar"]:not([overflowedItem])>.toolbarbutton-badge-stack {
       /* The design system does not have any inset box-shadow tokens. */
       /* stylelint-disable-next-line stylelint-plugin-mozilla/use-design-tokens */
       box-shadow: 0 0 16px 4px var(--box-shadow-color-darker-layer-1) inset;
@@ -1538,14 +1587,10 @@ popupnotificationcontent {
 
 #ai-window-switch-classic,
 #ai-window-switch-ai {
-  --button-background-color-ghost-active: light-dark(
-    color-mix(in srgb, var(--color-violet-desaturated-60) 30%, transparent),
-    color-mix(in srgb, var(--color-violet-desaturated-40) 36%, transparent)
-  );
-  --button-background-color-ghost-hover: light-dark(
-    color-mix(in srgb, var(--color-violet-desaturated-60) 16%, transparent),
-    color-mix(in srgb, var(--color-violet-desaturated-40) 24%, transparent)
-  );
+  --button-background-color-ghost-active: light-dark(color-mix(in srgb, var(--color-violet-desaturated-60) 30%, transparent),
+      color-mix(in srgb, var(--color-violet-desaturated-40) 36%, transparent));
+  --button-background-color-ghost-hover: light-dark(color-mix(in srgb, var(--color-violet-desaturated-60) 16%, transparent),
+      color-mix(in srgb, var(--color-violet-desaturated-40) 24%, transparent));
 
   moz-badge {
     margin-inline-start: var(--space-medium);
@@ -1614,14 +1659,14 @@ popupnotificationcontent {
   }
 
   @media not -moz-pref("browser.nova.enabled") {
-    > .toolbarbutton-icon {
+    >.toolbarbutton-icon {
       /* Smart Window icon has additional 0.125rem padding per side, to be slightly smaller than Classic Window icon when used in Switcher */
       padding: var(--space-xxsmall);
     }
   }
 }
 
-#appMenu-new-ai-window-button > moz-badge {
+#appMenu-new-ai-window-button>moz-badge {
   margin-inline-start: auto;
 }
 
@@ -1640,7 +1685,7 @@ popupnotificationcontent {
   }
 
   #urlbar-container,
-  #nav-bar-customization-target > *:not(#sidebar-button, #ai-window-toggle),
+  #nav-bar-customization-target>*:not(#sidebar-button, #ai-window-toggle),
   #nav-bar-overflow-button,
   #smartwindow-group-tabs-button {
     visibility: hidden;
@@ -1651,7 +1696,7 @@ popupnotificationcontent {
     display: none;
   }
 
-  #TabsToolbar-customization-target > *:not(#ai-window-toggle) {
+  #TabsToolbar-customization-target>*:not(#ai-window-toggle) {
     /* stylelint-disable-next-line stylelint-plugin-mozilla/use-design-tokens -- to be addressed in 2033919 */
     opacity: 0.2;
     pointer-events: none;
@@ -1670,6 +1715,7 @@ popupnotificationcontent {
    * splitter are hidden too, in case the user had a sidebar panel open when
    * they switched into the smart window. */
   @media not -moz-pref("sidebar.verticalTabs") {
+
     #sidebar-container,
     #sidebar-launcher-splitter,
     #sidebar-box,

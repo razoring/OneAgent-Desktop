@@ -504,14 +504,6 @@ menuseparator + #sidebar-extensions-separator {
       background-position-x: 100%;
     }
 
-    &:not([sidebar-positionend]) {
-      border-inline-end: 0.01px solid var(--sidebar-border-color);
-    }
-
-    &[sidebar-positionend] {
-      border-inline-start: 0.01px solid var(--sidebar-border-color);
-    }
-
     @media -moz-pref("sidebar.verticalTabs") {
       &:not([sidebar-launcher-expanded]) {
         width: var(--tab-collapsed-width, 42px);
@@ -524,15 +516,28 @@ menuseparator + #sidebar-extensions-separator {
       inset-inline-end: 0;
     }
 
-    /* Out of flow overlay when expanded */
+    /* Out of flow overlay when expanded - corners must not be rounded */
     &[sidebar-launcher-expanded] {
       z-index: var(--browser-area-z-index-sidebar-expand-on-hover);
       position: absolute;
+      width: var(--sidebar-launcher-width, 240px) !important;
+      border-inline-end: 1px solid var(--sidebar-border-color);
+      border-radius: 0 !important;
+    }
+
+    &[sidebar-launcher-expanded][sidebar-positionend] {
+      border-inline-start: 1px solid var(--sidebar-border-color);
+      border-inline-end: none;
+      border-radius: 0 !important;
+    }
+
+    &[sidebar-launcher-dragging] {
+      transition: none !important;
     }
 
     @media not -moz-pref("browser.nova.enabled") {
       :root[lwtheme] & {
-        border-radius: unset;
+        border-radius: 0 !important;
         border-inline: unset;
       }
     }
@@ -541,6 +546,7 @@ menuseparator + #sidebar-extensions-separator {
   /* Do not allow resizing when minimized in strip state */
   #sidebar-launcher-splitter:not([sidebar-launcher-expanded]) {
     display: none !important;
+    pointer-events: none !important;
   }
 
   /* When expanded, position the splitter at the outer trailing edge to allow resizing */
@@ -550,27 +556,47 @@ menuseparator + #sidebar-extensions-separator {
     position: absolute;
     top: 0;
     bottom: 0;
-    width: 6px;
+    width: 10px;
     box-sizing: border-box;
-    cursor: ew-resize;
-    z-index: calc(var(--browser-area-z-index-sidebar-expand-on-hover) + 1);
+    cursor: ew-resize !important;
+    z-index: calc(var(--browser-area-z-index-sidebar-expand-on-hover) + 2);
     background-color: transparent;
-    transition: background-color 0.2s ease;
+    border: none !important;
+    pointer-events: auto !important;
 
-    &:hover,
+    &::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 4px;
+      width: 2px;
+      background-color: transparent;
+      pointer-events: none;
+      transition: background-color 150ms ease;
+    }
+
+    &:hover::before,
+    &[state="dragging"]::before {
+      background-color: var(--focus-outline-color, -moz-accent-color);
+    }
+
     &[state="dragging"] {
-      background-color: var(--focus-outline-color) !important;
+      cursor: grabbing !important;
     }
   }
 
   &:not([sidebar-positionend]) #sidebar-launcher-splitter[sidebar-launcher-expanded] {
-    left: calc(var(--sidebar-launcher-width, 240px) - 3px);
-    border-inline-start: 1px solid var(--sidebar-border-color);
+    left: calc(var(--sidebar-launcher-width, 240px) - 5px);
   }
 
   &[sidebar-positionend] #sidebar-launcher-splitter[sidebar-launcher-expanded] {
-    right: calc(var(--sidebar-launcher-width, 240px) - 3px);
-    border-inline-end: 1px solid var(--sidebar-border-color);
+    right: calc(var(--sidebar-launcher-width, 240px) - 5px);
+
+    &::before {
+      left: unset;
+      right: 4px;
+    }
   }
 
   /* We add margin to compensate for the launcher width to the element next to it.
@@ -657,6 +683,34 @@ menuseparator + #sidebar-extensions-separator {
         }
       }
     }
+  }
+}
+
+:root[sidebar-launcher-dragging],
+:root[sidebar-launcher-dragging] * {
+  cursor: grabbing !important;
+}
+
+:root:not([sidebar-expand-on-hover]) #sidebar-launcher-splitter {
+  display: block !important;
+  visibility: visible !important;
+  width: 6px;
+  box-sizing: border-box;
+  cursor: ew-resize !important;
+  z-index: 10;
+  background-color: transparent;
+  border: none !important;
+  pointer-events: auto !important;
+
+  &:hover,
+  &[state="dragging"] {
+    cursor: ew-resize !important;
+    background: transparent !important;
+    border-inline-start: 2px solid var(--focus-outline-color) !important;
+  }
+
+  &[state="dragging"] {
+    cursor: grabbing !important;
   }
 }
 

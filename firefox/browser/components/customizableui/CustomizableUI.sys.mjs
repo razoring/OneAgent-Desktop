@@ -68,7 +68,7 @@ const kSubviewEvents = ["ViewShowing", "ViewHiding"];
  * The current version. We can use this to auto-add new default widgets as necessary.
  * (would be const but isn't because of testing purposes)
  */
-var kVersion = 29;
+var kVersion = 30;
 
 /**
  * Buttons removed from built-ins by version they were removed. kVersion must be
@@ -342,23 +342,15 @@ var CustomizableUIInternal = {
 
     let navbarPlacements = [
       "alltabs-button",
+      "vertical-spacer",
       "back-button",
       "forward-button",
       "stop-reload-button",
-      Services.policies.isAllowed("removeHomeButtonByDefault")
-        ? null
-        : "home-button",
-      "spring",
-      "vertical-spacer",
       "urlbar-container",
       "unified-extensions-button",
-      "spring",
       "downloads-button",
-      AppConstants.MOZ_DEV_EDITION ? "developer-button" : null,
-      lazy.ippEnabled ? "ipprotection-button" : null,
       "fxa-toolbar-menu-button",
-      lazy.resetPBMToolbarButtonEnabled ? "reset-pbm-toolbar-button" : null,
-    ].filter(name => name);
+    ];
 
     this.registerArea(
       CustomizableUI.AREA_NAVBAR,
@@ -366,11 +358,7 @@ var CustomizableUIInternal = {
         type: CustomizableUI.TYPE_TOOLBAR,
         overflowable: true,
         defaultPlacements: navbarPlacements,
-        verticalTabsDefaultPlacements: [
-          ...navbarPlacements,
-          "smartwindow-group-tabs-button",
-          "ai-window-toggle",
-        ],
+        verticalTabsDefaultPlacements: navbarPlacements,
         defaultCollapsed: false,
       },
       true
@@ -1025,35 +1013,31 @@ var CustomizableUIInternal = {
       }
     }
 
-    if (currentVersion < 29) {
+    if (currentVersion < 30) {
+      let desired = [
+        "alltabs-button",
+        "vertical-spacer",
+        "back-button",
+        "forward-button",
+        "stop-reload-button",
+        "urlbar-container",
+        "unified-extensions-button",
+        "downloads-button",
+        "fxa-toolbar-menu-button",
+      ];
       let navbar = gSavedState?.placements?.[CustomizableUI.AREA_NAVBAR];
       if (Array.isArray(navbar)) {
-        let alltabsIdx = navbar.indexOf("alltabs-button");
-        if (alltabsIdx !== -1) {
-          navbar.splice(alltabsIdx, 1);
+        navbar = navbar.filter(id => id !== "spring");
+        let newNavbar = [];
+        for (let id of desired) {
+          newNavbar.push(id);
         }
-        let tabstrip = gSavedState?.placements?.[CustomizableUI.AREA_TABSTRIP];
-        if (Array.isArray(tabstrip)) {
-          let tabstripAlltabsIdx = tabstrip.indexOf("alltabs-button");
-          if (tabstripAlltabsIdx !== -1) {
-            tabstrip.splice(tabstripAlltabsIdx, 1);
+        for (let id of navbar) {
+          if (!newNavbar.includes(id)) {
+            newNavbar.push(id);
           }
         }
-        let backIdx = navbar.indexOf("back-button");
-        if (backIdx !== -1) {
-          navbar.splice(backIdx, 0, "alltabs-button");
-        } else {
-          navbar.unshift("alltabs-button");
-        }
-
-        let uebIdx = navbar.indexOf("unified-extensions-button");
-        if (uebIdx !== -1) {
-          navbar.splice(uebIdx, 1);
-        }
-        let urlbarIdx = navbar.indexOf("urlbar-container");
-        if (urlbarIdx !== -1) {
-          navbar.splice(urlbarIdx + 1, 0, "unified-extensions-button");
-        }
+        gSavedState.placements[CustomizableUI.AREA_NAVBAR] = newNavbar;
       }
     }
   },
