@@ -747,6 +747,17 @@ export class SidebarState {
 
   set expandedLauncherWidth(width) {
     this.#props.expandedLauncherWidth = width;
+    if (Number.isFinite(width) && width >= 150) {
+      const doc = this.#controllerGlobal?.document;
+      doc?.documentElement.style.setProperty(
+        "--sidebar-launcher-width",
+        `${width}px`
+      );
+      doc?.documentElement.style.setProperty(
+        "--sidebar-expanded-launcher-width",
+        `${width}px`
+      );
+    }
     this.#updateLauncherWidth();
   }
 

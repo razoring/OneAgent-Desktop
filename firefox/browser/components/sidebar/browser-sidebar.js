@@ -749,7 +749,16 @@ var SidebarController = {
       this.refreshLauncherCollapsedWidth();
     }
     const width = entry.borderBoxSize[0].inlineSize;
-    if (this._state.launcherExpanded && width >= 150) {
+    const isHoverMode = this.sidebarRevampVisibility === "expand-on-hover";
+    const isDragging =
+      this.isLauncherDragging ||
+      this._launcherDragging ||
+      this._state?.launcherDragActive;
+    if (
+      this._state.launcherExpanded &&
+      width >= 150 &&
+      (!isHoverMode || isDragging)
+    ) {
       document.documentElement.style.setProperty(
         "--sidebar-launcher-width",
         `${width}px`
