@@ -329,6 +329,18 @@ export const CustomizableWidgets = [
     },
   },
   {
+    id: "taskbar-toggle",
+    l10nId: "taskbar-toggle",
+    onCommand(aEvent) {
+      const win = aEvent.target.documentGlobal;
+      const current = Services.prefs.getBoolPref("taskbar.visible", true);
+      Services.prefs.setBoolPref("taskbar.visible", !current);
+      win.document
+        .querySelector("sidebar-taskbar")
+        ?.applyVisibility();
+    },
+  },
+  {
     id: "zoom-controls",
     type: "custom",
     tooltiptext: "zoom-controls.tooltiptext2",

@@ -843,6 +843,19 @@ and never match. */
   }
 }
 
+/* Taskbar: static right-docked strip mirroring open tabs. Unlike the sidebar
+launcher it never expands on hover and takes a fixed in-flow width. It is
+transparent like the sidebar container, with its own variable names so the
+two designs can evolve independently. */
+#taskbar-container {
+  --taskbar-width: var(--tab-collapsed-width, 50px);
+  --taskbar-background-color: transparent;
+  flex: none;
+  width: var(--taskbar-width);
+  max-width: 45vw;
+  background-color: var(--taskbar-background-color);
+}
+
 /* History Menu */
 #sidebar-history-clear,
 #sidebar-history-sort-by-heading {

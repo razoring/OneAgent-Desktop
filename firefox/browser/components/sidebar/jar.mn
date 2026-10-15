@@ -35,4 +35,6 @@ browser.jar:
     content/browser/sidebar/sidebar-tab-list.css
     content/browser/sidebar/sidebar-tab-list.mjs
     content/browser/sidebar/sidebar-tab-row.css
+    content/browser/sidebar/sidebar-taskbar.css
+    content/browser/sidebar/sidebar-taskbar.mjs
     content/browser/sidebar/sidebar.css
