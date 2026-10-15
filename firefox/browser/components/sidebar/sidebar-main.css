@@ -239,10 +239,4 @@
 
 .sidebar-pin-button[aria-pressed="true"] {
   --button-background-color-ghost-active: transparent;
-  --button-background-color-ghost-selected: transparent;
-  --button-icon-fill: var(--toolbarbutton-icon-fill-attention);
-  --button-text-color-ghost: var(--toolbarbutton-icon-fill-attention);
-  --button-text-color-ghost-hover: var(--toolbarbutton-icon-fill-attention);
-  --button-text-color-ghost-active: var(--toolbarbutton-icon-fill-attention);
-  --button-text-color-ghost-selected: var(--toolbarbutton-icon-fill-attention);
 }

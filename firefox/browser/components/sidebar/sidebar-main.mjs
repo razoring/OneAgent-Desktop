@@ -964,7 +964,9 @@ export default class SidebarMain extends MozLitElement {
             type="icon ghost"
             aria-pressed=${this.isPinned}
             title=${this.isPinned ? "Unpin sidebar" : "Pin sidebar"}
-            .iconSrc=${"chrome://browser/skin/pin.svg"}
+            .iconSrc=${this.isPinned
+              ? "chrome://browser/skin/pin-filled.svg"
+              : "chrome://browser/skin/pin.svg"}
             @click=${this.togglePin}
           >
           </moz-button>
