@@ -12,7 +12,6 @@
   min-width: var(--appbar-width, 44px) !important;
   max-width: var(--appbar-width, 44px) !important;
   background-color: var(--toolbar-bgcolor);
-  border-inline-start: 1px solid var(--chrome-content-separator-color, rgba(0, 0, 0, 0.12));
   position: relative;
   z-index: 10;
   box-sizing: border-box;
@@ -33,7 +32,6 @@
   max-width: 65vw;
   width: var(--appbar-panel-width, 360px);
   background-color: var(--toolbar-bgcolor);
-  border-inline-start: 1px solid var(--chrome-content-separator-color, rgba(0, 0, 0, 0.12));
   position: relative;
   z-index: 9;
   box-sizing: border-box;
@@ -47,6 +45,8 @@
   order: 100 !important;
   cursor: ew-resize;
   width: 4px;
+  background: transparent;
+  border: none;
   position: relative;
   z-index: 10;
 }

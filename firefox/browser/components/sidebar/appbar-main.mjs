@@ -72,10 +72,17 @@ export default class AppbarMain extends MozLitElement {
   }
 
   onDragOver(e) {
-    if (e.dataTransfer.types.includes("text/x-moz-text-internal") ||
-        e.dataTransfer.types.includes("text/uri-list") ||
-        e.dataTransfer.types.includes("text/plain")) {
+    let types = Array.from(e.dataTransfer.types);
+    if (
+      [
+        "application/x-moz-tabbrowser-tab",
+        "text/x-moz-text-internal",
+        "text/uri-list",
+        "text/plain",
+      ].some(t => types.includes(t))
+    ) {
       e.preventDefault();
+      e.dataTransfer.dropEffect = "copy";
       this.isDragOver = true;
     }
   }
@@ -87,14 +94,18 @@ export default class AppbarMain extends MozLitElement {
   onDrop(e) {
     e.preventDefault();
     this.isDragOver = false;
-    let url = e.dataTransfer.getData("text/uri-list") ||
-              e.dataTransfer.getData("text/plain");
-
-    // If dragged from Firefox tab
-    let draggedTab = window.gBrowser?.selectedTab;
-    if (draggedTab && draggedTab.linkedBrowser?.currentURI?.spec) {
-      url = draggedTab.linkedBrowser.currentURI.spec;
+    let url;
+    let types = Array.from(e.dataTransfer.types);
+    if (types.includes("application/x-moz-tabbrowser-tab")) {
+      let tab = e.dataTransfer.mozGetDataAt(
+        "application/x-moz-tabbrowser-tab",
+        0
+      );
+      url = tab?.linkedBrowser?.currentURI?.spec;
     }
+    url ||=
+      e.dataTransfer.getData("text/uri-list")?.split("\n")[0] ||
+      e.dataTransfer.getData("text/plain");
 
     if (url && (url.startsWith("http://") || url.startsWith("https://") || url.startsWith("about:"))) {
       this.tabManager?.createTab(url, { select: true });

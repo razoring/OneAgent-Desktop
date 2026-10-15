@@ -4,6 +4,8 @@
 
 browser.jar:
     content/browser/sidebar/appbar.css
+    content/browser/sidebar/appbar-customize.html
+    content/browser/sidebar/appbar-customize.js
     content/browser/sidebar/appbar-main.css
     content/browser/sidebar/appbar-main.mjs
     content/browser/sidebar/browser-appbar.js

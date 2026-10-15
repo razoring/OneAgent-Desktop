@@ -53,7 +53,6 @@ category browser-window-domcontentloaded chrome://browser/content/browser.js Fir
 category browser-window-load-before-sessionstore-init chrome://browser/content/browser-captivePortal.js CaptivePortalWatcher.init
 category browser-window-load-before-sessionstore-init resource:///modules/ZoomUI.sys.mjs ZoomUI.init
 category browser-window-load-before-sessionstore-init chrome://browser/content/sidebar/browser-sidebar.js SidebarController.init
-category browser-window-load-before-sessionstore-init chrome://browser/content/sidebar/browser-appbar.js AppbarController.init
 category browser-window-load-before-sessionstore-init chrome://browser/content/downloads/indicator.js DownloadsButton.init
 
 # The category manager uses the entry name (the URL below) as a unique key

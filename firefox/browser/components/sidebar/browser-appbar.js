@@ -34,7 +34,7 @@ var AppbarController = {
     {
       view: "viewCustomizeAppbar",
       title: "Customize Appbar",
-      url: "chrome://browser/content/sidebar/sidebar-customize.html",
+      url: "chrome://browser/content/sidebar/appbar-customize.html",
       iconUrl: "chrome://global/skin/icons/settings.svg",
     },
   ],
@@ -63,7 +63,10 @@ var AppbarController = {
     // Load custom element if not yet defined
     if (!customElements.get("appbar-main")) {
       try {
-        ChromeUtils.importESModule("chrome://browser/content/sidebar/appbar-main.mjs");
+        ChromeUtils.importESModule(
+          "chrome://browser/content/sidebar/appbar-main.mjs",
+          { global: "current" }
+        );
       } catch (e) {
         console.error("Failed to load appbar-main.mjs:", e);
       }
@@ -187,3 +190,11 @@ var AppbarController = {
 };
 
 window.AppbarController = AppbarController;
+
+if (document.readyState === "complete") {
+  AppbarController.init();
+} else {
+  window.addEventListener("load", () => AppbarController.init(), {
+    once: true,
+  });
+}

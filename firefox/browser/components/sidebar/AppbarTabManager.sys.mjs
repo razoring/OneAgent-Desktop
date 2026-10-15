@@ -34,16 +34,7 @@ export class AppbarTabManager {
     return this.document.querySelector("appbar-main");
   }
 
-  init() {
-    // Initial default tab if empty
-    if (this._tabs.length === 0) {
-      this.createTab("https://www.google.com", {
-        title: "Search",
-        iconUrl: "chrome://global/skin/icons/search-glass.svg",
-        select: false,
-      });
-    }
-  }
+  init() {}
 
   createTab(url, options = {}) {
     this._tabCounter++;
@@ -57,7 +48,8 @@ export class AppbarTabManager {
     browser.setAttribute("id", `appbar-browser-${id}`);
     browser.setAttribute("type", "content");
     browser.setAttribute("remote", "true");
-    browser.setAttribute("disablehistory", "false");
+    browser.setAttribute("remoteType", "web");
+    browser.setAttribute("maychangeremoteness", "true");
     browser.setAttribute("messagemanagergroup", "browsers");
     browser.setAttribute("tooltip", "aHTMLTooltip");
     browser.setAttribute("autoscroll", "false");
@@ -127,6 +119,12 @@ export class AppbarTabManager {
 
     this._selectedTabId = tabId;
 
+    // Hide the chrome tool browser
+    const toolBrowser = this.document.getElementById("appbar");
+    if (toolBrowser) {
+      toolBrowser.removeAttribute("selected");
+      toolBrowser.style.display = "none";
+    }
     // Bring selected browser to front
     for (const t of this._tabs) {
       if (t.id === tabId) {
