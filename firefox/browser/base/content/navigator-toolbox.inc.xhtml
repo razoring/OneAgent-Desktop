@@ -87,14 +87,6 @@
 
         <toolbarspring cui-areatype="toolbar"
                        class="chromeclass-toolbar-additional"/>
-
-        <toolbarbutton id="alltabs-button"
-                       class="toolbarbutton-1 chromeclass-toolbar-additional tabs-alltabs-button"
-                       delegatesanchor="true"
-                       badged="true"
-                       data-l10n-id="tabs-toolbar-list-all-tabs-2"
-                       closemenu="none"
-                       removable="true"/>
       </hbox>
     </hbox>
 
@@ -136,6 +128,13 @@
     <toolbartabstop/>
 
     <hbox id="nav-bar-customization-target" flex="1">
+      <toolbarbutton id="alltabs-button"
+                     class="toolbarbutton-1 chromeclass-toolbar-additional tabs-alltabs-button"
+                     delegatesanchor="true"
+                     badged="true"
+                     data-l10n-id="tabs-toolbar-list-all-tabs-2"
+                     closemenu="none"
+                     removable="true"/>
       <toolbarbutton id="back-button" class="toolbarbutton-1 chromeclass-toolbar-additional"
                      data-l10n-id="toolbar-button-back-3"
                      removable="false" overflows="false"
@@ -445,6 +444,14 @@
         <toolbartabstop/>
       </toolbaritem>
 
+      <toolbarbutton id="unified-extensions-button"
+                     class="toolbarbutton-1 chromeclass-toolbar-additional"
+                     delegatesanchor="true"
+                     data-l10n-id="unified-extensions-button"
+                     hidden="true"
+                     overflows="false"
+                     removable="false"/>
+
       <toolbarspring cui-areatype="toolbar" class="chromeclass-toolbar-additional"/>
 
       <toolbarbutton id="downloads-button"
@@ -488,14 +495,6 @@
                       <label id="fxa-avatar-label" hidden="true"/>
                   </hbox>
       </toolbarbutton>
-
-      <toolbarbutton id="unified-extensions-button"
-                     class="toolbarbutton-1 chromeclass-toolbar-additional"
-                     delegatesanchor="true"
-                     data-l10n-id="unified-extensions-button"
-                     hidden="true"
-                     overflows="false"
-                     removable="false"/>
     </hbox>
 
     <toolbarbutton id="document-pip-return-to-opener-button" class="toolbarbutton-1"

@@ -68,7 +68,7 @@ const kSubviewEvents = ["ViewShowing", "ViewHiding"];
  * The current version. We can use this to auto-add new default widgets as necessary.
  * (would be const but isn't because of testing purposes)
  */
-var kVersion = 28;
+var kVersion = 29;
 
 /**
  * Buttons removed from built-ins by version they were removed. kVersion must be
@@ -341,6 +341,7 @@ var CustomizableUIInternal = {
     );
 
     let navbarPlacements = [
+      "alltabs-button",
       "back-button",
       "forward-button",
       "stop-reload-button",
@@ -350,6 +351,7 @@ var CustomizableUIInternal = {
       "spring",
       "vertical-spacer",
       "urlbar-container",
+      "unified-extensions-button",
       "spring",
       "downloads-button",
       AppConstants.MOZ_DEV_EDITION ? "developer-button" : null,
@@ -365,7 +367,7 @@ var CustomizableUIInternal = {
         overflowable: true,
         defaultPlacements: navbarPlacements,
         verticalTabsDefaultPlacements: [
-          "alltabs-button",
+          ...navbarPlacements,
           "smartwindow-group-tabs-button",
           "ai-window-toggle",
         ],
@@ -394,7 +396,6 @@ var CustomizableUIInternal = {
           "tabbrowser-tabs",
           "new-tab-button",
           "spring",
-          "alltabs-button",
           "smartwindow-group-tabs-button",
           "ai-window-toggle",
         ],
@@ -1021,6 +1022,38 @@ var CustomizableUIInternal = {
       if (horizontalSnapshot.length) {
         restoreFlexibleSpace(horizontalSnapshot);
         CustomizableUIInternal.saveHorizontalTabStripState(horizontalSnapshot);
+      }
+    }
+
+    if (currentVersion < 29) {
+      let navbar = gSavedState?.placements?.[CustomizableUI.AREA_NAVBAR];
+      if (Array.isArray(navbar)) {
+        let alltabsIdx = navbar.indexOf("alltabs-button");
+        if (alltabsIdx !== -1) {
+          navbar.splice(alltabsIdx, 1);
+        }
+        let tabstrip = gSavedState?.placements?.[CustomizableUI.AREA_TABSTRIP];
+        if (Array.isArray(tabstrip)) {
+          let tabstripAlltabsIdx = tabstrip.indexOf("alltabs-button");
+          if (tabstripAlltabsIdx !== -1) {
+            tabstrip.splice(tabstripAlltabsIdx, 1);
+          }
+        }
+        let backIdx = navbar.indexOf("back-button");
+        if (backIdx !== -1) {
+          navbar.splice(backIdx, 0, "alltabs-button");
+        } else {
+          navbar.unshift("alltabs-button");
+        }
+
+        let uebIdx = navbar.indexOf("unified-extensions-button");
+        if (uebIdx !== -1) {
+          navbar.splice(uebIdx, 1);
+        }
+        let urlbarIdx = navbar.indexOf("urlbar-container");
+        if (urlbarIdx !== -1) {
+          navbar.splice(urlbarIdx + 1, 0, "unified-extensions-button");
+        }
       }
     }
   },

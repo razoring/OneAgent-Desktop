@@ -33,7 +33,8 @@ class TestNoToolbarChanges(MarionetteTestCase):
             msg="AREA_TABSTRIP placements are as expected",
         )
         navbarPlacements = self.get_area_default_placements("AREA_NAVBAR")
-        navbarPlacements.append("unified-extensions-button")
+        if "unified-extensions-button" not in navbarPlacements:
+            navbarPlacements.append("unified-extensions-button")
         self.assertEqual(
             self.get_area_widgets("AREA_NAVBAR"),
             navbarPlacements,

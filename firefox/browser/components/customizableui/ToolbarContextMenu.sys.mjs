@@ -275,12 +275,12 @@ export var ToolbarContextMenu = {
           : "toolbar-context-turn-on-title-bar"
       );
     }
-    document.getElementById("toolbar-context-customize-sidebar").hidden =
-      !sidebarRevampEnabled ||
-      (toolbarItem?.id != "sidebar-button" &&
-        !gBrowser.tabContainer?.verticalMode) ||
-      (!["tabbrowser-tabs", "sidebar-button"].includes(toolbarItem?.id) &&
-        gBrowser.tabContainer?.verticalMode);
+    let customizeSidebarItem = document.getElementById(
+      "toolbar-context-customize-sidebar"
+    );
+    if (customizeSidebarItem) {
+      customizeSidebarItem.hidden = true;
+    }
     document.getElementById("sidebarRevampSeparator").hidden =
       !showSidebarActions || isVerticalTabStripMenu;
     document.getElementById("customizationMenuSeparator").hidden =

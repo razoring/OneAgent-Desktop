@@ -427,7 +427,9 @@ export default class SidebarMain extends MozLitElement {
     this._removeExtensionMenuItem.hidden = true;
     this._reportExtensionMenuItem.hidden = true;
     this._unpinExtensionMenuItem.hidden = true;
-    this._customizeSidebarMenuItem.hidden = false;
+    if (this._customizeSidebarMenuItem) {
+      this._customizeSidebarMenuItem.hidden = true;
+    }
     this._enableVerticalTabsMenuItem.hidden = false;
     this._hideSidebarMenuItem.hidden = false;
     this.hideToolMenuItems();
