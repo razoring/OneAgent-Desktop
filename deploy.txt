@@ -1,0 +1,4 @@
+Remove-Item -Recurse -Force C:\tmp\ff-clean -ErrorAction SilentlyContinue; New-Item -ItemType Directory -Path C:\tmp\ff-clean -Force | Out-Null; & "C:\Users\conta\OneDrive\Documents\Personal\Projects\Coding\OneAgent-Browser\firefox\obj-artifact\dist\bin\firefox.exe" -profile C:\tmp\ff-clean -no-remote -purgecaches
+
+python .\mach build faster
+python .\mach run

@@ -35,6 +35,8 @@
   position: relative;
   z-index: 9;
   box-sizing: border-box;
+  border-radius: var(--border-radius-medium, 4px);
+  overflow: hidden;
 }
 
 #appbar-box[hidden="true"] {
@@ -55,48 +57,133 @@
   display: none !important;
 }
 
-#appbar-header {
-  display: flex;
-  align-items: center;
-  padding: 6px 8px;
-  border-bottom: 1px solid var(--chrome-content-separator-color, rgba(0, 0, 0, 0.12));
-  min-height: 38px;
-  box-sizing: border-box;
-}
-
-#appbar-switcher-target {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-weight: 600;
-  font-size: 13px;
-  background: transparent;
-  border: none;
-  cursor: default;
-}
-
-#appbar-icon {
-  width: 16px;
-  height: 16px;
-}
-
-#appbar-close {
-  cursor: pointer;
-}
-
 .appbar-browser-stack {
   position: relative;
   flex: 1 1 auto;
   width: 100%;
   height: 100%;
+  border-radius: var(--border-radius-medium, 4px) var(--border-radius-medium, 4px) 0 0;
+  overflow: hidden;
 }
 
 .appbar-browser-stack > browser {
   width: 100%;
   height: 100%;
   background-color: var(--in-content-page-background, #ffffff);
+  border-radius: var(--border-radius-medium, 4px) var(--border-radius-medium, 4px) 0 0;
 }
 
 .appbar-browser-stack > browser:not([selected="true"]) {
   display: none !important;
+}
+
+/* Bottom URL bar and control buttons */
+#appbar-bottom-bar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 6px;
+  background-color: var(--toolbar-bgcolor);
+  border-top: 1px solid var(--chrome-content-separator-color, color-mix(in srgb, currentColor 12%, transparent));
+  border-radius: 0 0 var(--border-radius-medium, 4px) var(--border-radius-medium, 4px);
+  min-height: 38px;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+/* Integrated URL bar container */
+#appbar-urlbar-container {
+  display: flex;
+  align-items: center;
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 28px;
+  background: var(--toolbar-field-background-color, color-mix(in srgb, currentColor 8%, transparent));
+  border: 1px solid var(--toolbar-field-border-color, transparent);
+  border-radius: var(--border-radius-medium, 4px);
+  padding: 0 4px;
+  box-sizing: border-box;
+}
+
+#appbar-urlbar-container:focus-within {
+  border-color: var(--focus-outline-color, #0060df);
+  background: var(--toolbar-field-focus-background-color, var(--toolbar-field-background-color));
+}
+
+#appbar-identity-box {
+  display: flex;
+  align-items: center;
+  margin-inline-end: 2px;
+}
+
+#appbar-identity-button {
+  width: 22px;
+  height: 22px;
+  min-width: 22px;
+  min-height: 22px;
+  padding: 3px;
+  border-radius: var(--border-radius-small, 3px);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  fill: currentColor;
+  color: inherit;
+  box-sizing: border-box;
+}
+
+#appbar-identity-button:hover {
+  background-color: var(--tab-background-color-hover, color-mix(in srgb, currentColor 17%, transparent));
+}
+
+#appbar-identity-icon {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+  -moz-context-properties: fill, fill-opacity, stroke;
+}
+
+#appbar-url-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 100%;
+  background: transparent;
+  color: var(--toolbar-field-color, inherit);
+  border: none;
+  padding: 0 4px;
+  font-size: 12px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+#appbar-bottom-bar .toolbarbutton-1,
+#appbar-bottom-bar .close-icon {
+  width: 26px;
+  height: 26px;
+  min-width: 26px;
+  min-height: 26px;
+  padding: 4px;
+  border-radius: var(--border-radius-circle, 50%);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#appbar-bottom-bar .toolbarbutton-1:hover,
+#appbar-bottom-bar .close-icon:hover {
+  background-color: var(--tab-background-color-hover, color-mix(in srgb, currentColor 17%, transparent));
+}
+
+#appbar-bottom-bar .toolbarbutton-icon {
+  width: 16px;
+  height: 16px;
+}
+
+#appbar-toggle-mobile-button[aria-pressed="true"] {
+  background-color: color-mix(in srgb, currentColor 20%, transparent);
 }

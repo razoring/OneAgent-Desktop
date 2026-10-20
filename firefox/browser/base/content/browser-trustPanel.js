@@ -232,6 +232,11 @@ class TrustPanel {
   };
 
   #breachAlertsData = new BreachAlertsData();
+  #customBrowser = null;
+
+  get #browser() {
+    return this.#customBrowser || gBrowser.selectedBrowser;
+  }
 
   init() {
     for (let blocker of Object.values(this.#blockers)) {
@@ -395,8 +400,31 @@ class TrustPanel {
   async showPopup(opts = {}) {
     // Avoid flicker between the mouseup and panel shown by manually
     // setting open attribute.
-    let anchor = this.#anchor();
+    let anchor = opts.anchor || this.#anchor();
     anchor?.setAttribute("open", "true");
+
+    if (opts.browser) {
+      this.#customBrowser = opts.browser;
+      if (opts.uri) {
+        this.#uri = opts.uri;
+      } else if (opts.browser.currentURI) {
+        this.#uri = opts.browser.currentURI;
+      }
+      try {
+        this.#uriHasHost = !!this.#uri?.host;
+      } catch (ex) {
+        this.#uriHasHost = false;
+      }
+      this.#secInfo = opts.secInfo || opts.browser.securityUI?.secInfo || null;
+      if (typeof opts.state !== "undefined") {
+        this.#state = opts.state;
+      } else if (opts.browser.securityUI?.state) {
+        this.#state = opts.browser.securityUI.state;
+      }
+      this.#pageExtensionPolicy = this.#uri ? WebExtensionPolicy.getByURI(this.#uri) : null;
+      this.#qwac = null;
+      this.#qwacStatusPromise = null;
+    }
 
     this.#initializePopup();
 
@@ -405,7 +433,7 @@ class TrustPanel {
       let qwacStatusPromise = QWACs.determineQWACStatus(
         this.#secInfo,
         this.#uri,
-        gBrowser.selectedBrowser.browsingContext
+        this.#browser.browsingContext
       ).then(result => {
         // Check that when this promise resolves, we're still on the same
         // document as when it was created.
@@ -422,7 +450,7 @@ class TrustPanel {
     this.#openingReason = opts.reason ?? OPENING_REASONS.UNKNOWN;
 
     PanelMultiView.openPopup(this.#popup, anchor, {
-      position: "bottomleft topleft",
+      position: opts.position || "bottomleft topleft",
       triggerEvent: opts.event,
     });
 
@@ -816,7 +844,7 @@ class TrustPanel {
     this.#updateAttribute(
       document.getElementById("trustpanel-toggle-section"),
       "disabled",
-      !ContentBlockingAllowList.canHandle(window.gBrowser.selectedBrowser)
+      !ContentBlockingAllowList.canHandle(this.#browser)
     );
 
     // TODO(Bug 1751045): Show the clear site data footer in private browsing
@@ -843,7 +871,7 @@ class TrustPanel {
     this.#updateAttribute(
       document.getElementById("trustpanel-toggle"),
       "disabled",
-      !ContentBlockingAllowList.canHandle(window.gBrowser.selectedBrowser)
+      !ContentBlockingAllowList.canHandle(this.#browser)
     );
 
     // Ensure the toolbar tracker count is fully up-to-date and aligns with the
@@ -854,7 +882,10 @@ class TrustPanel {
   }
 
   #computeTrackerCount() {
-    const log = JSON.parse(gBrowser.selectedBrowser.getContentBlockingLog());
+    let log = {};
+    try {
+      log = JSON.parse(this.#browser.getContentBlockingLog?.() || "{}");
+    } catch (e) {}
 
     const logEntriesToCount = Object.values(log).filter(
       entry =>
@@ -1113,8 +1144,8 @@ class TrustPanel {
 
   get #trackingProtectionEnabled() {
     return (
-      !ContentBlockingAllowList.canHandle(window.gBrowser.selectedBrowser) ||
-      !ContentBlockingAllowList.includes(window.gBrowser.selectedBrowser)
+      !ContentBlockingAllowList.canHandle(this.#browser) ||
+      !ContentBlockingAllowList.includes(this.#browser)
     );
   }
 
@@ -1280,8 +1311,13 @@ class TrustPanel {
   }
 
   get #isSecureContext() {
-    if (gBrowser.contentPrincipal?.originNoSuffix != "resource://pdf.js") {
-      return gBrowser.securityUI.isSecureContext;
+    let contentPrincipal = this.#browser.contentPrincipal;
+    if (contentPrincipal?.originNoSuffix != "resource://pdf.js") {
+      let secUI = this.#browser.securityUI || gBrowser.securityUI;
+      if (secUI) {
+        return secUI.isSecureContext;
+      }
+      return this.#isSecureConnection;
     }
 
     // For PDF viewer pages (pdf.js) we can't rely on the isSecureContext field.
@@ -1292,7 +1328,7 @@ class TrustPanel {
     let principal;
     try {
       principal = Services.scriptSecurityManager.createContentPrincipal(
-        gBrowser.selectedBrowser.documentURI,
+        this.#browser.documentURI,
         {}
       );
       return principal.isOriginPotentiallyTrustworthy;
@@ -1445,7 +1481,7 @@ class TrustPanel {
   }
 
   get #isCertErrorPage() {
-    let { documentURI } = gBrowser.selectedBrowser;
+    let { documentURI } = this.#browser;
     if (documentURI?.scheme != "about") {
       return false;
     }
@@ -1458,7 +1494,7 @@ class TrustPanel {
   }
 
   get #isSecurelyConnectedAboutNetErrorPage() {
-    let { documentURI } = gBrowser.selectedBrowser;
+    let { documentURI } = this.#browser;
     if (documentURI?.scheme != "about" || documentURI.filePath != "neterror") {
       return false;
     }
@@ -1470,12 +1506,12 @@ class TrustPanel {
   }
 
   get #isAboutNetErrorPage() {
-    let { documentURI } = gBrowser.selectedBrowser;
+    let { documentURI } = this.#browser;
     return documentURI?.scheme == "about" && documentURI.filePath == "neterror";
   }
 
   get #isAboutHttpsOnlyErrorPage() {
-    let { documentURI } = gBrowser.selectedBrowser;
+    let { documentURI } = this.#browser;
     return (
       documentURI?.scheme == "about" && documentURI.filePath == "httpsonlyerror"
     );
@@ -1485,12 +1521,12 @@ class TrustPanel {
     return (
       !this.#isBrokenConnection &&
       (this.#isSecureContext ||
-        gBrowser.selectedBrowser.documentURI?.scheme == "chrome")
+        this.#browser.documentURI?.scheme == "chrome")
     );
   }
 
   get #isAboutBlockedPage() {
-    let { documentURI } = gBrowser.selectedBrowser;
+    let { documentURI } = this.#browser;
     return documentURI?.scheme == "about" && documentURI.filePath == "blocked";
   }
 
@@ -2064,6 +2100,13 @@ class TrustPanel {
 
     this.#shownAt = null;
     this.#closingReason = null;
+    if (this.#customBrowser) {
+      this.#customBrowser = null;
+      let curBrowser = gBrowser.selectedBrowser;
+      if (curBrowser?.currentURI) {
+        this.updateIdentity(curBrowser.securityUI?.state || 0, curBrowser.currentURI);
+      }
+    }
   }
 
   /**

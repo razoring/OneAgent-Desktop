@@ -35,17 +35,29 @@
   </vbox>
   <splitter id="appbar-splitter" class="chromeclass-extrachrome sidebar-splitter appbar-splitter" resizebefore="sibling" resizeafter="none" hidden="true" role="separator" aria-controls="appbar-box"/>
   <vbox id="appbar-box" hidden="true" class="chromeclass-extrachrome">
-    <box id="appbar-header" align="center">
-      <toolbarbutton id="appbar-switcher-target" class="tabbable" aria-expanded="false">
-        <image id="appbar-icon" consumeanchor="appbar-switcher-target"/>
-        <label id="appbar-title" crop="end" control="appbar"/>
-      </toolbarbutton>
-      <spacer id="appbar-spacer"/>
-      <toolbarbutton id="appbar-close" class="close-icon tabbable" data-l10n-id="sidebar-close-button"/>
-    </box>
     <stack id="appbar-browser-stack" class="sidebar-browser-stack appbar-browser-stack" flex="1">
       <browser id="appbar" autoscroll="false" disablehistory="true" disablefullscreen="true" tooltip="aHTMLTooltip"/>
     </stack>
+    <box id="appbar-bottom-bar" align="center">
+      <box id="appbar-urlbar-container" align="center" flex="1">
+        <box id="appbar-identity-box" align="center">
+          <box id="appbar-identity-button" role="button" class="identity-box-button verifiedDomain secure" tooltiptext="Connection secure">
+            <image id="appbar-identity-icon" class="identity-box-icon" src="chrome://browser/skin/trust-icon-active.svg"/>
+          </box>
+        </box>
+        <html:input id="appbar-url-input" type="text" spellcheck="false" placeholder="Search or enter address"/>
+      </box>
+      <toolbarbutton id="appbar-reload-button" class="toolbarbutton-1" tooltiptext="Reload page">
+        <image class="toolbarbutton-icon" src="chrome://global/skin/icons/reload.svg"/>
+      </toolbarbutton>
+      <toolbarbutton id="appbar-open-tab-button" class="toolbarbutton-1" tooltiptext="Open in browser tab">
+        <image class="toolbarbutton-icon" src="chrome://global/skin/icons/open-in-new.svg"/>
+      </toolbarbutton>
+      <toolbarbutton id="appbar-toggle-mobile-button" class="toolbarbutton-1" tooltiptext="Toggle desktop/mobile view">
+        <image class="toolbarbutton-icon" src="chrome://browser/skin/device-phone.svg"/>
+      </toolbarbutton>
+      <toolbarbutton id="appbar-close" class="close-icon tabbable" tooltiptext="Close app" data-l10n-id="sidebar-close-button"/>
+    </box>
   </vbox>
   <box id="appbar-launcher-splitter" class="chromeclass-extrachrome sidebar-splitter appbar-splitter"/>
   <box context="appbar-context-menu" id="appbar-container">

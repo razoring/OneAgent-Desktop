@@ -50,8 +50,9 @@ var AppbarController = {
   },
 
   getTools() {
-    // Exclude customize from normal tools strip, it is anchored at bottom
-    return this.tools.filter(t => t.view !== "viewCustomizeAppbar");
+    // Hide built-in tools (Bookmarks, History, Synced Tabs, AI Chatbot).
+    // Customize Appbar is handled separately in bottom-actions.
+    return [];
   },
 
   async init() {
@@ -79,10 +80,87 @@ var AppbarController = {
     this.tabManager = new AppbarTabManager(window);
     this.tabManager.init();
 
-    // Setup close button
+    // Setup bottom bar buttons and URL input
     const closeBtn = document.getElementById("appbar-close");
     if (closeBtn) {
-      closeBtn.addEventListener("click", () => this.hidePanel());
+      closeBtn.addEventListener("click", () => {
+        if (this.tabManager?.selectedTabId) {
+          this.tabManager.closeTab(this.tabManager.selectedTabId);
+        } else {
+          this.hidePanel();
+        }
+      });
+    }
+
+    const reloadBtn = document.getElementById("appbar-reload-button");
+    if (reloadBtn) {
+      reloadBtn.addEventListener("click", () => {
+        if (this.tabManager?.selectedTabId) {
+          this.tabManager.reloadTab(this.tabManager.selectedTabId);
+        }
+      });
+    }
+
+    const openNormalBtn = document.getElementById("appbar-open-tab-button");
+    if (openNormalBtn) {
+      openNormalBtn.addEventListener("click", () => {
+        if (this.tabManager?.selectedTabId) {
+          this.tabManager.openInNormalBrowser(this.tabManager.selectedTabId);
+        }
+      });
+    }
+
+    const toggleMobileBtn = document.getElementById("appbar-toggle-mobile-button");
+    if (toggleMobileBtn) {
+      toggleMobileBtn.addEventListener("click", () => {
+        if (this.tabManager?.selectedTabId) {
+          this.tabManager.toggleMobile(this.tabManager.selectedTabId);
+        }
+      });
+    }
+
+    const secBtn = document.getElementById("appbar-identity-button");
+    if (secBtn) {
+      secBtn.addEventListener("click", event => {
+        event.stopPropagation();
+        try {
+          const currentTab = this.tabManager?.currentTab;
+          const tabBrowser = currentTab?.browser;
+          if (window.gTrustPanelHandler) {
+            window.gTrustPanelHandler.showPopup({
+              anchor: secBtn,
+              position: "topleft bottomleft",
+              event,
+              browser: tabBrowser,
+              state: currentTab?.securityState,
+              uri: tabBrowser?.currentURI,
+              secInfo: tabBrowser?.securityUI?.secInfo,
+            });
+          } else if (window.gIdentityHandler) {
+            window.gIdentityHandler._initializePopup();
+            window.gIdentityHandler.refreshIdentityPopup();
+            let identityPopup = window.gIdentityHandler._identityPopup;
+            if (identityPopup && window.PanelMultiView) {
+              window.PanelMultiView.openPopup(identityPopup, secBtn, {
+                position: "topleft bottomleft",
+                triggerEvent: event,
+              });
+            }
+          }
+        } catch (err) {
+          console.error("Error opening trust panel from appbar:", err);
+        }
+      });
+    }
+
+    const urlInput = document.getElementById("appbar-url-input");
+    if (urlInput) {
+      urlInput.addEventListener("keydown", event => {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          this.tabManager?.loadUrlInCurrentTab(urlInput.value);
+        }
+      });
     }
 
     // Default container to shown on the right

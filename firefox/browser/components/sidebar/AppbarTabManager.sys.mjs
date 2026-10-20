@@ -61,7 +61,7 @@ export class AppbarTabManager {
     if (!resolvedIcon) {
       try {
         let domain = new URL(url).hostname;
-        resolvedIcon = `page-icon:https://${domain}/`;
+        resolvedIcon = `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
       } catch (e) {
         resolvedIcon = "chrome://global/skin/icons/defaultFavicon.svg";
       }
@@ -72,25 +72,19 @@ export class AppbarTabManager {
       url,
       title: options.title || url,
       iconUrl: resolvedIcon,
-      browser,
+      pinned: !!options.pinned,
+      isMobile: false,
+      loaded: false,
+      browser: null,
     };
 
-    // Load URL
-    browser.setAttribute("src", url);
+    if (options.deferLoad) {
+      this._tabs.push(tab);
+      this.appbarMain?.requestUpdate?.();
+      return tab;
+    }
 
-    // Track tab updates (title and icon)
-    browser.addEventListener("DOMContentLoaded", () => {
-      try {
-        if (browser.contentDocument?.title) {
-          tab.title = browser.contentDocument.title;
-          if (this._selectedTabId === id) {
-            this._updateHeader(tab);
-          }
-          this.appbarMain?.requestUpdate?.();
-        }
-      } catch (e) {}
-    });
-
+    this._ensureTabLoaded(tab);
     this._tabs.push(tab);
     this.appbarMain?.requestUpdate?.();
 
@@ -101,6 +95,123 @@ export class AppbarTabManager {
     return tab;
   }
 
+  _ensureTabLoaded(tab) {
+    if (tab.loaded && tab.browser) {
+      return tab.browser;
+    }
+
+    const stack = this.browserStack;
+    if (!stack) {
+      return null;
+    }
+
+    const browser = this.document.createXULElement("browser");
+    browser.setAttribute("id", `appbar-browser-${tab.id}`);
+    browser.setAttribute("type", "content");
+    browser.setAttribute("remote", "true");
+    browser.setAttribute("remoteType", "web");
+    browser.setAttribute("maychangeremoteness", "true");
+    browser.setAttribute("messagemanagergroup", "browsers");
+    browser.setAttribute("tooltip", "aHTMLTooltip");
+    browser.setAttribute("autoscroll", "false");
+    browser.setAttribute("selected", "false");
+    browser.style.display = "none";
+
+    stack.appendChild(browser);
+    tab.browser = browser;
+
+    // Track tab updates via webProgress listener
+    const progressListener = {
+      QueryInterface: ChromeUtils.generateQI([
+        "nsIWebProgressListener",
+        "nsISupportsWeakReference",
+      ]),
+      onLocationChange: (aWebProgress, aRequest, aLocation, aFlags) => {
+        if (!aLocation) {
+          return;
+        }
+        tab.url = aLocation.spec;
+        if (this._selectedTabId === tab.id) {
+          this._updateBottomBar(tab);
+        }
+      },
+      onStatusChange: () => {},
+      onProgressChange: () => {},
+      onSecurityChange: (aWebProgress, aRequest, aState) => {
+        tab.securityState = aState;
+        if (this._selectedTabId === tab.id) {
+          this._updateSecurityButton(tab);
+        }
+      },
+      onContentBlockingEvent: () => {},
+    };
+
+    try {
+      browser.addProgressListener(progressListener);
+      tab._progressListener = progressListener;
+    } catch (e) {}
+
+    const updateTabInfo = () => {
+      try {
+        if (browser.contentTitle) {
+          tab.title = browser.contentTitle;
+        }
+        if (browser.currentURI?.spec) {
+          tab.url = browser.currentURI.spec;
+          let domain = browser.currentURI.host;
+          if (domain) {
+            tab.iconUrl = `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
+          }
+        }
+        tab.loaded = true;
+        if (this._selectedTabId === tab.id) {
+          this._updateBottomBar(tab);
+        }
+        this.appbarMain?.requestUpdate?.();
+      } catch (e) {}
+    };
+
+    browser.addEventListener("DOMContentLoaded", updateTabInfo);
+    browser.addEventListener("load", updateTabInfo, true);
+
+    browser.setAttribute("src", tab.url);
+    tab.loaded = true;
+    return browser;
+  }
+
+  _unloadTab(tab) {
+    if (!tab) {
+      return;
+    }
+    if (tab.browser) {
+      try {
+        if (tab._progressListener) {
+          tab.browser.removeProgressListener(tab._progressListener);
+        }
+        tab.browser.remove();
+      } catch (e) {}
+      tab.browser = null;
+    }
+    tab.loaded = false;
+    tab.securityState = null;
+  }
+
+  pinTab(tabId) {
+    const tab = this._tabs.find(t => t.id === tabId);
+    if (tab) {
+      tab.pinned = true;
+      this.appbarMain?.requestUpdate?.();
+    }
+  }
+
+  unpinTab(tabId) {
+    const tab = this._tabs.find(t => t.id === tabId);
+    if (tab) {
+      tab.pinned = false;
+      this.appbarMain?.requestUpdate?.();
+    }
+  }
+
   selectTab(tabId) {
     const tab = this._tabs.find(t => t.id === tabId);
     if (!tab) {
@@ -108,7 +219,6 @@ export class AppbarTabManager {
     }
 
     const appbarBox = this.document.getElementById("appbar-box");
-    const appbarSplitter = this.document.getElementById("appbar-splitter");
     const isCurrentlyActive = this._selectedTabId === tabId && appbarBox && !appbarBox.hidden;
 
     // Confirmed requirement: Re-clicking active tab toggles (closes) the panel
@@ -116,6 +226,9 @@ export class AppbarTabManager {
       this.closePanel();
       return;
     }
+
+    // Ensure browser is loaded into memory when selected
+    this._ensureTabLoaded(tab);
 
     this._selectedTabId = tabId;
 
@@ -125,24 +238,27 @@ export class AppbarTabManager {
       toolBrowser.removeAttribute("selected");
       toolBrowser.style.display = "none";
     }
-    // Bring selected browser to front
+    // Bring selected browser to front without unloading others
     for (const t of this._tabs) {
-      if (t.id === tabId) {
-        t.browser.setAttribute("selected", "true");
-        t.browser.style.display = "flex";
-      } else {
-        t.browser.removeAttribute("selected");
-        t.browser.style.display = "none";
+      if (t.browser) {
+        if (t.id === tabId) {
+          t.browser.setAttribute("selected", "true");
+          t.browser.style.display = "flex";
+        } else {
+          t.browser.removeAttribute("selected");
+          t.browser.style.display = "none";
+        }
       }
     }
 
-    // Update Header
-    this._updateHeader(tab);
+    // Update Bottom Bar
+    this._updateBottomBar(tab);
 
     // Open panel
     if (appbarBox) {
       appbarBox.hidden = false;
     }
+    const appbarSplitter = this.document.getElementById("appbar-splitter");
     if (appbarSplitter) {
       appbarSplitter.hidden = false;
     }
@@ -176,17 +292,27 @@ export class AppbarTabManager {
       return;
     }
 
-    const [tab] = this._tabs.splice(index, 1);
-    try {
-      tab.browser.remove();
-    } catch (e) {}
+    const tab = this._tabs[index];
 
-    if (this._selectedTabId === tabId) {
-      if (this._tabs.length > 0) {
-        const nextIndex = Math.max(0, index - 1);
-        this.selectTab(this._tabs[nextIndex].id);
-      } else {
+    if (tab.pinned) {
+      // Pinned tabs stay in the appbar list, but are unloaded from memory
+      this._unloadTab(tab);
+
+      if (this._selectedTabId === tabId) {
         this.closePanel();
+      }
+    } else {
+      // Unpinned tabs are completely removed
+      this._tabs.splice(index, 1);
+      this._unloadTab(tab);
+
+      if (this._selectedTabId === tabId) {
+        if (this._tabs.length > 0) {
+          const nextIndex = Math.max(0, index - 1);
+          this.selectTab(this._tabs[nextIndex].id);
+        } else {
+          this.closePanel();
+        }
       }
     }
 
@@ -200,14 +326,102 @@ export class AppbarTabManager {
     }
   }
 
+  toggleMobile(tabId) {
+    const tab = this._tabs.find(t => t.id === tabId);
+    if (!tab?.browser) {
+      return;
+    }
+    tab.isMobile = !tab.isMobile;
+    const mobileUA = "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1";
+    try {
+      if (tab.browser.browsingContext) {
+        tab.browser.browsingContext.customUserAgent = tab.isMobile ? mobileUA : "";
+      }
+      tab.browser.reload?.();
+    } catch (e) {}
+    this._updateBottomBar(tab);
+  }
+
+  openInNormalBrowser(tabId) {
+    const tab = this._tabs.find(t => t.id === tabId);
+    if (!tab) {
+      return;
+    }
+    const targetUrl = tab.url || tab.browser?.currentURI?.spec;
+    if (targetUrl && this._window.gBrowser) {
+      this._window.gBrowser.addTab(targetUrl, {
+        triggeringPrincipal: Services.scriptSecurityManager.getSystemPrincipal(),
+      });
+      // Optionally focus the newly opened tab
+      const newTab = this._window.gBrowser.tabs[this._window.gBrowser.tabs.length - 1];
+      if (newTab) {
+        this._window.gBrowser.selectedTab = newTab;
+      }
+    }
+  }
+
+  loadUrlInCurrentTab(url) {
+    const tab = this.currentTab;
+    if (!tab || !url) {
+      return;
+    }
+    let target = url.trim();
+    if (!/^[a-zA-Z]+:\/\//i.test(target) && !target.startsWith("about:")) {
+      target = "https://" + target;
+    }
+    tab.url = target;
+    tab.browser.setAttribute("src", target);
+  }
+
+  _updateBottomBar(tab) {
+    if (!tab) {
+      return;
+    }
+    const urlInput = this.document.getElementById("appbar-url-input");
+    if (urlInput && this.document.activeElement !== urlInput) {
+      urlInput.value = tab.url || tab.browser?.currentURI?.spec || "";
+    }
+
+    const mobileBtn = this.document.getElementById("appbar-toggle-mobile-button");
+    if (mobileBtn) {
+      mobileBtn.setAttribute("aria-pressed", tab.isMobile ? "true" : "false");
+    }
+
+    this._updateSecurityButton(tab);
+  }
+
+  _updateSecurityButton(tab) {
+    const secBtn = this.document.getElementById("appbar-identity-button");
+    const secIcon = this.document.getElementById("appbar-identity-icon");
+    if (!secBtn || !secIcon) {
+      return;
+    }
+
+    const url = tab.url || tab.browser?.currentURI?.spec || "";
+    let isSecure = false;
+    let isChrome = false;
+    try {
+      const uri = Services.io.newURI(url);
+      isSecure = uri.scheme === "https";
+      isChrome = uri.scheme === "chrome" || uri.scheme === "about";
+    } catch (e) {}
+
+    if (isSecure) {
+      secIcon.setAttribute("src", "chrome://browser/skin/trust-icon-active.svg");
+      secBtn.setAttribute("class", "identity-box-button verifiedDomain secure");
+      secBtn.setAttribute("tooltiptext", "Connection secure");
+    } else if (isChrome) {
+      secIcon.setAttribute("src", "chrome://global/skin/icons/info.svg");
+      secBtn.setAttribute("class", "identity-box-button chromeUI secure");
+      secBtn.setAttribute("tooltiptext", "Firefox internal page");
+    } else {
+      secIcon.setAttribute("src", "chrome://browser/skin/trust-icon-insecure.svg");
+      secBtn.setAttribute("class", "identity-box-button notSecure insecure");
+      secBtn.setAttribute("tooltiptext", "Connection not secure");
+    }
+  }
+
   _updateHeader(tab) {
-    const titleEl = this.document.getElementById("appbar-title");
-    const iconEl = this.document.getElementById("appbar-icon");
-    if (titleEl) {
-      titleEl.value = tab.title || tab.url;
-    }
-    if (iconEl && tab.iconUrl) {
-      iconEl.setAttribute("src", tab.iconUrl);
-    }
+    this._updateBottomBar(tab);
   }
 }

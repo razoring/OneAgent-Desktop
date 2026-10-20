@@ -235,6 +235,7 @@
 
 .sidebar-pin-button {
   --button-border-radius: var(--border-radius-circle);
+  --button-background-color-ghost-hover: var(--tab-background-color-hover);
 }
 
 .sidebar-pin-button[aria-pressed="true"] {

@@ -2,6 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
+@import url("chrome://browser/skin/tabbrowser/tab.tokens.css");
+
 [hidden] {
   display: none !important;
 }
@@ -14,8 +16,8 @@
   max-width: var(--appbar-width, 44px);
   height: 100%;
   box-sizing: border-box;
-  --button-size-icon: 36px;
-  --button-min-height: 36px;
+  --button-size-icon: var(--tab-min-height, 32px);
+  --button-min-height: var(--tab-min-height, 32px);
   --focus-ring-clip-margin: max(0px, calc(var(--focus-outline-offset, 0px) + var(--focus-outline-width, 2px)));
 }
 
@@ -25,8 +27,8 @@
   height: 100%;
   width: 100%;
   box-sizing: border-box;
-  padding: var(--space-xxsmall, 4px) var(--space-xxsmall, 4px);
-  gap: var(--space-xxsmall, 4px);
+  padding: var(--space-small, 8px) 0;
+  gap: var(--space-small, 8px);
   align-items: center;
   overflow: hidden;
 }
@@ -36,7 +38,7 @@
   flex-direction: column;
   align-items: center;
   width: 100%;
-  gap: var(--space-xxsmall, 4px);
+  gap: var(--space-small, 8px);
   overflow-y: auto;
   overflow-x: hidden;
   scrollbar-width: none;
@@ -54,29 +56,73 @@
   flex-direction: column;
   align-items: center;
   width: 100%;
-  gap: var(--space-xxsmall, 4px);
+  gap: var(--space-small, 8px);
 }
 
+/* Base styling for all circular Appbar buttons */
 .appbar-tab-button,
 .tools-and-extensions moz-button,
 .bottom-actions moz-button,
 .appbar-add-tab-button {
-  width: 36px;
-  height: 36px;
-  min-width: 36px;
-  min-height: 36px;
-  border-radius: var(--border-radius-medium, 4px);
+  width: var(--tab-min-height, 32px);
+  height: var(--tab-min-height, 32px);
+  min-width: var(--tab-min-height, 32px);
+  min-height: var(--tab-min-height, 32px);
+  border-radius: var(--border-radius-circle, 50%) !important;
+  --button-border-radius: var(--border-radius-circle, 50%);
+  --button-background-color-ghost-hover: var(--tab-background-color-hover, color-mix(in srgb, currentColor 17%, transparent));
   --button-icon-fill: var(--toolbarbutton-icon-fill);
+  --icon-size: 16px;
+  flex-shrink: 0;
 }
 
-/* Active tab / tool outline */
-.appbar-tab-button[aria-selected="true"]::part(button),
-.tools-and-extensions moz-button[aria-selected="true"]::part(button),
-.bottom-actions moz-button[aria-selected="true"]::part(button) {
-  background-color: var(--button-background-color-active, color-mix(in srgb, currentColor 14%, transparent));
-  outline: 2px solid var(--focus-outline-color, #0060df);
+.appbar-tab-button::part(button),
+.tools-and-extensions moz-button::part(button),
+.bottom-actions moz-button::part(button),
+.appbar-add-tab-button::part(button) {
+  border-radius: var(--border-radius-circle, 50%) !important;
+  border: 1px solid transparent;
+  transition: width var(--sidebar-expand-on-hover-duration, 200ms) var(--motion-ease-emphasized),
+              border-radius var(--sidebar-expand-on-hover-duration, 200ms) var(--motion-ease-emphasized);
+}
+
+.appbar-tab-button:hover::part(button),
+.tools-and-extensions moz-button:hover::part(button),
+.bottom-actions moz-button:hover::part(button),
+.appbar-add-tab-button:hover::part(button) {
+  background-color: var(--tab-background-color-hover, color-mix(in srgb, currentColor 17%, transparent)) !important;
+}
+
+/* Unselected web tab icons have the same subtle translucent backing as unselected vertical tabs */
+.appbar-tab-button:not(.selected, [aria-selected="true"]):not(:hover)::part(button) {
+  background-color: color-mix(in srgb, currentColor 7%, transparent);
+}
+
+/* Pinned tabs not loaded into memory are slightly transparent until loaded */
+.appbar-tab-button.unloaded,
+moz-button[unloaded].appbar-tab-button {
+  opacity: 0.55;
+  transition: opacity 200ms ease;
+}
+
+.appbar-tab-button.unloaded:hover,
+moz-button[unloaded].appbar-tab-button:hover {
+  opacity: 0.8;
+}
+
+/* Active app / tab circular gradient styling identical to sidebar/vertical tabs */
+.appbar-tab-button:is(.selected, [aria-selected="true"])::part(button),
+.tools-and-extensions moz-button:is(.selected, [aria-selected="true"])::part(button),
+.bottom-actions moz-button:is(.selected, [aria-selected="true"])::part(button) {
+  border-radius: var(--border-radius-circle, 50%) !important;
+  outline: 1px solid var(--tab-border-color-selected, transparent) !important;
   outline-offset: -1px;
-  border-radius: var(--border-radius-medium, 4px);
+  border: 1px solid transparent !important;
+  background:
+    var(--tab-border-color-accent, linear-gradient(96deg, #B89CFF 20.68%, #FF9565 79.34%)) border-box border-area,
+    var(--tab-background-color-selected, var(--toolbar-background-color)) padding-box !important;
+  box-shadow: var(--tab-box-shadow-selected, none);
+  color: var(--tab-text-color-selected, inherit);
 }
 
 .appbar-separator {
