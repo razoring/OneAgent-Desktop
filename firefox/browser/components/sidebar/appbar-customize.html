@@ -5,26 +5,309 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>Customize Appbar</title>
+    <meta name="color-scheme" content="light dark" />
+    <meta http-equiv="Content-Security-Policy" content="default-src resource: chrome:; object-src 'none'; img-src data: chrome: https: http:; style-src 'unsafe-inline' chrome:;" />
+    <title>Add to Appbar</title>
     <link rel="stylesheet" href="chrome://global/skin/in-content/common.css" />
     <style>
-      body { padding: 12px; }
-      h1 { font-size: 1.2em; margin: 0 0 12px; }
-      form { display: flex; gap: 6px; margin-bottom: 12px; }
-      form input { flex: 1; }
-      ul { list-style: none; margin: 0; padding: 0; }
-      li { display: flex; align-items: center; gap: 8px; padding: 6px 0; }
-      li img { width: 16px; height: 16px; }
-      li span { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      :root {
+        --appbar-card-bg: light-dark(rgba(0, 0, 0, 0.03), rgba(255, 255, 255, 0.05));
+        --appbar-card-hover: light-dark(rgba(0, 0, 0, 0.06), rgba(255, 255, 255, 0.09));
+        --appbar-card-border: light-dark(rgba(0, 0, 0, 0.08), rgba(255, 255, 255, 0.12));
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        padding: 16px;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        background-color: var(--in-content-page-background, #ffffff);
+        color: var(--in-content-page-color, #15141a);
+        font-size: 13px;
+        line-height: 1.4;
+        user-select: none;
+      }
+      .panel-header {
+        margin-bottom: 16px;
+      }
+      .panel-header h1 {
+        font-size: 18px;
+        font-weight: 600;
+        margin: 0 0 4px;
+        color: var(--in-content-page-color, inherit);
+      }
+      .panel-header p {
+        margin: 0;
+        font-size: 12px;
+        opacity: 0.7;
+      }
+      .section {
+        margin-bottom: 20px;
+      }
+      .section-title {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        opacity: 0.65;
+        margin-bottom: 8px;
+      }
+      /* Current Page Card */
+      .current-page-card {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 12px;
+        background: var(--appbar-card-bg);
+        border: 1px solid var(--appbar-card-border);
+        border-radius: var(--border-radius-medium, 8px);
+        transition: background-color 150ms ease, border-color 150ms ease;
+      }
+      .current-page-card:hover {
+        background: var(--appbar-card-hover);
+      }
+      .card-icon {
+        width: 24px;
+        height: 24px;
+        border-radius: 4px;
+        object-fit: contain;
+        flex-shrink: 0;
+      }
+      .card-details {
+        flex: 1 1 auto;
+        min-width: 0;
+      }
+      .card-title {
+        font-weight: 600;
+        font-size: 13px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .card-subtitle {
+        font-size: 11px;
+        opacity: 0.65;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      /* Search / URL Input */
+      .search-form {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+      .search-input {
+        flex: 1 1 auto;
+        height: 32px;
+        padding: 0 10px;
+        font-size: 13px;
+        border: 1px solid var(--in-content-box-border-color, var(--appbar-card-border));
+        border-radius: var(--border-radius-medium, 8px);
+        background: var(--in-content-box-background, rgba(0, 0, 0, 0.03));
+        color: inherit;
+        outline: none;
+        transition: border-color 150ms ease, box-shadow 150ms ease;
+      }
+      .search-input:focus {
+        border-color: var(--focus-outline-color, #0060df);
+        box-shadow: 0 0 0 1px var(--focus-outline-color, #0060df);
+      }
+      /* Buttons */
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        height: 30px;
+        padding: 0 12px;
+        font-size: 12px;
+        font-weight: 600;
+        border-radius: var(--border-radius-medium, 8px);
+        border: 1px solid transparent;
+        cursor: pointer;
+        transition: background-color 150ms ease, opacity 150ms ease;
+        flex-shrink: 0;
+      }
+      .btn-primary {
+        background: var(--in-content-primary-button-background, #0060df);
+        color: var(--in-content-primary-button-text-color, #ffffff);
+      }
+      .btn-primary:hover:not(:disabled) {
+        background: var(--in-content-primary-button-background-hover, #0250bb);
+      }
+      .btn-secondary {
+        background: var(--in-content-button-background, rgba(0, 0, 0, 0.07));
+        color: inherit;
+      }
+      .btn-secondary:hover:not(:disabled) {
+        background: var(--in-content-button-background-hover, rgba(0, 0, 0, 0.12));
+      }
+      .btn:disabled {
+        opacity: 0.45;
+        cursor: default;
+      }
+      /* Top Sites Grid */
+      .top-sites-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+        gap: 8px;
+      }
+      .top-site-tile {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 8px 4px;
+        border-radius: var(--border-radius-medium, 8px);
+        background: var(--appbar-card-bg);
+        border: 1px solid var(--appbar-card-border);
+        cursor: pointer;
+        text-align: center;
+        transition: background-color 150ms ease, transform 150ms ease;
+      }
+      .top-site-tile:hover {
+        background: var(--appbar-card-hover);
+        transform: translateY(-1px);
+      }
+      .top-site-tile .site-icon {
+        width: 24px;
+        height: 24px;
+        border-radius: 4px;
+        margin-bottom: 6px;
+        object-fit: contain;
+      }
+      .top-site-tile .site-title {
+        font-size: 11px;
+        font-weight: 500;
+        max-width: 100%;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      /* Firefox Tools list */
+      .tools-list {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .tool-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 8px 12px;
+        border-radius: var(--border-radius-medium, 8px);
+        background: var(--appbar-card-bg);
+        border: 1px solid var(--appbar-card-border);
+        transition: background-color 150ms ease;
+      }
+      .tool-item:hover {
+        background: var(--appbar-card-hover);
+      }
+      .tool-icon {
+        width: 20px;
+        height: 20px;
+        flex-shrink: 0;
+        fill: currentColor;
+        -moz-context-properties: fill, fill-opacity, stroke;
+      }
+      .tool-info {
+        flex: 1 1 auto;
+        min-width: 0;
+      }
+      .tool-name {
+        font-weight: 600;
+        font-size: 12px;
+      }
+      .tool-desc {
+        font-size: 11px;
+        opacity: 0.65;
+      }
+      /* Apps list */
+      .apps-list {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .app-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 6px 10px;
+        border-radius: var(--border-radius-medium, 8px);
+        background: var(--appbar-card-bg);
+        border: 1px solid var(--appbar-card-border);
+      }
+      .app-row img {
+        width: 16px;
+        height: 16px;
+        flex-shrink: 0;
+      }
+      .app-row span {
+        flex: 1 1 auto;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: 12px;
+      }
+      .app-row .btn-remove {
+        padding: 2px 8px;
+        height: 24px;
+        font-size: 11px;
+      }
+      .badge-pinned {
+        font-size: 10px;
+        padding: 1px 5px;
+        border-radius: 4px;
+        background: light-dark(rgba(0, 0, 0, 0.08), rgba(255, 255, 255, 0.1));
+        opacity: 0.8;
+      }
     </style>
     <script src="chrome://browser/content/sidebar/appbar-customize.js" defer></script>
   </head>
   <body>
-    <h1>Customize Appbar</h1>
-    <form id="add-form">
-      <input id="url" type="text" placeholder="https://example.com" />
-      <button type="submit" class="primary">Add</button>
-    </form>
-    <ul id="apps"></ul>
+    <div class="panel-header">
+      <h1>Add an App</h1>
+      <p>Pin your favorite web apps and browser tools</p>
+    </div>
+
+    <!-- Current Page Section -->
+    <div class="section" id="section-current-page" style="display: none;">
+      <div class="section-title">Current Tab</div>
+      <div class="current-page-card">
+        <img id="current-page-icon" class="card-icon" src="" />
+        <div class="card-details">
+          <div id="current-page-title" class="card-title"></div>
+          <div id="current-page-url" class="card-subtitle"></div>
+        </div>
+        <button id="add-current-page-btn" class="btn btn-primary">Add</button>
+      </div>
+    </div>
+
+    <!-- Search or Enter URL -->
+    <div class="section">
+      <div class="section-title">Search or Enter URL</div>
+      <form id="add-form" class="search-form">
+        <input id="url" class="search-input" type="text" placeholder="e.g. youtube.com or search term..." />
+        <button type="submit" class="btn btn-primary">Add</button>
+      </form>
+    </div>
+
+    <!-- Top Sites Section -->
+    <div class="section" id="section-top-sites">
+      <div class="section-title">Top Sites</div>
+      <div id="top-sites-grid" class="top-sites-grid"></div>
+    </div>
+
+    <!-- Firefox Default Tools -->
+    <div class="section">
+      <div class="section-title">Firefox Tools</div>
+      <div class="tools-list" id="firefox-tools-list"></div>
+    </div>
+
+    <!-- Active Apps Management -->
+    <div class="section" id="section-active-apps">
+      <div class="section-title">Added Apps</div>
+      <div id="apps" class="apps-list"></div>
+    </div>
   </body>
 </html>

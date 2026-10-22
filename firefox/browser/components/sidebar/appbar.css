@@ -29,14 +29,16 @@
 #appbar-box {
   order: 101 !important;
   min-width: 220px;
-  max-width: 65vw;
+  max-width: 75vw;
   width: var(--appbar-panel-width, 360px);
   background-color: var(--toolbar-bgcolor);
   position: relative;
   z-index: 9;
   box-sizing: border-box;
-  border-radius: var(--border-radius-medium, 4px);
-  overflow: hidden;
+  border-radius: var(--border-radius-medium, 8px) !important;
+  overflow: clip !important;
+  margin-block-end: var(--urlbar-container-padding-block, 4px) !important;
+  border: 1px solid var(--chrome-content-separator-color);
 }
 
 #appbar-box[hidden="true"] {
@@ -45,12 +47,22 @@
 
 #appbar-splitter {
   order: 100 !important;
-  cursor: ew-resize;
-  width: 4px;
-  background: transparent;
-  border: none;
+  cursor: ew-resize !important;
+  width: var(--space-medium, 8px) !important;
+  min-width: 1px;
+  background-color: transparent;
+  background-clip: padding-box;
+  border-inline: calc((var(--space-medium, 8px) - var(--splitter-width, 4px)) / 2) solid transparent;
+  margin-inline: 0 calc(-1 * var(--space-medium, 8px));
   position: relative;
-  z-index: 10;
+  z-index: var(--browser-area-z-index-sidebar-splitter, 10);
+  transition: background-color 0.5s ease-in-out;
+  margin-block-end: var(--space-small, 4px);
+}
+
+#appbar-splitter:hover,
+#appbar-splitter[state="dragging"] {
+  background-color: var(--focus-outline-color, #0060df);
 }
 
 #appbar-splitter[hidden="true"] {
@@ -62,15 +74,16 @@
   flex: 1 1 auto;
   width: 100%;
   height: 100%;
-  border-radius: var(--border-radius-medium, 4px) var(--border-radius-medium, 4px) 0 0;
-  overflow: hidden;
+  border-radius: var(--border-radius-medium, 8px) !important;
+  overflow: clip !important;
 }
 
 .appbar-browser-stack > browser {
   width: 100%;
   height: 100%;
   background-color: var(--in-content-page-background, #ffffff);
-  border-radius: var(--border-radius-medium, 4px) var(--border-radius-medium, 4px) 0 0;
+  border-radius: var(--border-radius-medium, 8px) !important;
+  overflow: clip !important;
 }
 
 .appbar-browser-stack > browser:not([selected="true"]) {
@@ -85,10 +98,20 @@
   padding: 4px 6px;
   background-color: var(--toolbar-bgcolor);
   border-top: 1px solid var(--chrome-content-separator-color, color-mix(in srgb, currentColor 12%, transparent));
-  border-radius: 0 0 var(--border-radius-medium, 4px) var(--border-radius-medium, 4px);
+  border-radius: 0 0 calc(var(--border-radius-medium, 8px) - 1px) calc(var(--border-radius-medium, 8px) - 1px);
   min-height: 38px;
   box-sizing: border-box;
   flex-shrink: 0;
+}
+
+#appbar-box[internal-app="true"] #appbar-bottom-bar {
+  justify-content: flex-end;
+}
+
+#appbar-box[internal-app="true"] #appbar-urlbar-container,
+#appbar-box[internal-app="true"] #appbar-open-tab-button,
+#appbar-box[internal-app="true"] #appbar-toggle-mobile-button {
+  display: none !important;
 }
 
 /* Integrated URL bar container */
@@ -100,7 +123,7 @@
   height: 28px;
   background: var(--toolbar-field-background-color, color-mix(in srgb, currentColor 8%, transparent));
   border: 1px solid var(--toolbar-field-border-color, transparent);
-  border-radius: var(--border-radius-medium, 4px);
+  border-radius: var(--border-radius-medium, 8px);
   padding: 0 4px;
   box-sizing: border-box;
 }
@@ -122,9 +145,10 @@
   min-width: 22px;
   min-height: 22px;
   padding: 3px;
-  border-radius: var(--border-radius-small, 3px);
-  background: transparent;
-  border: none;
+  border-radius: var(--border-radius-circle, 50%) !important;
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -132,10 +156,12 @@
   fill: currentColor;
   color: inherit;
   box-sizing: border-box;
+  transition: background-color 150ms ease;
 }
 
 #appbar-identity-button:hover {
-  background-color: var(--tab-background-color-hover, color-mix(in srgb, currentColor 17%, transparent));
+  background-color: var(--tab-background-color-hover, color-mix(in srgb, currentColor 17%, transparent)) !important;
+  outline: none !important;
 }
 
 #appbar-identity-icon {
@@ -158,32 +184,69 @@
   box-sizing: border-box;
 }
 
+/* Control buttons in bottom bar - circular with no outline, matching sidebar buttons */
 #appbar-bottom-bar .toolbarbutton-1,
 #appbar-bottom-bar .close-icon {
-  width: 26px;
-  height: 26px;
-  min-width: 26px;
-  min-height: 26px;
-  padding: 4px;
-  border-radius: var(--border-radius-circle, 50%);
-  background: transparent;
-  border: none;
+  appearance: none !important;
+  width: 28px !important;
+  height: 28px !important;
+  min-width: 28px !important;
+  min-height: 28px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border-radius: var(--border-radius-circle, 50%) !important;
+  background-color: transparent !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
+  color: inherit;
+  transition: background-color 150ms ease;
+}
+
+#appbar-bottom-bar .toolbarbutton-1 > .toolbarbutton-icon,
+#appbar-bottom-bar .close-icon > .toolbarbutton-icon {
+  width: 16px !important;
+  height: 16px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border-radius: var(--border-radius-circle, 50%) !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
 }
 
 #appbar-bottom-bar .toolbarbutton-1:hover,
 #appbar-bottom-bar .close-icon:hover {
-  background-color: var(--tab-background-color-hover, color-mix(in srgb, currentColor 17%, transparent));
+  background-color: var(--tab-background-color-hover, color-mix(in srgb, currentColor 17%, transparent)) !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
 }
 
-#appbar-bottom-bar .toolbarbutton-icon {
-  width: 16px;
-  height: 16px;
+#appbar-bottom-bar .toolbarbutton-1:hover > .toolbarbutton-icon,
+#appbar-bottom-bar .close-icon:hover > .toolbarbutton-icon {
+  background-color: transparent !important;
+  border: none !important;
+  outline: none !important;
+}
+
+#appbar-bottom-bar .toolbarbutton-1:hover:active,
+#appbar-bottom-bar .close-icon:hover:active {
+  background-color: var(--toolbarbutton-background-color-active, color-mix(in srgb, currentColor 25%, transparent)) !important;
+  border: none !important;
+  outline: none !important;
+}
+
+#appbar-bottom-bar .toolbarbutton-1:focus-visible,
+#appbar-bottom-bar .close-icon:focus-visible {
+  outline: var(--focus-outline, 2px solid #0060df) !important;
+  outline-offset: 1px !important;
 }
 
 #appbar-toggle-mobile-button[aria-pressed="true"] {
-  background-color: color-mix(in srgb, currentColor 20%, transparent);
+  background-color: color-mix(in srgb, currentColor 18%, transparent) !important;
 }

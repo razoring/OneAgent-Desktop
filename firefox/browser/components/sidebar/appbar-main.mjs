@@ -16,6 +16,8 @@ export default class AppbarMain extends MozLitElement {
     selectedView: { type: String },
     selectedTabId: { type: String },
     isDragOver: { type: Boolean, reflect: true, attribute: "dragover" },
+    _draggedTabId: { state: true },
+    _dragOverTabId: { state: true },
   };
 
   constructor() {
@@ -23,6 +25,8 @@ export default class AppbarMain extends MozLitElement {
     this.selectedView = "";
     this.selectedTabId = null;
     this.isDragOver = false;
+    this._draggedTabId = null;
+    this._dragOverTabId = null;
   }
 
   get controller() {
@@ -152,6 +156,9 @@ export default class AppbarMain extends MozLitElement {
   }
 
   onDragOver(e) {
+    if (this._draggedTabId) {
+      return;
+    }
     let types = Array.from(e.dataTransfer.types);
     if (
       [
@@ -197,15 +204,50 @@ export default class AppbarMain extends MozLitElement {
     this.tabManager?.selectTab(tabId);
   }
 
-  async promptAddTab() {
-    let url = window.prompt("Enter web page URL to add to Appbar:", "https://");
-    if (url && url.trim() && url !== "https://") {
-      let finalUrl = url.trim();
-      if (!/^https?:\/\//i.test(finalUrl)) {
-        finalUrl = "https://" + finalUrl;
+  onTabDragStart(e, tabId) {
+    e.dataTransfer.setData("application/x-appbar-tab", tabId);
+    e.dataTransfer.effectAllowed = "move";
+    this._draggedTabId = tabId;
+    this.requestUpdate();
+  }
+
+  onTabDragOver(e, targetTabId) {
+    if (this._draggedTabId) {
+      e.preventDefault();
+      e.stopPropagation();
+      e.dataTransfer.dropEffect = "move";
+      if (this._dragOverTabId !== targetTabId) {
+        this._dragOverTabId = targetTabId;
+        this.requestUpdate();
       }
-      this.tabManager?.createTab(finalUrl, { select: true });
     }
+  }
+
+  onTabDragLeave(e, targetTabId) {
+    if (this._dragOverTabId === targetTabId) {
+      this._dragOverTabId = null;
+      this.requestUpdate();
+    }
+  }
+
+  onTabDrop(e, targetTabId) {
+    if (this._draggedTabId) {
+      e.preventDefault();
+      e.stopPropagation();
+      const fromId = this._draggedTabId;
+      this._dragOverTabId = null;
+      this._draggedTabId = null;
+      if (fromId && targetTabId && fromId !== targetTabId) {
+        this.tabManager?.moveTab(fromId, targetTabId);
+      }
+      this.requestUpdate();
+    }
+  }
+
+  onTabDragEnd() {
+    this._draggedTabId = null;
+    this._dragOverTabId = null;
+    this.requestUpdate();
   }
 
   async showView(viewId) {
@@ -220,10 +262,47 @@ export default class AppbarMain extends MozLitElement {
     this.requestUpdate();
   }
 
+  renderTabButton(t, activeTabId) {
+    const isSelected = activeTabId === t.id && this.controller?.isOpen;
+    const isUnloaded = !t.loaded;
+    const isDragging = this._draggedTabId === t.id;
+    const isDragOver = this._dragOverTabId === t.id;
+
+    return html`
+      <moz-button
+        class=${classMap({
+          "appbar-tab-button": true,
+          selected: isSelected,
+          unloaded: isUnloaded,
+          dragging: isDragging,
+          "drag-over": isDragOver,
+        })}
+        data-tab-id=${t.id}
+        draggable="true"
+        ?unloaded=${isUnloaded}
+        type="icon ghost"
+        aria-selected=${isSelected}
+        title=${t.title || t.url}
+        iconsrc=${t.iconUrl}
+        .iconSrc=${t.iconUrl}
+        @click=${() => this.onTabClick(t.id)}
+        @dragstart=${e => this.onTabDragStart(e, t.id)}
+        @dragover=${e => this.onTabDragOver(e, t.id)}
+        @dragleave=${e => this.onTabDragLeave(e, t.id)}
+        @drop=${e => this.onTabDrop(e, t.id)}
+        @dragend=${() => this.onTabDragEnd()}
+      >
+      </moz-button>
+    `;
+  }
+
   render() {
     const tabs = this.tabManager?.tabs || [];
     const activeTabId = this.tabManager?.selectedTabId;
     const tools = this.controller?.getTools() || [];
+
+    const pinnedTabs = tabs.filter(t => t.pinned);
+    const unpinnedTabs = tabs.filter(t => !t.pinned);
 
     return html`
       <link rel="stylesheet" href="chrome://browser/content/sidebar/appbar.css" />
@@ -235,41 +314,36 @@ export default class AppbarMain extends MozLitElement {
         <div class="scroll-section">
           <!-- Web Tabs List -->
           <div class="appbar-tabs-list">
+            <!-- Pinned Tabs -->
             ${repeat(
-              tabs,
+              pinnedTabs,
               t => t.id,
-              t => {
-                const isSelected = activeTabId === t.id && this.controller?.isOpen;
-                const isUnloaded = !t.loaded;
-                return html`
-                  <moz-button
-                    class=${classMap({
-                      "appbar-tab-button": true,
-                      selected: isSelected,
-                      unloaded: isUnloaded,
-                    })}
-                    data-tab-id=${t.id}
-                    ?unloaded=${isUnloaded}
-                    type="icon ghost"
-                    aria-selected=${isSelected}
-                    title=${t.title || t.url}
-                    iconsrc=${t.iconUrl}
-                    .iconSrc=${t.iconUrl}
-                    @click=${() => this.onTabClick(t.id)}
-                  >
-                  </moz-button>
-                `;
-              }
+              t => this.renderTabButton(t, activeTabId)
+            )}
+
+            ${pinnedTabs.length > 0 && unpinnedTabs.length > 0
+              ? html`<div class="appbar-pinned-divider"></div>`
+              : ""}
+
+            <!-- Unpinned Tabs -->
+            ${repeat(
+              unpinnedTabs,
+              t => t.id,
+              t => this.renderTabButton(t, activeTabId)
             )}
 
             <!-- Add Tab Button (+) -->
             <moz-button
-              class="appbar-add-tab-button"
+              class=${classMap({
+                "appbar-add-tab-button": true,
+                selected: this.selectedView === "viewCustomizeAppbar" && this.controller?.isOpen,
+              })}
               type="icon ghost"
-              title="Add page to Appbar"
+              aria-selected=${this.selectedView === "viewCustomizeAppbar" && this.controller?.isOpen}
+              title="Add to Appbar"
               iconsrc="chrome://global/skin/icons/plus.svg"
               .iconSrc="chrome://global/skin/icons/plus.svg"
-              @click=${this.promptAddTab}
+              @click=${() => this.showView("viewCustomizeAppbar")}
             >
             </moz-button>
           </div>

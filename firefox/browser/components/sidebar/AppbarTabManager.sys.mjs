@@ -44,19 +44,6 @@ export class AppbarTabManager {
       return null;
     }
 
-    const browser = this.document.createXULElement("browser");
-    browser.setAttribute("id", `appbar-browser-${id}`);
-    browser.setAttribute("type", "content");
-    browser.setAttribute("remote", "true");
-    browser.setAttribute("remoteType", "web");
-    browser.setAttribute("maychangeremoteness", "true");
-    browser.setAttribute("messagemanagergroup", "browsers");
-    browser.setAttribute("tooltip", "aHTMLTooltip");
-    browser.setAttribute("autoscroll", "false");
-    browser.setAttribute("selected", "false");
-
-    stack.appendChild(browser);
-
     let resolvedIcon = options.iconUrl;
     if (!resolvedIcon) {
       try {
@@ -67,13 +54,16 @@ export class AppbarTabManager {
       }
     }
 
+    const isInternal = !!options.isTool || url.startsWith("chrome://") || url.startsWith("about:");
+
     const tab = {
       id,
       url,
       title: options.title || url,
       iconUrl: resolvedIcon,
-      pinned: !!options.pinned,
-      isMobile: false,
+      pinned: typeof options.pinned === "boolean" ? options.pinned : false,
+      isMobile: typeof options.isMobile === "boolean" ? options.isMobile : !isInternal,
+      isTool: isInternal,
       loaded: false,
       browser: null,
     };
@@ -105,20 +95,34 @@ export class AppbarTabManager {
       return null;
     }
 
+    const isInternal = tab.isTool || tab.url.startsWith("chrome://") || tab.url.startsWith("about:");
+
     const browser = this.document.createXULElement("browser");
     browser.setAttribute("id", `appbar-browser-${tab.id}`);
-    browser.setAttribute("type", "content");
-    browser.setAttribute("remote", "true");
-    browser.setAttribute("remoteType", "web");
-    browser.setAttribute("maychangeremoteness", "true");
-    browser.setAttribute("messagemanagergroup", "browsers");
-    browser.setAttribute("tooltip", "aHTMLTooltip");
     browser.setAttribute("autoscroll", "false");
+    browser.setAttribute("disablehistory", "true");
+    browser.setAttribute("disablefullscreen", "true");
+    browser.setAttribute("tooltip", "aHTMLTooltip");
     browser.setAttribute("selected", "false");
     browser.style.display = "none";
 
+    if (!isInternal) {
+      browser.setAttribute("type", "content");
+      browser.setAttribute("remote", "true");
+      browser.setAttribute("remoteType", "web");
+      browser.setAttribute("maychangeremoteness", "true");
+      browser.setAttribute("messagemanagergroup", "browsers");
+    }
+
     stack.appendChild(browser);
     tab.browser = browser;
+
+    const mobileUA = "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1";
+    try {
+      if (tab.isMobile && !isInternal && browser.browsingContext) {
+        browser.browsingContext.customUserAgent = mobileUA;
+      }
+    } catch (e) {}
 
     // Track tab updates via webProgress listener
     const progressListener = {
@@ -212,6 +216,21 @@ export class AppbarTabManager {
     }
   }
 
+  moveTab(fromId, toId) {
+    const fromIndex = this._tabs.findIndex(t => t.id === fromId);
+    const toIndex = this._tabs.findIndex(t => t.id === toId);
+    if (fromIndex === -1 || toIndex === -1 || fromIndex === toIndex) {
+      return;
+    }
+    const targetPinned = this._tabs[toIndex].pinned;
+    const [movedTab] = this._tabs.splice(fromIndex, 1);
+    movedTab.pinned = targetPinned;
+    const newToIndex = this._tabs.findIndex(t => t.id === toId);
+    const insertIndex = fromIndex < toIndex ? newToIndex + 1 : newToIndex;
+    this._tabs.splice(insertIndex, 0, movedTab);
+    this.appbarMain?.requestUpdate?.();
+  }
+
   selectTab(tabId) {
     const tab = this._tabs.find(t => t.id === tabId);
     if (!tab) {
@@ -270,20 +289,7 @@ export class AppbarTabManager {
   }
 
   closePanel() {
-    const appbarBox = this.document.getElementById("appbar-box");
-    const appbarSplitter = this.document.getElementById("appbar-splitter");
-    if (appbarBox) {
-      appbarBox.hidden = true;
-    }
-    if (appbarSplitter) {
-      appbarSplitter.hidden = true;
-    }
-
-    const contentArea = this.document.getElementById("tabbrowser-tabbox");
-    contentArea?.removeAttribute("appbar-panel-open");
-
-    this._selectedTabId = null;
-    this.appbarMain?.requestUpdate?.();
+    this._window.AppbarController?.hidePanel();
   }
 
   closeTab(tabId) {
@@ -377,14 +383,35 @@ export class AppbarTabManager {
     if (!tab) {
       return;
     }
-    const urlInput = this.document.getElementById("appbar-url-input");
-    if (urlInput && this.document.activeElement !== urlInput) {
-      urlInput.value = tab.url || tab.browser?.currentURI?.spec || "";
+    const url = tab.url || tab.browser?.currentURI?.spec || "";
+    const isInternal = tab.isTool || !url || url.startsWith("about:") || url.startsWith("chrome://");
+
+    const appbarBox = this.document.getElementById("appbar-box");
+    if (appbarBox) {
+      if (isInternal) {
+        appbarBox.setAttribute("internal-app", "true");
+      } else {
+        appbarBox.removeAttribute("internal-app");
+      }
     }
 
+    const urlContainer = this.document.getElementById("appbar-urlbar-container");
+    if (urlContainer) {
+      urlContainer.hidden = isInternal;
+    }
+    const openBtn = this.document.getElementById("appbar-open-tab-button");
+    if (openBtn) {
+      openBtn.hidden = isInternal;
+    }
     const mobileBtn = this.document.getElementById("appbar-toggle-mobile-button");
     if (mobileBtn) {
+      mobileBtn.hidden = isInternal;
       mobileBtn.setAttribute("aria-pressed", tab.isMobile ? "true" : "false");
+    }
+
+    const urlInput = this.document.getElementById("appbar-url-input");
+    if (urlInput && this.document.activeElement !== urlInput) {
+      urlInput.value = url;
     }
 
     this._updateSecurityButton(tab);

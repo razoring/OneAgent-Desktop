@@ -1,0 +1,626 @@
+{
+  "firefox/browser/components/sidebar/AppbarTabManager.sys.mjs": {
+    "mtime": 1792699802.6537924,
+    "seen": 1792707055.2243106,
+    "ast_hash": "2df232eed54fd835bb804f3f1060cfe3",
+    "semantic_hash": "2df232eed54fd835bb804f3f1060cfe3"
+  },
+  "firefox/browser/components/sidebar/SidebarCollapsedWindows.sys.mjs": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "29db54ba0f8682bcac359f56411e078a",
+    "semantic_hash": "29db54ba0f8682bcac359f56411e078a"
+  },
+  "firefox/browser/components/sidebar/SidebarManager.sys.mjs": {
+    "mtime": 1792009046.3613932,
+    "seen": 1792707055.2243106,
+    "ast_hash": "df8d90366ae06259e52c0690db5e2538",
+    "semantic_hash": "df8d90366ae06259e52c0690db5e2538"
+  },
+  "firefox/browser/components/sidebar/SidebarState.sys.mjs": {
+    "mtime": 1792047826.6327727,
+    "seen": 1792707055.2243106,
+    "ast_hash": "bb94c8adecec36997e3ffc19630b8d23",
+    "semantic_hash": "bb94c8adecec36997e3ffc19630b8d23"
+  },
+  "firefox/browser/components/sidebar/SidebarTreeView.sys.mjs": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "b0cb12d9f56d179e31a65f61154d4584",
+    "semantic_hash": "b0cb12d9f56d179e31a65f61154d4584"
+  },
+  "firefox/browser/components/sidebar/appbar-customize.js": {
+    "mtime": 1792175297.0261033,
+    "seen": 1792707055.2243106,
+    "ast_hash": "4b6260a33e44d129ca399e997b41d87c",
+    "semantic_hash": "4b6260a33e44d129ca399e997b41d87c"
+  },
+  "firefox/browser/components/sidebar/appbar-main.mjs": {
+    "mtime": 1792476008.6353848,
+    "seen": 1792707055.2243106,
+    "ast_hash": "17af1b85ecbd3f38487ff4ce92ea7b14",
+    "semantic_hash": "17af1b85ecbd3f38487ff4ce92ea7b14"
+  },
+  "firefox/browser/components/sidebar/browser-appbar.js": {
+    "mtime": 1792699780.8516264,
+    "seen": 1792707055.2243106,
+    "ast_hash": "924b96ad6bb05336433972b24a48d450",
+    "semantic_hash": "924b96ad6bb05336433972b24a48d450"
+  },
+  "firefox/browser/components/sidebar/browser-sidebar.js": {
+    "mtime": 1792699742.6231728,
+    "seen": 1792707055.2243106,
+    "ast_hash": "4e009db788ca8f1ae8edfb8ca713fde4",
+    "semantic_hash": "4e009db788ca8f1ae8edfb8ca713fde4"
+  },
+  "firefox/browser/components/sidebar/sidebar-bookmark-list.mjs": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "e726bf681545c574ed32ff015a1cf041",
+    "semantic_hash": "e726bf681545c574ed32ff015a1cf041"
+  },
+  "firefox/browser/components/sidebar/sidebar-bookmarks.mjs": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "66c53d16fe32d09d33bcccfc28bb50a1",
+    "semantic_hash": "66c53d16fe32d09d33bcccfc28bb50a1"
+  },
+  "firefox/browser/components/sidebar/sidebar-customize.mjs": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "88951028c64e0a376db773f4462af840",
+    "semantic_hash": "88951028c64e0a376db773f4462af840"
+  },
+  "firefox/browser/components/sidebar/sidebar-history.mjs": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "75dd2e21b2f95993ce81a6f1c2810f53",
+    "semantic_hash": "75dd2e21b2f95993ce81a6f1c2810f53"
+  },
+  "firefox/browser/components/sidebar/sidebar-main.mjs": {
+    "mtime": 1792058782.1038148,
+    "seen": 1792707055.2243106,
+    "ast_hash": "8220bac431cbca5d7c490445ed932846",
+    "semantic_hash": "8220bac431cbca5d7c490445ed932846"
+  },
+  "firefox/browser/components/sidebar/sidebar-opentabs-preview.mjs": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "5814af027beda08baf4e2e10e929e618",
+    "semantic_hash": "5814af027beda08baf4e2e10e929e618"
+  },
+  "firefox/browser/components/sidebar/sidebar-opentabs.mjs": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "6c262bf5063538397c5b23ad64a8a94c",
+    "semantic_hash": "6c262bf5063538397c5b23ad64a8a94c"
+  },
+  "firefox/browser/components/sidebar/sidebar-page.mjs": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "e1347cef9ba6bbf3de85fef88596684b",
+    "semantic_hash": "e1347cef9ba6bbf3de85fef88596684b"
+  },
+  "firefox/browser/components/sidebar/sidebar-panel-header.mjs": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "a57f1f25da16fa30125b146d78104a25",
+    "semantic_hash": "a57f1f25da16fa30125b146d78104a25"
+  },
+  "firefox/browser/components/sidebar/sidebar-panel-switcher.mjs": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "a366ec530defb927b51074cf4d2dcde2",
+    "semantic_hash": "a366ec530defb927b51074cf4d2dcde2"
+  },
+  "firefox/browser/components/sidebar/sidebar-permissions-ui.mjs": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "022de52fa309793e921984d54e37a686",
+    "semantic_hash": "022de52fa309793e921984d54e37a686"
+  },
+  "firefox/browser/components/sidebar/sidebar-permissions.mjs": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "6a9e8afcec20dc861b8cd3d6fb0fd370",
+    "semantic_hash": "6a9e8afcec20dc861b8cd3d6fb0fd370"
+  },
+  "firefox/browser/components/sidebar/sidebar-pins-promo.mjs": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "aadf07632808e68d9e064f74b6439a6b",
+    "semantic_hash": "aadf07632808e68d9e064f74b6439a6b"
+  },
+  "firefox/browser/components/sidebar/sidebar-syncedtabs.mjs": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "a85af2d67870fb7273acc9b4244b20ad",
+    "semantic_hash": "a85af2d67870fb7273acc9b4244b20ad"
+  },
+  "firefox/browser/components/sidebar/sidebar-tab-list.mjs": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "5af2f1517291dc90f3cf3c0a1fcdd646",
+    "semantic_hash": "5af2f1517291dc90f3cf3c0a1fcdd646"
+  },
+  "firefox/browser/components/sidebar/tests/BookmarksSidebarTestUtils.sys.mjs": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "fddb9aec4122ae1f94cd8499ed6b5ec0",
+    "semantic_hash": "fddb9aec4122ae1f94cd8499ed6b5ec0"
+  },
+  "firefox/browser/components/sidebar/tests/SidebarTestUtils.sys.mjs": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "a647a583fc48f955034d67ddddd9b80f",
+    "semantic_hash": "a647a583fc48f955034d67ddddd9b80f"
+  },
+  "firefox/browser/components/sidebar/tests/browser/browser_a11y_sidebar.js": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "6277ef821956457669bdb8970a51d0ce",
+    "semantic_hash": "6277ef821956457669bdb8970a51d0ce"
+  },
+  "firefox/browser/components/sidebar/tests/browser/browser_adopt_sidebar_from_opener.js": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "8477d96541f99fabe566b6aa3c7c862b",
+    "semantic_hash": "8477d96541f99fabe566b6aa3c7c862b"
+  },
+  "firefox/browser/components/sidebar/tests/browser/browser_bookmarks_a11y_tree.js": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "a6b118f3722e71659dc59614fcbaa526",
+    "semantic_hash": "a6b118f3722e71659dc59614fcbaa526"
+  },
+  "firefox/browser/components/sidebar/tests/browser/browser_bookmarks_keyboard_navigation.js": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "15c322fd9ae5a0424e079a03cb27444b",
+    "semantic_hash": "15c322fd9ae5a0424e079a03cb27444b"
+  },
+  "firefox/browser/components/sidebar/tests/browser/browser_bookmarks_multiselect.js": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "de8380d848745d2b1a7f567e7b9c68f7",
+    "semantic_hash": "de8380d848745d2b1a7f567e7b9c68f7"
+  },
+  "firefox/browser/components/sidebar/tests/browser/browser_bookmarks_show_in_folder_from_menu.js": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "f12827086dc29015c203b35c93ec2975",
+    "semantic_hash": "f12827086dc29015c203b35c93ec2975"
+  },
+  "firefox/browser/components/sidebar/tests/browser/browser_bookmarks_show_in_folder_virtualized.js": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "7962cc25ab6c9f3835a1467ed79af160",
+    "semantic_hash": "7962cc25ab6c9f3835a1467ed79af160"
+  },
+  "firefox/browser/components/sidebar/tests/browser/browser_bookmarks_sidebar.js": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "75b87c230079864762275f299780ff5d",
+    "semantic_hash": "75b87c230079864762275f299780ff5d"
+  },
+  "firefox/browser/components/sidebar/tests/browser/browser_bookmarks_sidebar_auxclick.js": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "1b82547cc27dafccbbd027dc3a7a3f63",
+    "semantic_hash": "1b82547cc27dafccbbd027dc3a7a3f63"
+  },
+  "firefox/browser/components/sidebar/tests/browser/browser_bookmarks_sidebar_drag_and_drop.js": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "0ba92184f01d09045058474330058af3",
+    "semantic_hash": "0ba92184f01d09045058474330058af3"
+  },
+  "firefox/browser/components/sidebar/tests/browser/browser_bookmarks_sidebar_glean.js": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "6b48f6ddc474bd79ac0fb2b09d2c8ba3",
+    "semantic_hash": "6b48f6ddc474bd79ac0fb2b09d2c8ba3"
+  },
+  "firefox/browser/components/sidebar/tests/browser/browser_bookmarks_sidebar_root_folders.js": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "b2f006cb9b143ed58b68b46c556dd940",
+    "semantic_hash": "b2f006cb9b143ed58b68b46c556dd940"
+  },
+  "firefox/browser/components/sidebar/tests/browser/browser_bookmarks_sidebar_smart_bookmarks.js": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "a1c28c72cafe7fdf90e44a39b63c17b5",
+    "semantic_hash": "a1c28c72cafe7fdf90e44a39b63c17b5"
+  },
+  "firefox/browser/components/sidebar/tests/browser/browser_bookmarks_sidebar_truncation.js": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "cb21b6460a443f523b4d55caf2180b62",
+    "semantic_hash": "cb21b6460a443f523b4d55caf2180b62"
+  },
+  "firefox/browser/components/sidebar/tests/browser/browser_customize_sidebar.js": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "40e96acaea80235be03f9710b7bd612b",
+    "semantic_hash": "40e96acaea80235be03f9710b7bd612b"
+  },
+  "firefox/browser/components/sidebar/tests/browser/browser_delete_sidebar_history.js": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "e4ac728a32b5033d64f363a044018bd9",
+    "semantic_hash": "e4ac728a32b5033d64f363a044018bd9"
+  },
+  "firefox/browser/components/sidebar/tests/browser/browser_domfullscreen_sidebar.js": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "8f6cc5771d58e7feba4e354ea335978e",
+    "semantic_hash": "8f6cc5771d58e7feba4e354ea335978e"
+  },
+  "firefox/browser/components/sidebar/tests/browser/browser_extensions_sidebar.js": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "de7fa6dfc372692d1bbfefd3b67a4283",
+    "semantic_hash": "de7fa6dfc372692d1bbfefd3b67a4283"
+  },
+  "firefox/browser/components/sidebar/tests/browser/browser_f11_fullscreen_sidebar.js": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "a62096e55de23a0c206f1aedcd1e9323",
+    "semantic_hash": "a62096e55de23a0c206f1aedcd1e9323"
+  },
+  "firefox/browser/components/sidebar/tests/browser/browser_glean_sidebar.js": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "43c8a5ce888696f6f1e99a7c7231e141",
+    "semantic_hash": "43c8a5ce888696f6f1e99a7c7231e141"
+  },
+  "firefox/browser/components/sidebar/tests/browser/browser_hide_sidebar.js": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "b78d09da7905f694847bbeac6333e7fe",
+    "semantic_hash": "b78d09da7905f694847bbeac6333e7fe"
+  },
+  "firefox/browser/components/sidebar/tests/browser/browser_hide_sidebar_on_popup.js": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "48dc0cc7c60484a77912609ea99dee1d",
+    "semantic_hash": "48dc0cc7c60484a77912609ea99dee1d"
+  },
+  "firefox/browser/components/sidebar/tests/browser/browser_history_a11y_tree.js": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "1b4a8b737a9f540424a0244c97c20a5a",
+    "semantic_hash": "1b4a8b737a9f540424a0244c97c20a5a"
+  },
+  "firefox/browser/components/sidebar/tests/browser/browser_history_keyboard_navigation.js": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "b9014ad7d8517706d8f29ba34ba20934",
+    "semantic_hash": "b9014ad7d8517706d8f29ba34ba20934"
+  },
+  "firefox/browser/components/sidebar/tests/browser/browser_history_multiselect.js": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "46fc76c52c1cdea5904debd57f9a75cb",
+    "semantic_hash": "46fc76c52c1cdea5904debd57f9a75cb"
+  },
+  "firefox/browser/components/sidebar/tests/browser/browser_history_sidebar.js": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "6d25224c7d42cdfeefd49a5107a89397",
+    "semantic_hash": "6d25224c7d42cdfeefd49a5107a89397"
+  },
+  "firefox/browser/components/sidebar/tests/browser/browser_history_sidebar_glean.js": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "87125db871add129d722e0ba8918f509",
+    "semantic_hash": "87125db871add129d722e0ba8918f509"
+  },
+  "firefox/browser/components/sidebar/tests/browser/browser_history_sidebar_import_promo.js": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "cd8c4f8a25cd0e5453e796085d0d9c50",
+    "semantic_hash": "cd8c4f8a25cd0e5453e796085d0d9c50"
+  },
+  "firefox/browser/components/sidebar/tests/browser/browser_launcher_dividers.js": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "ab73f8a97ece11c920d8276b60e82f64",
+    "semantic_hash": "ab73f8a97ece11c920d8276b60e82f64"
+  },
+  "firefox/browser/components/sidebar/tests/browser/browser_launcher_hidden_restore.js": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "21e613979638caac31aa4045079bd610",
+    "semantic_hash": "21e613979638caac31aa4045079bd610"
+  },
+  "firefox/browser/components/sidebar/tests/browser/browser_launcher_splitter_drag_release.js": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "07a340c778948c89098ce7e5e8f490e5",
+    "semantic_hash": "07a340c778948c89098ce7e5e8f490e5"
+  },
+  "firefox/browser/components/sidebar/tests/browser/browser_launcher_splitter_expand_on_hover.js": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "d4a8b18587a92ddea229882bd2968172",
+    "semantic_hash": "d4a8b18587a92ddea229882bd2968172"
+  },
+  "firefox/browser/components/sidebar/tests/browser/browser_launcher_splitter_visibility.js": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "f1d311a662803077c303bc1d8edc263c",
+    "semantic_hash": "f1d311a662803077c303bc1d8edc263c"
+  },
+  "firefox/browser/components/sidebar/tests/browser/browser_opentabs_hover_preview.js": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "64e05de6b09e290efe9d7a0cf686177d",
+    "semantic_hash": "64e05de6b09e290efe9d7a0cf686177d"
+  },
+  "firefox/browser/components/sidebar/tests/browser/browser_opentabs_sidebar.js": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "40e402a9952e5a1903bdde30f2839d58",
+    "semantic_hash": "40e402a9952e5a1903bdde30f2839d58"
+  },
+  "firefox/browser/components/sidebar/tests/browser/browser_resize_sidebar.js": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "a0291408910b3f7075216528d9aa146c",
+    "semantic_hash": "a0291408910b3f7075216528d9aa146c"
+  },
+  "firefox/browser/components/sidebar/tests/browser/browser_sidebar_animation.js": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "aab926bdd28fe0e483ec7e849c3b6f01",
+    "semantic_hash": "aab926bdd28fe0e483ec7e849c3b6f01"
+  },
+  "firefox/browser/components/sidebar/tests/browser/browser_sidebar_collapsed_close_tab_button.js": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "d16091efeb9fd2e757be10ea3cc33add",
+    "semantic_hash": "d16091efeb9fd2e757be10ea3cc33add"
+  },
+  "firefox/browser/components/sidebar/tests/browser/browser_sidebar_context_menu.js": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "8523f8d5acf7fc00b90c3f1e3e315342",
+    "semantic_hash": "8523f8d5acf7fc00b90c3f1e3e315342"
+  },
+  "firefox/browser/components/sidebar/tests/browser/browser_sidebar_escape_collapse.js": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "1e735821d0af180e19f310c7464deb39",
+    "semantic_hash": "1e735821d0af180e19f310c7464deb39"
+  },
+  "firefox/browser/components/sidebar/tests/browser/browser_sidebar_expand_on_hover.js": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "0abc67d437026fd1b43cbd0718ac43fa",
+    "semantic_hash": "0abc67d437026fd1b43cbd0718ac43fa"
+  },
+  "firefox/browser/components/sidebar/tests/browser/browser_sidebar_focus_ring.js": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "9dd2e6261808600e90011740aa8b7daa",
+    "semantic_hash": "9dd2e6261808600e90011740aa8b7daa"
+  },
+  "firefox/browser/components/sidebar/tests/browser/browser_sidebar_macmenu.js": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "1e500a598fecaa5165ce355905a931c4",
+    "semantic_hash": "1e500a598fecaa5165ce355905a931c4"
+  },
+  "firefox/browser/components/sidebar/tests/browser/browser_sidebar_max_width.js": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "9b1c7dd6f783050bf903ef2b5f0fc49a",
+    "semantic_hash": "9b1c7dd6f783050bf903ef2b5f0fc49a"
+  },
+  "firefox/browser/components/sidebar/tests/browser/browser_sidebar_menubar_item_commands.js": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "0268e397e55ea0843256607846f141ee",
+    "semantic_hash": "0268e397e55ea0843256607846f141ee"
+  },
+  "firefox/browser/components/sidebar/tests/browser/browser_sidebar_nimbus.js": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "e2f8592fc60069b86dea81edf0d32fe6",
+    "semantic_hash": "e2f8592fc60069b86dea81edf0d32fe6"
+  },
+  "firefox/browser/components/sidebar/tests/browser/browser_sidebar_panel_header.js": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "07aa977ba9613258cdf4164aae5b3731",
+    "semantic_hash": "07aa977ba9613258cdf4164aae5b3731"
+  },
+  "firefox/browser/components/sidebar/tests/browser/browser_sidebar_panel_states.js": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "dd1a51a7281232a4d33f7e2f1b55c2e5",
+    "semantic_hash": "dd1a51a7281232a4d33f7e2f1b55c2e5"
+  },
+  "firefox/browser/components/sidebar/tests/browser/browser_sidebar_pinned_tab_promo.js": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "c5113fa694610596ecbec2488fe84606",
+    "semantic_hash": "c5113fa694610596ecbec2488fe84606"
+  },
+  "firefox/browser/components/sidebar/tests/browser/browser_sidebar_position.js": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "c4fbe4b6c9113f72a6c32e358707d2ed",
+    "semantic_hash": "c4fbe4b6c9113f72a6c32e358707d2ed"
+  },
+  "firefox/browser/components/sidebar/tests/browser/browser_sidebar_prefs.js": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "dcbc1681a5aa9e85d82185f31a917a1b",
+    "semantic_hash": "dcbc1681a5aa9e85d82185f31a917a1b"
+  },
+  "firefox/browser/components/sidebar/tests/browser/browser_sidebar_splitter_keyboard.js": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "416124b23f3327ce38dd0c9191a74956",
+    "semantic_hash": "416124b23f3327ce38dd0c9191a74956"
+  },
+  "firefox/browser/components/sidebar/tests/browser/browser_syncedtabs_sidebar.js": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "e0c2f735d381e7d36e2e4eeb72c20172",
+    "semantic_hash": "e0c2f735d381e7d36e2e4eeb72c20172"
+  },
+  "firefox/browser/components/sidebar/tests/browser/browser_syncedtabs_sidebar_glean.js": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "1d2a5ffaeb24f6c63d683b6387e5c6b5",
+    "semantic_hash": "1d2a5ffaeb24f6c63d683b6387e5c6b5"
+  },
+  "firefox/browser/components/sidebar/tests/browser/browser_toolbar_sidebar_button.js": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "04042d15a164512d6b8a798ab2d54daa",
+    "semantic_hash": "04042d15a164512d6b8a798ab2d54daa"
+  },
+  "firefox/browser/components/sidebar/tests/browser/browser_tools_migration.js": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "30e4aa15aff860729f32de6d26a6abce",
+    "semantic_hash": "30e4aa15aff860729f32de6d26a6abce"
+  },
+  "firefox/browser/components/sidebar/tests/browser/browser_tools_overflow.js": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "9fac2022cc25934523adb03502f7e1a2",
+    "semantic_hash": "9fac2022cc25934523adb03502f7e1a2"
+  },
+  "firefox/browser/components/sidebar/tests/browser/browser_verticalTabs_widget_placements.js": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "bf3782f69863382102d2b6b0b70a1926",
+    "semantic_hash": "bf3782f69863382102d2b6b0b70a1926"
+  },
+  "firefox/browser/components/sidebar/tests/browser/browser_vertical_tabs.js": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "04b5853c7447bd12cc13ad6687aa322d",
+    "semantic_hash": "04b5853c7447bd12cc13ad6687aa322d"
+  },
+  "firefox/browser/components/sidebar/tests/browser/browser_vertical_tabs_cui_reset.js": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "f4d97a2a07c564d1abf863cd3552bd2c",
+    "semantic_hash": "f4d97a2a07c564d1abf863cd3552bd2c"
+  },
+  "firefox/browser/components/sidebar/tests/browser/browser_vertical_tabs_fitts.js": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "e5d86fa9ca6135664f9a08b31d747b80",
+    "semantic_hash": "e5d86fa9ca6135664f9a08b31d747b80"
+  },
+  "firefox/browser/components/sidebar/tests/browser/browser_vertical_tabs_restore_last_window.js": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "862252f1a2c1f09abc19055fd272fbd3",
+    "semantic_hash": "862252f1a2c1f09abc19055fd272fbd3"
+  },
+  "firefox/browser/components/sidebar/tests/browser/browser_vertical_tabs_stacking_context.js": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "50f2dafb43f86bf120cf52f608128533",
+    "semantic_hash": "50f2dafb43f86bf120cf52f608128533"
+  },
+  "firefox/browser/components/sidebar/tests/browser/browser_view_sidebar_menu.js": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "dc3b18bc45e505061b48bbf937c91c4f",
+    "semantic_hash": "dc3b18bc45e505061b48bbf937c91c4f"
+  },
+  "firefox/browser/components/sidebar/tests/browser/head.js": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "e770294ec560940b58faea374f4b86b5",
+    "semantic_hash": "e770294ec560940b58faea374f4b86b5"
+  },
+  "firefox/browser/components/sidebar/tests/browser/legacy/browser_sidebar_adopt.js": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "7c9c5eeb2a2268dddd9c83dc7bd99a14",
+    "semantic_hash": "7c9c5eeb2a2268dddd9c83dc7bd99a14"
+  },
+  "firefox/browser/components/sidebar/tests/browser/legacy/browser_sidebar_app_locale_changed.js": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "3ad64ff61390b0414b43aa738744f5d1",
+    "semantic_hash": "3ad64ff61390b0414b43aa738744f5d1"
+  },
+  "firefox/browser/components/sidebar/tests/browser/legacy/browser_sidebar_keys.js": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "ee54a9099cd476917f3700401518aaf7",
+    "semantic_hash": "ee54a9099cd476917f3700401518aaf7"
+  },
+  "firefox/browser/components/sidebar/tests/browser/legacy/browser_sidebar_move.js": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "7304299c20f4e02efa40fe7d7b1cb37f",
+    "semantic_hash": "7304299c20f4e02efa40fe7d7b1cb37f"
+  },
+  "firefox/browser/components/sidebar/tests/browser/legacy/browser_sidebar_persist.js": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "0c5c4f7cf5449d8225697d8d3ac25d06",
+    "semantic_hash": "0c5c4f7cf5449d8225697d8d3ac25d06"
+  },
+  "firefox/browser/components/sidebar/tests/browser/legacy/browser_sidebar_switcher.js": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "42c9fc875e775b59e5002c3525e366a3",
+    "semantic_hash": "42c9fc875e775b59e5002c3525e366a3"
+  },
+  "firefox/browser/components/sidebar/tests/marionette/test_contextual_password_manager_disabled.py": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "dc7e6bf7e6e5adb468068715359d23ff",
+    "semantic_hash": "dc7e6bf7e6e5adb468068715359d23ff"
+  },
+  "firefox/browser/components/sidebar/tests/marionette/test_default_launcher_visible.py": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "e6f864b1d94b125607827c0b0357a5b3",
+    "semantic_hash": "e6f864b1d94b125607827c0b0357a5b3"
+  },
+  "firefox/browser/components/sidebar/tests/marionette/test_initialize_vertical_tabs.py": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "2bf07b0c6aa6d0efdf6ef30f73c80c26",
+    "semantic_hash": "2bf07b0c6aa6d0efdf6ef30f73c80c26"
+  },
+  "firefox/browser/components/sidebar/tests/marionette/test_last_used_sidebar_panel.py": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "48e7f4abdfbee3cf67e35b1cd83894e4",
+    "semantic_hash": "48e7f4abdfbee3cf67e35b1cd83894e4"
+  },
+  "firefox/browser/components/sidebar/tests/marionette/test_sidebar_button_removal.py": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "e9d10305f280459ce4c83545d70ada5b",
+    "semantic_hash": "e9d10305f280459ce4c83545d70ada5b"
+  },
+  "firefox/browser/components/sidebar/tests/unit/test_sidebar_state.js": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "6fe7a55e0a48f4fc692d6bfb26cecc89",
+    "semantic_hash": "6fe7a55e0a48f4fc692d6bfb26cecc89"
+  },
+  "firefox/browser/components/sidebar/triage.json": {
+    "mtime": 1791962957.0,
+    "seen": 1792707055.2243106,
+    "ast_hash": "70d41f63d0a79ea6cbacdd3c3d3a43a1",
+    "semantic_hash": "70d41f63d0a79ea6cbacdd3c3d3a43a1"
+  }
+}

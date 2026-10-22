@@ -125,6 +125,14 @@ moz-button[unloaded].appbar-tab-button:hover {
   color: var(--tab-text-color-selected, inherit);
 }
 
+.appbar-pinned-divider {
+  width: 24px;
+  height: 1px;
+  background-color: var(--chrome-content-separator-color, color-mix(in srgb, currentColor 15%, transparent));
+  margin-block: var(--space-xxsmall, 4px);
+  flex-shrink: 0;
+}
+
 .appbar-separator {
   width: 24px;
   height: 1px;
@@ -143,7 +151,22 @@ moz-button[unloaded].appbar-tab-button:hover {
   flex-shrink: 0;
 }
 
-/* Drag hover feedback */
+/* Drag & Drop Reordering feedback */
+.appbar-tab-button[draggable="true"] {
+  cursor: grab;
+}
+
+.appbar-tab-button.dragging {
+  opacity: 0.35;
+  cursor: grabbing;
+}
+
+.appbar-tab-button.drag-over::part(button) {
+  outline: 2px solid var(--focus-outline-color, #0060df) !important;
+  outline-offset: 1px;
+}
+
+/* Host drag hover feedback for external drops */
 :host([dragover]) {
   outline: 2px dashed var(--focus-outline-color, #0060df);
   outline-offset: -2px;

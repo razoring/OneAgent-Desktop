@@ -2410,6 +2410,7 @@ var SidebarController = {
     if (this.sidebarRevampEnabled) {
       this._box.dispatchEvent(new CustomEvent("sidebar-hide"));
     }
+    window.AppbarController?.hidePanel?.();
     this.selectMenuItem("");
 
     // Replace the document currently displayed in the sidebar with about:blank

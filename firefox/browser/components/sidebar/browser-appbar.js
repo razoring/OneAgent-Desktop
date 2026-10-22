@@ -97,6 +97,9 @@ var AppbarController = {
       reloadBtn.addEventListener("click", () => {
         if (this.tabManager?.selectedTabId) {
           this.tabManager.reloadTab(this.tabManager.selectedTabId);
+        } else {
+          let defaultBrowser = document.getElementById("appbar");
+          defaultBrowser?.reload?.();
         }
       });
     }
@@ -163,6 +166,24 @@ var AppbarController = {
       });
     }
 
+    // Splitter dragging & width persistence
+    const appbarSplitter = document.getElementById("appbar-splitter");
+    const appbarBox = document.getElementById("appbar-box");
+    if (appbarSplitter && appbarBox) {
+      appbarSplitter.addEventListener("command", () => {
+        const curWidth = appbarBox.getBoundingClientRect().width;
+        if (curWidth > 150) {
+          document.documentElement.style.setProperty("--appbar-panel-width", `${curWidth}px`);
+        }
+      });
+      appbarSplitter.addEventListener("pointerdown", () => {
+        appbarSplitter.setAttribute("state", "dragging");
+      });
+      window.addEventListener("pointerup", () => {
+        appbarSplitter.removeAttribute("state");
+      });
+    }
+
     // Default container to shown on the right
     let container = document.getElementById("appbar-container");
     if (container) {
@@ -182,8 +203,10 @@ var AppbarController = {
     if (this.tabManager) {
       this.tabManager._selectedTabId = null;
       for (const t of this.tabManager.tabs) {
-        t.browser.removeAttribute("selected");
-        t.browser.style.display = "none";
+        if (t.browser) {
+          t.browser.removeAttribute("selected");
+          t.browser.style.display = "none";
+        }
       }
     }
 
@@ -212,9 +235,23 @@ var AppbarController = {
     let splitter = document.getElementById("appbar-splitter");
     if (box) {
       box.hidden = false;
+      box.setAttribute("internal-app", "true");
     }
     if (splitter) {
       splitter.hidden = false;
+    }
+
+    let urlContainer = document.getElementById("appbar-urlbar-container");
+    if (urlContainer) {
+      urlContainer.hidden = true;
+    }
+    let openBtn = document.getElementById("appbar-open-tab-button");
+    if (openBtn) {
+      openBtn.hidden = true;
+    }
+    let mobileBtn = document.getElementById("appbar-toggle-mobile-button");
+    if (mobileBtn) {
+      mobileBtn.hidden = true;
     }
 
     let contentArea = document.getElementById("tabbrowser-tabbox");
@@ -229,6 +266,7 @@ var AppbarController = {
     let splitter = document.getElementById("appbar-splitter");
     if (box) {
       box.hidden = true;
+      box.removeAttribute("internal-app");
     }
     if (splitter) {
       splitter.hidden = true;
