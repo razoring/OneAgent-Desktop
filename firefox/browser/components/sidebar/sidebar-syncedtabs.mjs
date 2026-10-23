@@ -99,6 +99,9 @@ class SyncedTabsInSidebar extends SidebarPage {
 
   handleContextMenuEvent(e) {
     const contextMenu = this._contextMenu;
+    if (!contextMenu) {
+      return;
+    }
     const tabItemSelectors = [
       "#sidebar-synced-tabs-context-open-in-window",
       "#sidebar-synced-tabs-context-open-in-private-window",

@@ -128,6 +128,7 @@ function renderTopSites() {
     const img = document.createElement("img");
     img.className = "site-icon";
     img.src = iconUrl;
+    img.alt = "";
 
     const titleEl = document.createElement("div");
     titleEl.className = "site-title";
@@ -159,6 +160,7 @@ function renderFirefoxTools() {
     const img = document.createElement("img");
     img.className = "tool-icon";
     img.src = tool.iconUrl;
+    img.alt = "";
 
     const info = document.createElement("div");
     info.className = "tool-info";
@@ -212,6 +214,7 @@ function renderActiveApps() {
 
     const img = document.createElement("img");
     img.src = tab.iconUrl || "chrome://global/skin/icons/defaultFavicon.svg";
+    img.alt = "";
 
     const label = document.createElement("span");
     label.textContent = tab.title || tab.url;
@@ -229,7 +232,8 @@ function renderActiveApps() {
     btn.className = "btn btn-secondary btn-remove";
     btn.textContent = "Remove";
     btn.addEventListener("click", () => {
-      ctl()?.tabManager?.closeTab(tab.id);
+      // Use removeTab to completely remove the tab from Appbar
+      ctl()?.tabManager?.removeTab(tab.id);
       renderAll();
     });
 
@@ -245,14 +249,12 @@ function renderAll() {
   renderActiveApps();
 }
 
-document.getElementById("add-form").addEventListener("submit", e => {
-  e.preventDefault();
-  const input = document.getElementById("url");
-  let val = input.value.trim();
+function submitUrl(rawVal) {
+  let val = rawVal.trim();
   if (!val) {
     return;
   }
-  if (!/^[a-zA-Z]+:\/\//i.test(val)) {
+  if (!/^[a-zA-Z]+:\/\//i.test(val) && !val.startsWith("about:") && !val.startsWith("chrome://")) {
     if (val.includes(".") && !val.includes(" ")) {
       val = "https://" + val;
     } else {
@@ -260,8 +262,202 @@ document.getElementById("add-form").addEventListener("submit", e => {
     }
   }
   ctl()?.tabManager?.createTab(val, { pinned: false, select: true });
-  input.value = "";
+  const input = document.getElementById("url");
+  if (input) {
+    input.value = "";
+  }
+  closeAutocomplete();
   renderAll();
+}
+
+/* Places Autocomplete Implementation */
+let autocompleteDebounceTimer = null;
+let currentAutocompleteItems = [];
+let selectedAutocompleteIndex = -1;
+
+async function queryPlaces(searchQuery) {
+  if (!searchQuery || searchQuery.trim().length < 1) {
+    return [];
+  }
+  try {
+    const { PlacesUtils } = ChromeUtils.importESModule(
+      "resource://gre/modules/PlacesUtils.sys.mjs"
+    );
+    const conn = await PlacesUtils.promiseDBConnection();
+    const rows = await conn.executeCached(
+      `SELECT p.url, IFNULL(p.title, p.url) as title
+       FROM moz_places p
+       WHERE p.hidden = 0
+         AND (p.url LIKE :search OR p.title LIKE :search)
+       ORDER BY p.frecency DESC
+       LIMIT 6`,
+      { search: `%${searchQuery.trim()}%` }
+    );
+    return rows.map(r => ({
+      url: r.getResultByName("url"),
+      title: r.getResultByName("title"),
+    }));
+  } catch (e) {
+    console.error("Places query error:", e);
+    return [];
+  }
+}
+
+function renderAutocomplete(items) {
+  const dropdown = document.getElementById("autocomplete-dropdown");
+  dropdown.replaceChildren();
+  currentAutocompleteItems = items;
+  selectedAutocompleteIndex = -1;
+
+  if (!items || items.length === 0) {
+    dropdown.style.display = "none";
+    return;
+  }
+
+  for (let i = 0; i < items.length; i++) {
+    const item = items[i];
+    const el = document.createElement("div");
+    el.className = "autocomplete-item";
+    el.setAttribute("data-index", i);
+
+    let iconUrl = "chrome://global/skin/icons/defaultFavicon.svg";
+    try {
+      const domain = new URL(item.url).hostname;
+      if (domain) {
+        iconUrl = `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
+      }
+    } catch (e) {}
+
+    const img = document.createElement("img");
+    img.className = "item-icon";
+    img.src = iconUrl;
+    img.alt = "";
+
+    const textWrap = document.createElement("div");
+    textWrap.className = "item-text";
+
+    const titleDiv = document.createElement("div");
+    titleDiv.className = "item-title";
+    titleDiv.textContent = item.title;
+
+    const urlDiv = document.createElement("div");
+    urlDiv.className = "item-url";
+    urlDiv.textContent = item.url;
+
+    textWrap.append(titleDiv, urlDiv);
+    el.append(img, textWrap);
+
+    el.addEventListener("mousedown", e => {
+      e.preventDefault();
+      submitUrl(item.url);
+    });
+
+    dropdown.append(el);
+  }
+
+  dropdown.style.display = "block";
+}
+
+function closeAutocomplete() {
+  const dropdown = document.getElementById("autocomplete-dropdown");
+  dropdown.style.display = "none";
+  currentAutocompleteItems = [];
+  selectedAutocompleteIndex = -1;
+}
+
+function updateAutocompleteSelection() {
+  const dropdown = document.getElementById("autocomplete-dropdown");
+  const children = dropdown.querySelectorAll(".autocomplete-item");
+  children.forEach((child, idx) => {
+    if (idx === selectedAutocompleteIndex) {
+      child.classList.add("selected");
+      child.scrollIntoView({ block: "nearest" });
+      const input = document.getElementById("url");
+      if (input && currentAutocompleteItems[idx]) {
+        input.value = currentAutocompleteItems[idx].url;
+      }
+    } else {
+      child.classList.remove("selected");
+    }
+  });
+}
+
+// Input and Event Listeners Setup
+const urlInput = document.getElementById("url");
+const clearBtn = document.getElementById("search-clear-btn");
+const closePanelBtn = document.getElementById("panel-close-btn");
+
+if (closePanelBtn) {
+  closePanelBtn.addEventListener("click", () => {
+    ctl()?.hidePanel();
+  });
+}
+
+if (urlInput) {
+  urlInput.addEventListener("input", e => {
+    const val = e.target.value;
+    if (clearBtn) {
+      clearBtn.style.display = val.length > 0 ? "flex" : "none";
+    }
+
+    clearTimeout(autocompleteDebounceTimer);
+    if (!val || val.trim().length === 0) {
+      closeAutocomplete();
+      return;
+    }
+
+    autocompleteDebounceTimer = setTimeout(async () => {
+      const items = await queryPlaces(val);
+      renderAutocomplete(items);
+    }, 120);
+  });
+
+  urlInput.addEventListener("keydown", e => {
+    const dropdown = document.getElementById("autocomplete-dropdown");
+    const isDropdownVisible = dropdown && dropdown.style.display === "block";
+
+    if (e.key === "ArrowDown") {
+      if (isDropdownVisible && currentAutocompleteItems.length > 0) {
+        e.preventDefault();
+        selectedAutocompleteIndex = (selectedAutocompleteIndex + 1) % currentAutocompleteItems.length;
+        updateAutocompleteSelection();
+      }
+    } else if (e.key === "ArrowUp") {
+      if (isDropdownVisible && currentAutocompleteItems.length > 0) {
+        e.preventDefault();
+        selectedAutocompleteIndex =
+          selectedAutocompleteIndex <= 0
+            ? currentAutocompleteItems.length - 1
+            : selectedAutocompleteIndex - 1;
+        updateAutocompleteSelection();
+      }
+    } else if (e.key === "Escape") {
+      closeAutocomplete();
+    }
+  });
+
+  urlInput.addEventListener("blur", () => {
+    setTimeout(() => closeAutocomplete(), 200);
+  });
+}
+
+if (clearBtn) {
+  clearBtn.addEventListener("click", () => {
+    if (urlInput) {
+      urlInput.value = "";
+      urlInput.focus();
+    }
+    clearBtn.style.display = "none";
+    closeAutocomplete();
+  });
+}
+
+document.getElementById("add-form").addEventListener("submit", e => {
+  e.preventDefault();
+  const input = document.getElementById("url");
+  if (input && input.value.trim()) {
+    submitUrl(input.value);
+  }
 });
 
 renderAll();

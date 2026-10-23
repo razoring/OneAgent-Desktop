@@ -329,6 +329,28 @@ export class AppbarTabManager {
     this.appbarMain?.requestUpdate?.();
   }
 
+  removeTab(tabId) {
+    const index = this._tabs.findIndex(t => t.id === tabId);
+    if (index === -1) {
+      return;
+    }
+
+    const tab = this._tabs[index];
+    this._tabs.splice(index, 1);
+    this._unloadTab(tab);
+
+    if (this._selectedTabId === tabId) {
+      if (this._tabs.length > 0) {
+        const nextIndex = Math.max(0, index - 1);
+        this.selectTab(this._tabs[nextIndex].id);
+      } else {
+        this.closePanel();
+      }
+    }
+
+    this.appbarMain?.requestUpdate?.();
+  }
+
   reloadTab(tabId) {
     const tab = this._tabs.find(t => t.id === tabId);
     if (tab?.browser) {

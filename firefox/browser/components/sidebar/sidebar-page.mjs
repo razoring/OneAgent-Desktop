@@ -27,7 +27,21 @@ export class SidebarPage extends MozLitElement {
     this.documentGlobal.addEventListener("beforeunload", this.clearDocument);
     this.documentGlobal.addEventListener("unload", this.clearDocument);
 
-    this._contextMenu = this.topWindow.SidebarController.currentContextMenu;
+    let doc = this.topWindow.document;
+    let url = this.documentGlobal.location?.href || "";
+    let menu = this.topWindow.SidebarController?.currentContextMenu;
+    if (!menu && doc) {
+      if (url.includes("sidebar-history")) {
+        menu = doc.getElementById("sidebar-history-context-menu");
+      } else if (url.includes("sidebar-bookmarks")) {
+        menu = doc.getElementById("sidebar-bookmarks-context-menu");
+      } else if (url.includes("sidebar-syncedtabs")) {
+        menu = doc.getElementById("sidebar-synced-tabs-context-menu");
+      } else if (url.includes("sidebar-opentabs")) {
+        menu = doc.getElementById("sidebar-opentabs-context-menu");
+      }
+    }
+    this._contextMenu = menu;
   }
 
   disconnectedCallback() {
@@ -127,6 +141,9 @@ export class SidebarPage extends MozLitElement {
 
   addContextMenuListeners() {
     this.addEventListener("contextmenu", this);
+    if (!this._contextMenu) {
+      return;
+    }
     this._contextMenu.addEventListener("command", this);
     this._contextMenu.addEventListener(
       "popupshowing",
@@ -137,6 +154,9 @@ export class SidebarPage extends MozLitElement {
 
   removeContextMenuListeners() {
     this.removeEventListener("contextmenu", this);
+    if (!this._contextMenu) {
+      return;
+    }
     this._contextMenu.removeEventListener("command", this);
     this._contextMenu.removeEventListener(
       "popupshowing",

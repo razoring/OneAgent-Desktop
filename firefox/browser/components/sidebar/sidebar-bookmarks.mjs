@@ -78,7 +78,7 @@ export class SidebarBookmarks extends SidebarPage {
   #contextMenuItems = null;
 
   #initContextMenuItems() {
-    const q = id => this._contextMenu.querySelector(id);
+    const q = id => this._contextMenu?.querySelector?.(id);
     const openAllBookmarks = q("#sidebar-bookmarks-context-open-all-bookmarks");
     const sepOpenAll = q("#sidebar-bookmarks-context-sep-open-all");
     const sortByName = q("#sidebar-bookmarks-context-sort-by-name");

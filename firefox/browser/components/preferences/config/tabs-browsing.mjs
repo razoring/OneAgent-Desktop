@@ -642,7 +642,7 @@ Preferences.addSetting({
 
 SettingGroupManager.registerGroups({
   appbar: {
-    subcategory: "layout",
+    subcategory: "appbar",
     l10nId: "appbar-group-header",
     iconSrc: "chrome://browser/skin/sidebar-collapsed-right.svg",
     headingLevel: 2,

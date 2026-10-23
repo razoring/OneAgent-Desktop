@@ -154,8 +154,7 @@ export default class AppbarMain extends MozLitElement {
     } else if (commandId === "appbar-context-menu-unpin-tab" && this._contextTabId) {
       this.tabManager?.unpinTab(this._contextTabId);
     } else if (commandId === "appbar-context-menu-remove-tab" && this._contextTabId) {
-      this.tabManager?.unpinTab(this._contextTabId);
-      this.tabManager?.closeTab(this._contextTabId);
+      this.tabManager?.removeTab(this._contextTabId);
     } else if (commandId === "appbar-context-menu-reload-tab" && this._contextTabId) {
       this.tabManager?.reloadTab(this._contextTabId);
     } else if (commandId === "appbar-context-menu-manage-extension" && this._contextExtensionId) {
@@ -277,7 +276,7 @@ export default class AppbarMain extends MozLitElement {
   }
 
   openSettings() {
-    window.openPreferences("paneGeneral");
+    window.openPreferences("general-appbar");
   }
 
   renderTabButton(t, activeTabId) {

@@ -36,6 +36,7 @@ export const LEGACY_PANE_MAPPINGS = new Map([
     { category: "tabsBrowsing", subcategory: "cfrfeatures" },
   ],
   ["general-layout", { category: "tabsBrowsing", subcategory: "layout" }],
+  ["general-appbar", { category: "tabsBrowsing", subcategory: "appbar" }],
   [
     "general-link-preview",
     { category: "tabsBrowsing", subcategory: "link-preview" },

@@ -71,9 +71,9 @@ export class SidebarHistory extends SidebarPage {
     this._menuSortByMostVisited = doc.getElementById(
       "sidebar-history-sort-by-most-visited"
     );
-    this._menu.addEventListener("command", this);
-    this._menu.addEventListener("popuphidden", this.handlePopupEvent);
-    this._contextMenu.addEventListener("popupshowing", this);
+    this._menu?.addEventListener?.("command", this);
+    this._menu?.addEventListener?.("popuphidden", this.handlePopupEvent);
+    this._contextMenu?.addEventListener?.("popupshowing", this);
     this.addContextMenuListeners();
     this.addSidebarFocusedListeners();
     this.controller.updateCache();
@@ -85,9 +85,9 @@ export class SidebarHistory extends SidebarPage {
       ["page-removed", "history-cleared"],
       this.#placesRemovedObserver
     );
-    this._menu.removeEventListener("command", this);
-    this._menu.removeEventListener("popuphidden", this.handlePopupEvent);
-    this._contextMenu.removeEventListener("popupshowing", this);
+    this._menu?.removeEventListener?.("command", this);
+    this._menu?.removeEventListener?.("popuphidden", this.handlePopupEvent);
+    this._contextMenu?.removeEventListener?.("popupshowing", this);
     this.removeContextMenuListeners();
     this.removeSidebarFocusedListeners();
   }
