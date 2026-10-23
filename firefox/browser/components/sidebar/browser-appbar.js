@@ -84,6 +84,30 @@ var AppbarController = {
     const closeBtn = document.getElementById("appbar-close");
     if (closeBtn) {
       closeBtn.addEventListener("click", () => {
+        const warnOnClose = Services.prefs.getBoolPref("browser.appbar.warnOnClose", true);
+        if (warnOnClose) {
+          const flags =
+            Services.prompt.BUTTON_TITLE_IS_STRING * Services.prompt.BUTTON_POS_0 +
+            Services.prompt.BUTTON_TITLE_CANCEL * Services.prompt.BUTTON_POS_1;
+          const warnCheck = { value: false };
+          const buttonPressed = Services.prompt.confirmEx(
+            window,
+            "Close App",
+            "Are you sure you want to close this app and end all running processes?",
+            flags,
+            "Close App",
+            null,
+            null,
+            "Do not show again",
+            warnCheck
+          );
+          if (buttonPressed !== 0) {
+            return;
+          }
+          if (warnCheck.value) {
+            Services.prefs.setBoolPref("browser.appbar.warnOnClose", false);
+          }
+        }
         if (this.tabManager?.selectedTabId) {
           this.tabManager.closeTab(this.tabManager.selectedTabId);
         } else {
@@ -184,13 +208,31 @@ var AppbarController = {
       });
     }
 
-    // Default container to shown on the right
+    // Set container visibility according to browser.appbar.enabled
+    const isEnabled = Services.prefs.getBoolPref("browser.appbar.enabled", true);
     let container = document.getElementById("appbar-container");
     if (container) {
-      container.hidden = false;
+      container.hidden = !isEnabled;
     }
     let contentArea = document.getElementById("tabbrowser-tabbox");
-    contentArea?.setAttribute("appbar-shown", "true");
+    if (isEnabled) {
+      contentArea?.setAttribute("appbar-shown", "true");
+    } else {
+      contentArea?.removeAttribute("appbar-shown");
+    }
+
+    const updateEnabled = () => {
+      const enabled = Services.prefs.getBoolPref("browser.appbar.enabled", true);
+      this.toggleAppbarVisibility(enabled);
+    };
+    Services.prefs.addObserver("browser.appbar.enabled", updateEnabled);
+    window.addEventListener(
+      "unload",
+      () => {
+        Services.prefs.removeObserver("browser.appbar.enabled", updateEnabled);
+      },
+      { once: true }
+    );
   },
 
   async showTool(viewId) {
@@ -301,6 +343,9 @@ var AppbarController = {
       contentArea?.setAttribute("appbar-shown", "true");
     } else {
       contentArea?.removeAttribute("appbar-shown");
+    }
+    if (Services.prefs.getBoolPref("browser.appbar.enabled", true) !== shouldShow) {
+      Services.prefs.setBoolPref("browser.appbar.enabled", shouldShow);
     }
   },
 };

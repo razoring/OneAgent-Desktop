@@ -365,6 +365,18 @@ browser-layout-vertical-tabs2 =
     .title = Tabs on the side, in the sidebar
     .description = Tabs on the side, in the sidebar
 
+appbar-group-header =
+    .label = Appbar Sidebar
+
+appbar-enabled-setting =
+    .label = Show Appbar sidebar
+
+appbar-warn-on-close-setting =
+    .label = Confirm before closing an app and ending its processes
+
+appbar-default-mobile-setting =
+    .label = Open web apps in mobile view by default
+
 page-navigation-group =
     .label = Page navigation
 

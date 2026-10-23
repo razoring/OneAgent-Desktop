@@ -295,37 +295,23 @@ export const CustomizableWidgets = [
   },
   {
     id: "sidebar-button",
-    l10nId: "show-sidebars",
+    label: "sidebar-button.label",
+    tooltiptext: "sidebar-button.tooltiptext2",
     defaultArea: "nav-bar",
     _introducedByPref: "sidebar.revamp",
     onCommand(aEvent) {
-      const { SidebarController } = aEvent.target.documentGlobal;
-      if (lazy.sidebarRevampEnabled) {
-        SidebarController.handleToolbarButtonClick();
+      const win = aEvent.target.documentGlobal;
+      if (win.AppbarController) {
+        win.AppbarController.toggleAppbarVisibility();
+      } else if (lazy.sidebarRevampEnabled) {
+        win.SidebarController?.handleToolbarButtonClick();
       } else {
-        SidebarController.toggle();
+        win.SidebarController?.toggle();
       }
     },
     onCreated(aNode) {
-      if (lazy.sidebarRevampEnabled) {
-        const { SidebarController } = aNode.documentGlobal;
-        SidebarController.updateToolbarButton(aNode);
-        aNode.setAttribute("overflows", "false");
-        // Show the toolbar button badge by setting the badged attribute.
-        // This activates badge styling by adding feature-callout class to the toolbarbutton-badge element.
-        aNode.setAttribute("badged", true);
-      } else {
-        // Add an observer so the button is checked while the sidebar is open
-        let doc = aNode.ownerDocument;
-        let obChecked = doc.createXULElement("observes");
-        obChecked.setAttribute("element", "sidebar-box");
-        obChecked.setAttribute("attribute", "checked");
-        let obPosition = doc.createXULElement("observes");
-        obPosition.setAttribute("element", "sidebar-box");
-        obPosition.setAttribute("attribute", "positionend");
-        aNode.appendChild(obChecked);
-        aNode.appendChild(obPosition);
-      }
+      aNode.setAttribute("label", "Appbar");
+      aNode.setAttribute("tooltiptext", "Toggle Appbar");
     },
   },
   {

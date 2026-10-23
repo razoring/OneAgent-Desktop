@@ -471,6 +471,7 @@ const CONFIG_PANES = Object.freeze({
     l10nId: "tabs-browsing-section",
     groupIds: [
       "browserLayout",
+      "appbar",
       "tabs",
       "pageNavigation",
       "keyboardShortcuts",

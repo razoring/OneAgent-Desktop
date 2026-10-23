@@ -107,6 +107,11 @@ Preferences.addAll([
 
   // Browser layout
   { id: "sidebar.verticalTabs", type: "bool" },
+
+  // Appbar
+  { id: "browser.appbar.enabled", type: "bool" },
+  { id: "browser.appbar.warnOnClose", type: "bool" },
+  { id: "browser.appbar.defaultMobile", type: "bool" },
 ]);
 
 if (lazy.AppConstants.platform === "win") {
@@ -621,7 +626,41 @@ Preferences.addSetting({
   set: value => value === "true",
 });
 
+// Appbar settings
+Preferences.addSetting({
+  id: "appbarEnabled",
+  pref: "browser.appbar.enabled",
+});
+Preferences.addSetting({
+  id: "appbarWarnOnClose",
+  pref: "browser.appbar.warnOnClose",
+});
+Preferences.addSetting({
+  id: "appbarDefaultMobile",
+  pref: "browser.appbar.defaultMobile",
+});
+
 SettingGroupManager.registerGroups({
+  appbar: {
+    subcategory: "layout",
+    l10nId: "appbar-group-header",
+    iconSrc: "chrome://browser/skin/sidebar-collapsed-right.svg",
+    headingLevel: 2,
+    items: [
+      {
+        id: "appbarEnabled",
+        l10nId: "appbar-enabled-setting",
+      },
+      {
+        id: "appbarWarnOnClose",
+        l10nId: "appbar-warn-on-close-setting",
+      },
+      {
+        id: "appbarDefaultMobile",
+        l10nId: "appbar-default-mobile-setting",
+      },
+    ],
+  },
   browserLayout: {
     subcategory: "layout",
     l10nId: "browser-layout-header2",

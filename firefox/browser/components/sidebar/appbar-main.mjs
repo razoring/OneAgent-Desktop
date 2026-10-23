@@ -66,6 +66,7 @@ export default class AppbarMain extends MozLitElement {
 
     const pinItem = document.getElementById("appbar-context-menu-pin-tab");
     const unpinItem = document.getElementById("appbar-context-menu-unpin-tab");
+    const removeItem = document.getElementById("appbar-context-menu-remove-tab");
     const closeItem = document.getElementById("appbar-context-menu-close-tab");
     const reloadItem = document.getElementById("appbar-context-menu-reload-tab");
     const tabSeparator = document.getElementById("appbar-context-menu-tab-separator");
@@ -80,6 +81,9 @@ export default class AppbarMain extends MozLitElement {
       }
       if (unpinItem) {
         unpinItem.hidden = !tab?.pinned;
+      }
+      if (removeItem) {
+        removeItem.hidden = !tab?.pinned;
       }
       if (closeItem) {
         closeItem.hidden = false;
@@ -96,6 +100,9 @@ export default class AppbarMain extends MozLitElement {
       }
       if (unpinItem) {
         unpinItem.hidden = true;
+      }
+      if (removeItem) {
+        removeItem.hidden = true;
       }
       if (closeItem) {
         closeItem.hidden = true;
@@ -134,6 +141,10 @@ export default class AppbarMain extends MozLitElement {
     }
   }
 
+  openSettings() {
+    window.openPreferences?.("paneTabsBrowsing-appbar") || window.openPreferences?.();
+  }
+
   async onContextMenuCommand(e) {
     const commandId = e.target.id;
     if (commandId === "appbar-context-menu-close-tab" && this._contextTabId) {
@@ -142,6 +153,9 @@ export default class AppbarMain extends MozLitElement {
       this.tabManager?.pinTab(this._contextTabId);
     } else if (commandId === "appbar-context-menu-unpin-tab" && this._contextTabId) {
       this.tabManager?.unpinTab(this._contextTabId);
+    } else if (commandId === "appbar-context-menu-remove-tab" && this._contextTabId) {
+      this.tabManager?.unpinTab(this._contextTabId);
+      this.tabManager?.closeTab(this._contextTabId);
     } else if (commandId === "appbar-context-menu-reload-tab" && this._contextTabId) {
       this.tabManager?.reloadTab(this._contextTabId);
     } else if (commandId === "appbar-context-menu-manage-extension" && this._contextExtensionId) {
@@ -149,7 +163,7 @@ export default class AppbarMain extends MozLitElement {
     } else if (commandId === "appbar-context-menu-report-extension" && this._contextExtensionId) {
       window.BrowserAddonUI?.reportAddon?.(this._contextExtensionId, "appbar-context-menu");
     } else if (commandId === "appbar-context-menu-customize-appbar") {
-      await this.showView("viewCustomizeAppbar");
+      this.openSettings();
     } else if (commandId === "appbar-context-menu-hide-appbar") {
       this.controller?.toggleAppbarVisibility(false);
     }
@@ -260,6 +274,10 @@ export default class AppbarMain extends MozLitElement {
       await this.controller?.showTool(viewId);
     }
     this.requestUpdate();
+  }
+
+  openSettings() {
+    window.openPreferences("paneGeneral");
   }
 
   renderTabButton(t, activeTabId) {
@@ -378,19 +396,15 @@ export default class AppbarMain extends MozLitElement {
           </div>
         </div>
 
-        <!-- Bottom Actions (Settings / Customize) -->
+        <!-- Bottom Actions (Settings) -->
         <div class="bottom-actions">
           <moz-button
-            class=${classMap({
-              "customize-appbar-button": true,
-              selected: this.selectedView === "viewCustomizeAppbar" && this.controller?.isOpen,
-            })}
+            class="customize-appbar-button"
             type="icon ghost"
-            aria-selected=${this.selectedView === "viewCustomizeAppbar" && this.controller?.isOpen}
-            title="Customize Appbar"
+            title="Appbar Settings"
             iconsrc="chrome://global/skin/icons/settings.svg"
             .iconSrc="chrome://global/skin/icons/settings.svg"
-            @click=${() => this.showView("viewCustomizeAppbar")}
+            @click=${() => this.openSettings()}
           >
           </moz-button>
         </div>

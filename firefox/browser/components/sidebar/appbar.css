@@ -31,7 +31,8 @@
   min-width: 220px;
   max-width: 75vw;
   width: var(--appbar-panel-width, 360px);
-  background-color: var(--toolbar-bgcolor);
+  background-color: var(--sidebar-background-color, var(--toolbar-bgcolor));
+  color: var(--sidebar-text-color, inherit);
   position: relative;
   z-index: 9;
   box-sizing: border-box;
@@ -74,15 +75,15 @@
   flex: 1 1 auto;
   width: 100%;
   height: 100%;
-  border-radius: var(--border-radius-medium, 8px) !important;
+  border-radius: var(--border-radius-medium, 8px) var(--border-radius-medium, 8px) 0 0 !important;
   overflow: clip !important;
 }
 
 .appbar-browser-stack > browser {
   width: 100%;
   height: 100%;
-  background-color: var(--in-content-page-background, #ffffff);
-  border-radius: var(--border-radius-medium, 8px) !important;
+  background-color: var(--sidebar-background-color, var(--toolbar-bgcolor));
+  border-radius: var(--border-radius-medium, 8px) var(--border-radius-medium, 8px) 0 0 !important;
   overflow: clip !important;
 }
 
@@ -102,6 +103,7 @@
   min-height: 38px;
   box-sizing: border-box;
   flex-shrink: 0;
+  margin: 0;
 }
 
 #appbar-box[internal-app="true"] #appbar-bottom-bar {

@@ -2349,6 +2349,9 @@ pref("browser.titlebar.header.enabled", true);
 // here is the vertical default; SidebarManager normalizes to the right value
 // for the current orientation.
 pref("sidebar.visibility", "always-show");
+pref("browser.appbar.enabled", true);
+pref("browser.appbar.warnOnClose", true);
+pref("browser.appbar.defaultMobile", true);
 // Sidebar UI state is stored per-window via session restore. Use this pref
 // as a backup to restore the sidebar UI state when a user has PPB mode on
 // or has history cleared on browser close.

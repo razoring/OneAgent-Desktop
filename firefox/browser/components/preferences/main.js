@@ -675,6 +675,7 @@ var gMainPane = {
 
     // Initialize settings groups from the config object.
     initSettingGroup("browserLayout");
+    initSettingGroup("appbar");
     initSettingGroup("appearance");
     initSettingGroup("drm");
     initSettingGroup("contrast");

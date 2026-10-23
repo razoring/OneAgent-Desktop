@@ -62,7 +62,11 @@ export class AppbarTabManager {
       title: options.title || url,
       iconUrl: resolvedIcon,
       pinned: typeof options.pinned === "boolean" ? options.pinned : false,
-      isMobile: typeof options.isMobile === "boolean" ? options.isMobile : !isInternal,
+      isMobile:
+        typeof options.isMobile === "boolean"
+          ? options.isMobile
+          : !isInternal &&
+            Services.prefs.getBoolPref("browser.appbar.defaultMobile", true),
       isTool: isInternal,
       loaded: false,
       browser: null,

@@ -79,7 +79,7 @@ function renderCurrentPage() {
     ctl()?.tabManager?.createTab(currentURI, {
       title: currentTitle,
       iconUrl: currentIcon,
-      pinned: true,
+      pinned: false,
       select: true,
     });
     renderAll();
@@ -139,7 +139,7 @@ function renderTopSites() {
       ctl()?.tabManager?.createTab(site.url, {
         title: site.title || site.label || site.url,
         iconUrl,
-        pinned: true,
+        pinned: false,
         select: true,
       });
       renderAll();
@@ -183,7 +183,7 @@ function renderFirefoxTools() {
         title: tool.title,
         iconUrl: tool.iconUrl,
         isTool: true,
-        pinned: true,
+        pinned: false,
         select: true,
       });
       renderAll();
@@ -259,7 +259,7 @@ document.getElementById("add-form").addEventListener("submit", e => {
       val = "https://www.google.com/search?q=" + encodeURIComponent(val);
     }
   }
-  ctl()?.tabManager?.createTab(val, { pinned: true, select: true });
+  ctl()?.tabManager?.createTab(val, { pinned: false, select: true });
   input.value = "";
   renderAll();
 });
