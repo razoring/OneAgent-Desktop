@@ -7,27 +7,35 @@
     <meta charset="utf-8" />
     <meta name="color-scheme" content="light dark" />
     <meta http-equiv="Content-Security-Policy" content="default-src resource: chrome:; object-src 'none'; img-src data: chrome: https: http:; style-src 'unsafe-inline' chrome:;" />
-    <title>Add an App</title>
-    <link rel="stylesheet" href="chrome://browser/content/sidebar/sidebar.css" />
+    <title>Add apps</title>
+    <link rel="stylesheet" href="chrome://global/skin/global.css" />
     <link rel="stylesheet" href="chrome://global/skin/in-content/common.css" />
+    <link rel="stylesheet" href="chrome://browser/content/sidebar/sidebar.css" />
     <script src="chrome://browser/content/contentTheme.js"></script>
     <style>
       :root {
-        --appbar-bg: var(--sidebar-background-color, var(--toolbar-bgcolor, #1c1b22));
-        --appbar-text: var(--sidebar-text-color, currentColor);
-        --appbar-card-bg: color-mix(in srgb, currentColor 5%, transparent);
-        --appbar-card-hover: color-mix(in srgb, currentColor 9%, transparent);
-        --appbar-card-border: color-mix(in srgb, currentColor 10%, transparent);
-        --appbar-separator: color-mix(in srgb, currentColor 12%, transparent);
-        --primary-blue: var(--in-content-primary-button-background, #0060df);
-        --primary-blue-hover: var(--in-content-primary-button-background-hover, #0250bb);
-        --primary-blue-active: var(--in-content-primary-button-background-active, #054096);
-        background-color: var(--appbar-bg);
-        color: var(--appbar-text);
+        --appbar-page-bg: var(--in-content-page-background, var(--sidebar-background-color, #1c1b22));
+        --appbar-page-color: var(--in-content-page-color, var(--sidebar-text-color, #fbfbfe));
+        --appbar-card-bg: var(--in-content-box-background, color-mix(in srgb, currentColor 5%, transparent));
+        --appbar-card-border: var(--in-content-box-border-color, color-mix(in srgb, currentColor 12%, transparent));
+        --appbar-tile-bg: color-mix(in srgb, currentColor 4%, transparent);
+        --appbar-tile-border: color-mix(in srgb, currentColor 10%, transparent);
+        --appbar-tile-border-hover: color-mix(in srgb, currentColor 22%, transparent);
+        --appbar-item-hover: var(--in-content-item-hover, var(--in-content-button-background-hover, color-mix(in srgb, currentColor 8%, transparent)));
+        --appbar-deemphasized: var(--in-content-deemphasized-text, color-mix(in srgb, currentColor 65%, transparent));
+        --appbar-primary-bg: var(--in-content-primary-button-background, #0060df);
+        --appbar-primary-hover: var(--in-content-primary-button-background-hover, #0250bb);
+        --appbar-primary-active: var(--in-content-primary-button-background-active, #054096);
+        --appbar-primary-text: var(--in-content-primary-button-text-color, #ffffff);
+        --appbar-focus: var(--in-content-focus-outline-color, #0060df);
+        background-color: var(--appbar-page-bg);
+        color: var(--appbar-page-color);
       }
+
       * {
         box-sizing: border-box;
       }
+
       body {
         margin: 0;
         padding: 16px;
@@ -39,108 +47,209 @@
         line-height: 1.4;
         user-select: none;
         overflow-x: hidden;
+        scrollbar-width: thin;
       }
 
-      /* Header */
+      /* Panel Header */
       .panel-header {
-        display: flex;
-        align-items: flex-start;
-        justify-content: space-between;
-        margin-bottom: 16px;
+        margin-bottom: 18px;
       }
-      .panel-header-text h1 {
-        font-size: 18px;
+
+      .panel-header h1 {
+        font-size: 20px;
         font-weight: 600;
-        margin: 0 0 2px;
+        margin: 0;
         color: inherit;
         letter-spacing: -0.2px;
       }
-      .panel-header-text p {
-        margin: 0;
-        font-size: 12px;
-        opacity: 0.65;
+
+      /* Sections & Cards */
+      .section {
+        margin-bottom: 20px;
       }
-      .panel-close-btn {
-        background: transparent;
-        border: none;
+
+      .card {
+        background-color: var(--appbar-card-bg);
+        border: 1px solid var(--appbar-card-border);
         border-radius: var(--border-radius-medium, 8px);
-        cursor: pointer;
-        color: inherit;
-        padding: 4px;
+        padding: 14px 16px;
+      }
+
+      .card-header-row {
         display: flex;
         align-items: center;
-        justify-content: center;
-        width: 28px;
-        height: 28px;
-        transition: background-color 150ms ease;
+        gap: 8px;
+        margin-bottom: 12px;
       }
-      .panel-close-btn:hover {
-        background: color-mix(in srgb, currentColor 12%, transparent);
-      }
-      .panel-close-btn img {
-        width: 14px;
-        height: 14px;
+
+      .card-header-icon {
+        width: 16px;
+        height: 16px;
         fill: currentColor;
         -moz-context-properties: fill;
       }
 
-      /* Sections */
-      .section {
-        margin-bottom: 20px;
-      }
-      .section-title {
-        font-size: 11px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.6px;
-        opacity: 0.6;
-        margin-bottom: 8px;
+      .card-header-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: inherit;
+        margin: 0;
       }
 
-      /* Search & Autocomplete Box */
+      .card-title-block {
+        margin-bottom: 12px;
+      }
+
+      .card-title-block h2 {
+        font-size: 14px;
+        font-weight: 600;
+        margin: 0 0 4px;
+        color: inherit;
+      }
+
+      .card-title-block p {
+        font-size: 12px;
+        color: var(--appbar-deemphasized);
+        margin: 0;
+      }
+
+      /* Frequently Visited Grid - max 2 rows, flexible & responsive */
+      .tiles-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(74px, 1fr));
+        gap: 8px;
+      }
+
+      .freq-grid {
+        max-height: 172px;
+        overflow: hidden;
+      }
+
+      .app-tile {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 10px 6px;
+        border-radius: var(--border-radius-medium, 8px);
+        background-color: var(--appbar-tile-bg);
+        border: 1px solid var(--appbar-tile-border);
+        cursor: pointer;
+        text-align: center;
+        transition: background-color 150ms ease, border-color 150ms ease, transform 150ms ease;
+      }
+
+      .app-tile:hover {
+        background-color: var(--appbar-item-hover);
+        border-color: var(--appbar-focus);
+        transform: translateY(-2px);
+      }
+
+      .app-tile:active {
+        transform: translateY(0);
+      }
+
+      .app-tile .tile-icon {
+        width: 24px;
+        height: 24px;
+        border-radius: 4px;
+        object-fit: contain;
+        margin-bottom: 6px;
+      }
+
+      .app-tile .tile-title {
+        font-size: 11px;
+        font-weight: 500;
+        max-width: 100%;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      /* Manage Apps Tile with Close Button */
+      .manage-tile {
+        position: relative;
+      }
+
+      .manage-tile .tile-close-btn {
+        position: absolute;
+        top: 4px;
+        right: 4px;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        border: none;
+        background: transparent;
+        color: inherit;
+        opacity: 0.6;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: opacity 150ms ease, background-color 150ms ease;
+      }
+
+      .manage-tile:hover .tile-close-btn {
+        opacity: 0.9;
+        background-color: color-mix(in srgb, currentColor 14%, transparent);
+      }
+
+      .manage-tile .tile-close-btn:hover {
+        opacity: 1;
+        background-color: var(--icon-color-critical, #e22850);
+        color: #ffffff;
+      }
+
+      .manage-tile .tile-close-btn img {
+        width: 12px;
+        height: 12px;
+        fill: currentColor;
+        -moz-context-properties: fill;
+      }
+
+      /* Search Bar - styled like about:preferences */
       .search-container {
         position: relative;
         width: 100%;
+        margin-bottom: 12px;
       }
+
       .search-form {
+        position: relative;
         display: flex;
-        gap: 8px;
         align-items: center;
         width: 100%;
       }
-      .search-input-wrapper {
-        position: relative;
-        flex: 1 1 auto;
-        display: flex;
-        align-items: center;
-      }
+
       .search-icon {
         position: absolute;
         left: 10px;
         width: 14px;
         height: 14px;
-        opacity: 0.55;
+        color: var(--appbar-deemphasized);
         pointer-events: none;
         -moz-context-properties: fill;
         fill: currentColor;
       }
+
       .search-input {
         width: 100%;
-        height: 34px;
-        padding: 0 30px 0 32px;
+        height: 32px;
+        padding: 0 28px 0 32px;
         font-size: 13px;
         border: 1px solid var(--appbar-card-border);
-        border-radius: var(--border-radius-medium, 8px);
-        background: color-mix(in srgb, currentColor 5%, transparent);
+        border-radius: 20px;
+        background-color: var(--appbar-tile-bg);
         color: inherit;
         outline: none;
-        transition: border-color 150ms ease, box-shadow 150ms ease, background-color 150ms ease;
+        transition: border-color 150ms ease, box-shadow 150ms ease;
       }
+
       .search-input:focus {
-        border-color: var(--focus-outline-color, #0060df);
-        box-shadow: 0 0 0 1px var(--focus-outline-color, #0060df);
-        background: color-mix(in srgb, currentColor 8%, transparent);
+        border-color: var(--appbar-focus);
+        box-shadow: 0 0 0 1px var(--appbar-focus);
       }
+
       .search-clear-btn {
         position: absolute;
         right: 8px;
@@ -155,10 +264,12 @@
         justify-content: center;
         border-radius: 50%;
       }
+
       .search-clear-btn:hover {
         opacity: 0.9;
-        background: color-mix(in srgb, currentColor 15%, transparent);
+        background-color: var(--appbar-item-hover);
       }
+
       .search-clear-btn img {
         width: 12px;
         height: 12px;
@@ -173,26 +284,31 @@
         left: 0;
         right: 0;
         z-index: 1000;
-        background: var(--appbar-bg);
+        background-color: var(--appbar-page-bg);
         border: 1px solid var(--appbar-card-border);
-        border-radius: var(--border-radius-medium, 8px);
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+        border-radius: var(--border-radius-medium, 6px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
         max-height: 240px;
         overflow-y: auto;
         display: none;
+        padding: 4px;
       }
+
       .autocomplete-item {
         display: flex;
         align-items: center;
         gap: 10px;
         padding: 8px 10px;
+        border-radius: var(--border-radius-small, 4px);
         cursor: pointer;
         transition: background-color 100ms ease;
       }
+
       .autocomplete-item:hover,
       .autocomplete-item.selected {
-        background: var(--appbar-card-hover);
+        background-color: var(--appbar-item-hover);
       }
+
       .autocomplete-item .item-icon {
         width: 16px;
         height: 16px;
@@ -200,12 +316,14 @@
         flex-shrink: 0;
         object-fit: contain;
       }
+
       .autocomplete-item .item-text {
         flex: 1 1 auto;
         min-width: 0;
         display: flex;
         flex-direction: column;
       }
+
       .autocomplete-item .item-title {
         font-size: 12px;
         font-weight: 500;
@@ -213,220 +331,184 @@
         text-overflow: ellipsis;
         white-space: nowrap;
       }
+
       .autocomplete-item .item-url {
         font-size: 11px;
-        opacity: 0.6;
+        color: var(--appbar-deemphasized);
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
       }
 
-      /* Buttons */
-      .btn {
-        display: inline-flex;
+      /* Pinned Apps List - Table taken from about:preferences#search */
+      .pinned-list-container {
+        border: 1px solid var(--appbar-card-border);
+        border-radius: var(--border-radius-medium, 8px);
+        overflow: hidden;
+        background-color: var(--appbar-tile-bg);
+      }
+
+      .pinned-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 12px;
+        border-bottom: 1px solid var(--appbar-card-border);
+        transition: background-color 150ms ease, opacity 150ms ease;
+      }
+
+      .pinned-row:last-child {
+        border-bottom: none;
+      }
+
+      .pinned-row:hover {
+        background-color: var(--appbar-item-hover);
+      }
+
+      .pinned-row.dragging {
+        opacity: 0.4;
+      }
+
+      .pinned-row.drag-over-top {
+        border-top: 2px solid var(--appbar-focus);
+      }
+
+      .pinned-row.drag-over-bottom {
+        border-bottom: 2px solid var(--appbar-focus);
+      }
+
+      .drag-handle {
+        width: 18px;
+        height: 18px;
+        cursor: grab;
+        display: flex;
         align-items: center;
         justify-content: center;
-        height: 32px;
-        padding: 0 14px;
-        font-size: 12px;
-        font-weight: 600;
-        border-radius: var(--border-radius-medium, 8px);
-        border: 1px solid transparent;
-        cursor: pointer;
-        transition: background-color 150ms ease, opacity 150ms ease, transform 100ms ease;
-        flex-shrink: 0;
-      }
-      .btn:active:not(:disabled) {
-        transform: scale(0.97);
-      }
-      .btn-primary {
-        background: var(--primary-blue);
-        color: #ffffff;
-      }
-      .btn-primary:hover:not(:disabled) {
-        background: var(--primary-blue-hover);
-      }
-      .btn-primary:active:not(:disabled) {
-        background: var(--primary-blue-active);
-      }
-      .btn-secondary {
-        background: color-mix(in srgb, currentColor 8%, transparent);
-        color: inherit;
-        border-color: var(--appbar-card-border);
-      }
-      .btn-secondary:hover:not(:disabled) {
-        background: color-mix(in srgb, currentColor 14%, transparent);
-      }
-      .btn:disabled {
         opacity: 0.45;
-        cursor: default;
-      }
-
-      /* Current Page Card */
-      .current-page-card {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        padding: 10px 12px;
-        background: var(--appbar-card-bg);
-        border: 1px solid var(--appbar-card-border);
-        border-radius: var(--border-radius-medium, 8px);
-        transition: background-color 150ms ease, border-color 150ms ease;
-      }
-      .current-page-card:hover {
-        background: var(--appbar-card-hover);
-      }
-      .card-icon {
-        width: 24px;
-        height: 24px;
-        border-radius: 4px;
-        object-fit: contain;
         flex-shrink: 0;
-      }
-      .card-details {
-        flex: 1 1 auto;
-        min-width: 0;
-      }
-      .card-title {
-        font-weight: 600;
-        font-size: 13px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-      .card-subtitle {
-        font-size: 11px;
-        opacity: 0.65;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+        transition: opacity 150ms ease;
       }
 
-      /* Top Sites Grid */
-      .top-sites-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(68px, 1fr));
-        gap: 8px;
+      .drag-handle:hover {
+        opacity: 0.9;
       }
-      .top-site-tile {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding: 10px 6px;
-        border-radius: var(--border-radius-medium, 8px);
-        background: var(--appbar-card-bg);
-        border: 1px solid var(--appbar-card-border);
-        cursor: pointer;
-        text-align: center;
-        transition: background-color 150ms ease, transform 150ms cubic-bezier(0.2, 0, 0, 1), box-shadow 150ms ease;
+
+      .drag-handle:active {
+        cursor: grabbing;
       }
-      .top-site-tile:hover {
-        background: var(--appbar-card-hover);
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+
+      .drag-handle img {
+        width: 14px;
+        height: 14px;
+        fill: currentColor;
+        -moz-context-properties: fill;
       }
-      .top-site-tile:active {
-        transform: translateY(0);
-      }
-      .top-site-tile .site-icon {
-        width: 24px;
-        height: 24px;
-        border-radius: 4px;
-        margin-bottom: 6px;
+
+      .pinned-icon {
+        width: 16px;
+        height: 16px;
+        border-radius: 2px;
         object-fit: contain;
-      }
-      .top-site-tile .site-title {
-        font-size: 11px;
-        font-weight: 500;
-        max-width: 100%;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-
-      /* Firefox Tools list */
-      .tools-list {
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-      }
-      .tool-item {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        padding: 8px 12px;
-        border-radius: var(--border-radius-medium, 8px);
-        background: var(--appbar-card-bg);
-        border: 1px solid var(--appbar-card-border);
-        transition: background-color 150ms ease;
-      }
-      .tool-item:hover {
-        background: var(--appbar-card-hover);
-      }
-      .tool-icon {
-        width: 20px;
-        height: 20px;
         flex-shrink: 0;
         fill: currentColor;
         -moz-context-properties: fill;
       }
-      .tool-info {
+
+      .pinned-title {
         flex: 1 1 auto;
-        min-width: 0;
-      }
-      .tool-name {
-        font-weight: 600;
-        font-size: 12px;
-      }
-      .tool-desc {
-        font-size: 11px;
-        opacity: 0.65;
+        font-size: 13px;
+        font-weight: 500;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
 
-      /* Added Apps list */
-      .apps-list {
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-      }
-      .app-row {
+      .pinned-actions {
         display: flex;
         align-items: center;
         gap: 10px;
-        padding: 6px 10px;
-        border-radius: var(--border-radius-medium, 8px);
-        background: var(--appbar-card-bg);
-        border: 1px solid var(--appbar-card-border);
-        transition: background-color 150ms ease;
-      }
-      .app-row:hover {
-        background: var(--appbar-card-hover);
-      }
-      .app-row img {
-        width: 16px;
-        height: 16px;
-        border-radius: 2px;
         flex-shrink: 0;
       }
-      .app-row span {
-        flex: 1 1 auto;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        font-size: 12px;
+
+      /* Toggle Switch - Firefox Settings style */
+      .toggle-switch {
+        position: relative;
+        width: 36px;
+        height: 20px;
+        background: transparent;
+        border: none;
+        padding: 0;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
       }
-      .app-row .btn-remove {
-        padding: 2px 10px;
-        height: 26px;
-        font-size: 11px;
+
+      .toggle-track {
+        width: 36px;
+        height: 20px;
+        border-radius: 10px;
+        background-color: color-mix(in srgb, currentColor 25%, transparent);
+        transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1);
+        display: block;
+        position: relative;
       }
-      .badge-pinned {
-        font-size: 10px;
-        padding: 1px 6px;
+
+      .toggle-switch.active .toggle-track {
+        background-color: var(--appbar-primary-bg);
+      }
+
+      .toggle-thumb {
+        position: absolute;
+        top: 3px;
+        left: 3px;
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background-color: #ffffff;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+        transition: transform 150ms cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .toggle-switch.active .toggle-thumb {
+        transform: translateX(16px);
+      }
+
+      /* Delete button */
+      .btn-delete {
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        color: inherit;
+        opacity: 0.6;
+        padding: 4px;
         border-radius: 4px;
-        background: color-mix(in srgb, currentColor 12%, transparent);
-        font-weight: 500;
-        opacity: 0.8;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+        height: 24px;
+        transition: opacity 150ms ease, background-color 150ms ease;
+      }
+
+      .btn-delete:hover {
+        opacity: 1;
+        background-color: color-mix(in srgb, currentColor 12%, transparent);
+      }
+
+      .btn-delete img {
+        width: 14px;
+        height: 14px;
+        fill: currentColor;
+        -moz-context-properties: fill;
+      }
+
+      /* Empty State */
+      .empty-state-text {
+        font-size: 12px;
+        color: var(--appbar-deemphasized);
+        text-align: center;
+        padding: 16px 8px;
+        margin: 0;
       }
     </style>
     <script src="chrome://browser/content/sidebar/appbar-customize.js" defer></script>
@@ -434,69 +516,61 @@
   <body>
     <!-- Header -->
     <div class="panel-header">
-      <div class="panel-header-text">
-        <h1>Add an App</h1>
-        <p>Pin favorite web apps and browser tools</p>
-      </div>
-      <button id="panel-close-btn" class="panel-close-btn" title="Close Panel">
-        <img src="chrome://global/skin/icons/close.svg" alt="Close" />
-      </button>
+      <h1>Add apps</h1>
     </div>
 
-    <!-- Current Tab Section -->
-    <div class="section" id="section-current-page" style="display: none;">
-      <div class="section-title">Current Tab</div>
-      <div class="current-page-card">
-        <img id="current-page-icon" class="card-icon" src="" alt="" />
-        <div class="card-details">
-          <div id="current-page-title" class="card-title"></div>
-          <div id="current-page-url" class="card-subtitle"></div>
+    <!-- Frequently Visited Section -->
+    <div class="section" id="section-freq-visited">
+      <div class="card">
+        <div class="card-header-row">
+          <img class="card-header-icon" src="chrome://global/skin/icons/defaultFavicon.svg" alt="" />
+          <h2 class="card-header-title">Frequently visited</h2>
         </div>
-        <button id="add-current-page-btn" class="btn btn-primary">Add</button>
+        <div id="freq-grid" class="tiles-grid freq-grid"></div>
       </div>
     </div>
 
-    <!-- Search or Enter URL with Autocomplete -->
-    <div class="section">
-      <div class="section-title">Search or Enter URL</div>
-      <div class="search-container">
-        <form id="add-form" class="search-form" autocomplete="off">
-          <div class="search-input-wrapper">
+    <!-- Pinned Apps Section -->
+    <div class="section" id="section-pinned-apps">
+      <div class="card">
+        <div class="card-title-block">
+          <h2>Pinned apps</h2>
+          <p>Reposition where apps appear and edit their visibility.</p>
+        </div>
+
+        <!-- Search Bar with Autocomplete -->
+        <div class="search-container">
+          <form id="add-form" class="search-form" autocomplete="off">
             <img class="search-icon" src="chrome://global/skin/icons/search-glass.svg" alt="" />
             <input
               id="url"
               class="search-input"
               type="text"
-              placeholder="e.g. youtube.com or search term..."
+              placeholder="Enter URL or search favorites"
               autocomplete="off"
               spellcheck="false"
             />
             <button id="search-clear-btn" type="button" class="search-clear-btn" title="Clear input">
               <img src="chrome://global/skin/icons/close.svg" alt="Clear" />
             </button>
-          </div>
-          <button type="submit" class="btn btn-primary">Add</button>
-        </form>
-        <div id="autocomplete-dropdown" class="autocomplete-dropdown"></div>
+          </form>
+          <div id="autocomplete-dropdown" class="autocomplete-dropdown"></div>
+        </div>
+
+        <!-- Reorderable List of Pinned Apps -->
+        <div id="pinned-list" class="pinned-list-container"></div>
       </div>
     </div>
 
-    <!-- Top Sites Section -->
-    <div class="section" id="section-top-sites">
-      <div class="section-title">Top Sites</div>
-      <div id="top-sites-grid" class="top-sites-grid"></div>
-    </div>
-
-    <!-- Firefox Default Tools -->
-    <div class="section">
-      <div class="section-title">Firefox Tools</div>
-      <div class="tools-list" id="firefox-tools-list"></div>
-    </div>
-
-    <!-- Added Apps Management -->
-    <div class="section" id="section-active-apps">
-      <div class="section-title">Added Apps</div>
-      <div id="apps" class="apps-list"></div>
+    <!-- Manage Apps Section (Active Apps) -->
+    <div class="section" id="section-manage-apps">
+      <div class="card">
+        <div class="card-title-block">
+          <h2>Manage apps</h2>
+          <p>Close currently active apps to save memory.</p>
+        </div>
+        <div id="manage-grid" class="tiles-grid"></div>
+      </div>
     </div>
   </body>
 </html>

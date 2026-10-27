@@ -48,15 +48,6 @@ export class SidebarPanelHeader extends MozLitElement {
       <div class="sidebar-panel-heading">
         <h4 class="sidebar-panel-title text-truncated-ellipsis">${this.heading}</h4>
         <sidebar-panel-switcher view=${this.view}></sidebar-panel-switcher>
-        <moz-button
-          iconsrc="chrome://global/skin/icons/close.svg"
-          data-l10n-id="sidebar-panel-header-close-button"
-          @click=${this.closeSidebarPanel}
-          view=${this.view}
-          size="default"
-          type="icon ghost"
-        >
-        </moz-button>
       </div>
       <slot></slot>
     `;

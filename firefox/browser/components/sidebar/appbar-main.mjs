@@ -318,8 +318,8 @@ export default class AppbarMain extends MozLitElement {
     const activeTabId = this.tabManager?.selectedTabId;
     const tools = this.controller?.getTools() || [];
 
-    const pinnedTabs = tabs.filter(t => t.pinned);
-    const unpinnedTabs = tabs.filter(t => !t.pinned);
+    const pinnedTabs = tabs.filter(t => t.pinned && !t.hidden);
+    const unpinnedTabs = tabs.filter(t => !t.pinned && !t.hidden);
 
     return html`
       <link rel="stylesheet" href="chrome://browser/content/sidebar/appbar.css" />

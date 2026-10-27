@@ -350,6 +350,7 @@ var CustomizableUIInternal = {
       "unified-extensions-button",
       "downloads-button",
       "fxa-toolbar-menu-button",
+      "sidebar-button",
     ];
 
     this.registerArea(
@@ -838,6 +839,10 @@ var CustomizableUIInternal = {
         !navbarPlacements.includes("reset-pbm-toolbar-button")
       ) {
         navbarPlacements.push("reset-pbm-toolbar-button");
+      }
+
+      if (navbarPlacements && !navbarPlacements.includes("sidebar-button")) {
+        navbarPlacements.push("sidebar-button");
       }
     }
 

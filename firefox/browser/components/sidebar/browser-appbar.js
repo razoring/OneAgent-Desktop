@@ -221,6 +221,20 @@ var AppbarController = {
       contentArea?.removeAttribute("appbar-shown");
     }
 
+    // Ensure sidebar-button (Appbar) is placed in nav-bar if not placed
+    try {
+      const placement = window.CustomizableUI?.getPlacementOfWidget("sidebar-button");
+      if (!placement) {
+        window.CustomizableUI?.addWidgetToArea("sidebar-button", "nav-bar");
+      }
+    } catch (e) {}
+
+    let button = document.getElementById("sidebar-button");
+    if (button) {
+      button.toggleAttribute("expanded", isEnabled);
+      button.checked = isEnabled;
+    }
+
     const updateEnabled = () => {
       const enabled = Services.prefs.getBoolPref("browser.appbar.enabled", true);
       this.toggleAppbarVisibility(enabled);
@@ -343,6 +357,11 @@ var AppbarController = {
       contentArea?.setAttribute("appbar-shown", "true");
     } else {
       contentArea?.removeAttribute("appbar-shown");
+    }
+    let button = document.getElementById("sidebar-button");
+    if (button) {
+      button.toggleAttribute("expanded", shouldShow);
+      button.checked = shouldShow;
     }
     if (Services.prefs.getBoolPref("browser.appbar.enabled", true) !== shouldShow) {
       Services.prefs.setBoolPref("browser.appbar.enabled", shouldShow);

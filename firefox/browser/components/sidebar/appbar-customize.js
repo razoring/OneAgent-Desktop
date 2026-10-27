@@ -4,252 +4,387 @@
 
 const getTopWin = () => window.browsingContext?.topChromeWindow || window.opener || window;
 const ctl = () => getTopWin().AppbarController;
+const tabMgr = () => ctl()?.tabManager;
 
-const DEFAULT_TOOLS = [
-  {
-    id: "bookmarks",
-    title: "Bookmarks",
-    desc: "Quick access to your bookmarks",
-    url: "chrome://browser/content/sidebar/sidebar-bookmarks.html",
-    iconUrl: "chrome://browser/skin/bookmark-hollow.svg",
-  },
-  {
-    id: "history",
-    title: "History",
-    desc: "Recent browsing history",
-    url: "chrome://browser/content/sidebar/sidebar-history.html",
-    iconUrl: "chrome://browser/skin/history.svg",
-  },
-  {
-    id: "passwords",
-    title: "Passwords",
-    desc: "Saved logins and passwords",
-    url: "chrome://global/content/megalist/megalist.html",
-    iconUrl: "chrome://browser/skin/login.svg",
-  },
-  {
-    id: "syncedtabs",
-    title: "Tabs from other devices",
-    desc: "Synced tabs across your devices",
-    url: "chrome://browser/content/sidebar/sidebar-syncedtabs.html",
-    iconUrl: "chrome://browser/skin/synced-tabs.svg",
-  },
-];
+let autocompleteDebounceTimer = null;
+let currentAutocompleteItems = [];
+let selectedAutocompleteIndex = -1;
+let draggedRowId = null;
 
-function isAppAdded(url) {
-  const tabs = ctl()?.tabManager?.tabs || [];
-  return tabs.some(t => t.url === url);
-}
-
-function renderCurrentPage() {
-  const section = document.getElementById("section-current-page");
-  const topWin = getTopWin();
-  const gBrowser = topWin.gBrowser;
-  if (!gBrowser) {
-    section.style.display = "none";
-    return;
+async function queryPlaces(searchTerm) {
+  if (!searchTerm || searchTerm.trim().length === 0) {
+    return [];
   }
 
-  const selectedBrowser = gBrowser.selectedBrowser;
-  const currentURI = selectedBrowser?.currentURI?.spec;
-  if (!currentURI || (!currentURI.startsWith("http://") && !currentURI.startsWith("https://"))) {
-    section.style.display = "none";
-    return;
-  }
-
-  const selectedTab = gBrowser.selectedTab;
-  const currentTitle = selectedBrowser?.contentTitle || selectedTab?.label || currentURI;
-  let currentIcon = "chrome://global/skin/icons/defaultFavicon.svg";
   try {
-    if (gBrowser.getIcon) {
-      currentIcon = gBrowser.getIcon(selectedTab) || currentIcon;
+    const { PlacesUtils } = ChromeUtils.importESModule(
+      "resource://gre/modules/PlacesUtils.sys.mjs"
+    );
+    const db = await PlacesUtils.promiseDBConnection();
+    const queryPattern = `%${searchTerm.toLowerCase()}%`;
+    const rows = await db.executeCached(
+      `SELECT url, title, rev_host
+       FROM moz_places
+       WHERE (LOWER(title) LIKE :query OR LOWER(url) LIKE :query)
+         AND hidden = 0
+         AND url NOT LIKE 'about:%'
+         AND url NOT LIKE 'chrome://%'
+         AND url NOT LIKE 'resource://%'
+       ORDER BY frecency DESC, visit_count DESC
+       LIMIT 6`,
+      { query: queryPattern }
+    );
+
+    const results = [];
+    for (const row of rows) {
+      const url = row.getResultByName("url");
+      let title = row.getResultByName("title");
+      if (!title) {
+        try {
+          title = new URL(url).hostname;
+        } catch (e) {
+          title = url;
+        }
+      }
+      let icon = "chrome://global/skin/icons/defaultFavicon.svg";
+      try {
+        const domain = new URL(url).hostname;
+        icon = `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
+      } catch (e) {}
+      results.push({ url, title, icon });
     }
-  } catch (e) {}
-
-  section.style.display = "block";
-  document.getElementById("current-page-icon").src = currentIcon;
-  document.getElementById("current-page-title").textContent = currentTitle;
-  document.getElementById("current-page-url").textContent = currentURI;
-
-  const addBtn = document.getElementById("add-current-page-btn");
-  const added = isAppAdded(currentURI);
-  addBtn.textContent = added ? "Added" : "Add";
-  addBtn.disabled = added;
-  addBtn.onclick = () => {
-    ctl()?.tabManager?.createTab(currentURI, {
-      title: currentTitle,
-      iconUrl: currentIcon,
-      pinned: false,
-      select: true,
-    });
-    renderAll();
-  };
+    return results;
+  } catch (err) {
+    console.error("Places query error in appbar autocomplete:", err);
+    return [];
+  }
 }
 
-function renderTopSites() {
-  const grid = document.getElementById("top-sites-grid");
+async function getFrequentlyVisitedSites() {
+  try {
+    const { PlacesUtils } = ChromeUtils.importESModule(
+      "resource://gre/modules/PlacesUtils.sys.mjs"
+    );
+    const db = await PlacesUtils.promiseDBConnection();
+    const rows = await db.executeCached(
+      `SELECT url, title, visit_count
+       FROM moz_places
+       WHERE hidden = 0
+         AND visit_count > 0
+         AND url NOT LIKE 'about:%'
+         AND url NOT LIKE 'chrome://%'
+         AND url NOT LIKE 'resource://%'
+       ORDER BY visit_count DESC
+       LIMIT 16`
+    );
+
+    const sites = [];
+    for (const row of rows) {
+      const url = row.getResultByName("url");
+      let title = row.getResultByName("title");
+      if (!title) {
+        try {
+          title = new URL(url).hostname;
+        } catch (e) {
+          title = url;
+        }
+      }
+      let icon = "chrome://global/skin/icons/defaultFavicon.svg";
+      try {
+        const domain = new URL(url).hostname;
+        icon = `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
+      } catch (e) {}
+      sites.push({ url, title, icon });
+    }
+    if (sites.length > 0) {
+      return sites;
+    }
+  } catch (err) {
+    console.error("Failed to query moz_places for frequently visited:", err);
+  }
+
+  // Fallback to AboutNewTab top sites
+  try {
+    const { AboutNewTab } = ChromeUtils.importESModule(
+      "resource:///modules/AboutNewTab.sys.mjs"
+    );
+    const topSites = AboutNewTab.getTopSites() || [];
+    return topSites.map(s => {
+      let icon = "chrome://global/skin/icons/defaultFavicon.svg";
+      try {
+        const domain = new URL(s.url).hostname;
+        icon = `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
+      } catch (e) {}
+      return {
+        url: s.url,
+        title: s.title || s.label || s.url,
+        icon,
+      };
+    });
+  } catch (e) {
+    return [];
+  }
+}
+
+async function renderFrequentlyVisited() {
+  const grid = document.getElementById("freq-grid");
+  if (!grid) {
+    return;
+  }
   grid.replaceChildren();
 
-  let topSites = [];
-  try {
-    const { AboutNewTab } = ChromeUtils.importESModule("resource:///modules/AboutNewTab.sys.mjs");
-    topSites = AboutNewTab.getTopSites() || [];
-  } catch (e) {}
-
-  if (!topSites || topSites.length === 0) {
-    topSites = [
-      { title: "YouTube", url: "https://www.youtube.com" },
-      { title: "Google", url: "https://www.google.com" },
-      { title: "GitHub", url: "https://github.com" },
-      { title: "Wikipedia", url: "https://www.wikipedia.org" },
-      { title: "Reddit", url: "https://www.reddit.com" },
-      { title: "X", url: "https://x.com" },
-    ];
+  const sites = await getFrequentlyVisitedSites();
+  if (sites.length === 0) {
+    const empty = document.createElement("p");
+    empty.className = "empty-state-text";
+    empty.textContent = "No frequent sites found";
+    grid.append(empty);
+    return;
   }
 
-  const sitesToDisplay = topSites.slice(0, 8);
-  for (const site of sitesToDisplay) {
-    if (!site.url) {
-      continue;
-    }
-    const tile = document.createElement("div");
-    tile.className = "top-site-tile";
+  // Cap to 12 items for max 2 rows
+  const displaySites = sites.slice(0, 12);
 
-    let iconUrl = site.iconUrl;
-    if (!iconUrl) {
-      try {
-        const domain = new URL(site.url).hostname;
-        iconUrl = `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
-      } catch (e) {
-        iconUrl = "chrome://global/skin/icons/defaultFavicon.svg";
-      }
-    }
+  for (const site of displaySites) {
+    const tile = document.createElement("div");
+    tile.className = "app-tile";
+    tile.title = `Open ${site.title}`;
 
     const img = document.createElement("img");
-    img.className = "site-icon";
-    img.src = iconUrl;
+    img.className = "tile-icon";
+    img.src = site.icon;
     img.alt = "";
 
-    const titleEl = document.createElement("div");
-    titleEl.className = "site-title";
-    titleEl.textContent = site.title || site.label || site.url;
+    const titleEl = document.createElement("span");
+    titleEl.className = "tile-title";
+    titleEl.textContent = site.title;
 
     tile.append(img, titleEl);
-    tile.title = `Add ${site.title || site.url} to Appbar`;
     tile.addEventListener("click", () => {
-      ctl()?.tabManager?.createTab(site.url, {
-        title: site.title || site.label || site.url,
-        iconUrl,
+      // User decision: Open immediately as an active unpinned app in Appbar
+      tabMgr()?.createTab(site.url, {
+        title: site.title,
+        iconUrl: site.icon,
         pinned: false,
         select: true,
       });
       renderAll();
     });
+
     grid.append(tile);
   }
 }
 
-function renderFirefoxTools() {
-  const container = document.getElementById("firefox-tools-list");
+function renderPinnedApps() {
+  const container = document.getElementById("pinned-list");
+  if (!container) {
+    return;
+  }
   container.replaceChildren();
 
-  for (const tool of DEFAULT_TOOLS) {
-    const item = document.createElement("div");
-    item.className = "tool-item";
+  const pinnedTabs = (tabMgr()?.tabs || []).filter(t => t.pinned);
 
-    const img = document.createElement("img");
-    img.className = "tool-icon";
-    img.src = tool.iconUrl;
-    img.alt = "";
+  if (pinnedTabs.length === 0) {
+    const empty = document.createElement("p");
+    empty.className = "empty-state-text";
+    empty.textContent = "No pinned apps";
+    container.append(empty);
+    return;
+  }
 
-    const info = document.createElement("div");
-    info.className = "tool-info";
+  for (const tab of pinnedTabs) {
+    const row = document.createElement("div");
+    row.className = "pinned-row";
+    row.setAttribute("data-tab-id", tab.id);
 
-    const name = document.createElement("div");
-    name.className = "tool-name";
-    name.textContent = tool.title;
+    // Drag Handle with move icon
+    const handle = document.createElement("div");
+    handle.className = "drag-handle";
+    handle.title = "Drag to reposition";
+    handle.draggable = true;
 
-    const desc = document.createElement("div");
-    desc.className = "tool-desc";
-    desc.textContent = tool.desc;
+    const handleImg = document.createElement("img");
+    handleImg.src = "chrome://global/skin/icons/move-16.svg";
+    handleImg.alt = "Reorder";
+    handle.append(handleImg);
 
-    info.append(name, desc);
-
-    const btn = document.createElement("button");
-    const added = isAppAdded(tool.url);
-    btn.className = added ? "btn btn-secondary" : "btn btn-primary";
-    btn.textContent = added ? "Added" : "Add";
-    btn.disabled = added;
-    btn.addEventListener("click", () => {
-      ctl()?.tabManager?.createTab(tool.url, {
-        title: tool.title,
-        iconUrl: tool.iconUrl,
-        isTool: true,
-        pinned: false,
-        select: true,
-      });
-      renderAll();
+    // Drag-and-drop event handlers
+    handle.addEventListener("dragstart", e => {
+      draggedRowId = tab.id;
+      row.classList.add("dragging");
+      e.dataTransfer.effectAllowed = "move";
+      e.dataTransfer.setData("text/plain", tab.id);
     });
 
-    item.append(img, info, btn);
-    container.append(item);
+    handle.addEventListener("dragend", () => {
+      draggedRowId = null;
+      row.classList.remove("dragging");
+      document.querySelectorAll(".pinned-row").forEach(r => {
+        r.classList.remove("drag-over-top", "drag-over-bottom");
+      });
+    });
+
+    row.addEventListener("dragover", e => {
+      e.preventDefault();
+      if (!draggedRowId || draggedRowId === tab.id) {
+        return;
+      }
+      e.dataTransfer.dropEffect = "move";
+      const rect = row.getBoundingClientRect();
+      const midY = rect.top + rect.height / 2;
+      if (e.clientY < midY) {
+        row.classList.add("drag-over-top");
+        row.classList.remove("drag-over-bottom");
+      } else {
+        row.classList.add("drag-over-bottom");
+        row.classList.remove("drag-over-top");
+      }
+    });
+
+    row.addEventListener("dragleave", () => {
+      row.classList.remove("drag-over-top", "drag-over-bottom");
+    });
+
+    row.addEventListener("drop", e => {
+      e.preventDefault();
+      row.classList.remove("drag-over-top", "drag-over-bottom");
+      if (!draggedRowId || draggedRowId === tab.id) {
+        return;
+      }
+      tabMgr()?.reorderTabs(draggedRowId, tab.id);
+      draggedRowId = null;
+      renderPinnedApps();
+    });
+
+    // Favicon
+    const icon = document.createElement("img");
+    icon.className = "pinned-icon";
+    icon.src = tab.iconUrl || "chrome://global/skin/icons/defaultFavicon.svg";
+    icon.alt = "";
+
+    // Title
+    const title = document.createElement("span");
+    title.className = "pinned-title";
+    title.textContent = tab.title || tab.url;
+
+    // Actions block: Visibility Toggle & Delete
+    const actions = document.createElement("div");
+    actions.className = "pinned-actions";
+
+    // Visibility Toggle Switch
+    const isVisible = !tab.hidden;
+    const toggleBtn = document.createElement("button");
+    toggleBtn.type = "button";
+    toggleBtn.className = isVisible ? "toggle-switch active" : "toggle-switch";
+    toggleBtn.setAttribute("role", "switch");
+    toggleBtn.setAttribute("aria-checked", isVisible ? "true" : "false");
+    toggleBtn.title = isVisible ? "Visible in Appbar (click to hide)" : "Hidden in Appbar (click to show)";
+
+    const track = document.createElement("span");
+    track.className = "toggle-track";
+    const thumb = document.createElement("span");
+    thumb.className = "toggle-thumb";
+    track.append(thumb);
+    toggleBtn.append(track);
+
+    toggleBtn.addEventListener("click", () => {
+      tabMgr()?.toggleTabVisibility(tab.id);
+      renderPinnedApps();
+    });
+    actions.append(toggleBtn);
+
+    // Delete Button - only for custom apps (default tools cannot be deleted)
+    if (!tab.isTool) {
+      const deleteBtn = document.createElement("button");
+      deleteBtn.type = "button";
+      deleteBtn.className = "btn-delete";
+      deleteBtn.title = "Remove from Pinned apps";
+
+      const delImg = document.createElement("img");
+      delImg.src = "chrome://global/skin/icons/delete.svg";
+      delImg.alt = "Delete";
+      deleteBtn.append(delImg);
+
+      deleteBtn.addEventListener("click", () => {
+        tabMgr()?.removeTab(tab.id);
+        renderAll();
+      });
+      actions.append(deleteBtn);
+    }
+
+    row.append(handle, icon, title, actions);
+    container.append(row);
   }
 }
 
-function renderActiveApps() {
-  const list = document.getElementById("apps");
-  const section = document.getElementById("section-active-apps");
-  list.replaceChildren();
-
-  const tabs = ctl()?.tabManager?.tabs || [];
-  if (tabs.length === 0) {
-    section.style.display = "none";
+function renderManageApps() {
+  const grid = document.getElementById("manage-grid");
+  if (!grid) {
     return;
   }
-  section.style.display = "block";
+  grid.replaceChildren();
 
-  for (const tab of tabs) {
-    const row = document.createElement("div");
-    row.className = "app-row";
+  // Active apps are those loaded in memory
+  const allTabs = tabMgr()?.tabs || [];
+  const activeTabs = allTabs.filter(t => t.loaded);
+
+  if (activeTabs.length === 0) {
+    const empty = document.createElement("p");
+    empty.className = "empty-state-text";
+    empty.textContent = "No active apps running";
+    grid.append(empty);
+    return;
+  }
+
+  for (const tab of activeTabs) {
+    const tile = document.createElement("div");
+    tile.className = "app-tile manage-tile";
+    tile.title = `Active: ${tab.title}`;
 
     const img = document.createElement("img");
+    img.className = "tile-icon";
     img.src = tab.iconUrl || "chrome://global/skin/icons/defaultFavicon.svg";
     img.alt = "";
 
-    const label = document.createElement("span");
-    label.textContent = tab.title || tab.url;
+    const titleEl = document.createElement("span");
+    titleEl.className = "tile-title";
+    titleEl.textContent = tab.title;
 
-    if (tab.pinned) {
-      const pinBadge = document.createElement("span");
-      pinBadge.className = "badge-pinned";
-      pinBadge.textContent = "Pinned";
-      row.append(img, label, pinBadge);
-    } else {
-      row.append(img, label);
-    }
+    // Close button (x) to unload from memory
+    const closeBtn = document.createElement("button");
+    closeBtn.type = "button";
+    closeBtn.className = "tile-close-btn";
+    closeBtn.title = "Close app to save memory";
 
-    const btn = document.createElement("button");
-    btn.className = "btn btn-secondary btn-remove";
-    btn.textContent = "Remove";
-    btn.addEventListener("click", () => {
-      // Use removeTab to completely remove the tab from Appbar
-      ctl()?.tabManager?.removeTab(tab.id);
+    const closeImg = document.createElement("img");
+    closeImg.src = "chrome://global/skin/icons/close.svg";
+    closeImg.alt = "Close";
+    closeBtn.append(closeImg);
+
+    closeBtn.addEventListener("click", e => {
+      e.stopPropagation();
+      tabMgr()?.closeTab(tab.id);
       renderAll();
     });
 
-    row.append(btn);
-    list.append(row);
+    // Clicking tile brings it into view
+    tile.addEventListener("click", () => {
+      tabMgr()?.selectTab(tab.id);
+      renderAll();
+    });
+
+    tile.append(closeBtn, img, titleEl);
+    grid.append(tile);
   }
 }
 
 function renderAll() {
-  renderCurrentPage();
-  renderTopSites();
-  renderFirefoxTools();
-  renderActiveApps();
+  renderFrequentlyVisited();
+  renderPinnedApps();
+  renderManageApps();
 }
 
-function submitUrl(rawVal) {
+function submitUrl(rawVal, title = null) {
   let val = rawVal.trim();
   if (!val) {
     return;
@@ -261,7 +396,15 @@ function submitUrl(rawVal) {
       val = "https://www.google.com/search?q=" + encodeURIComponent(val);
     }
   }
-  ctl()?.tabManager?.createTab(val, { pinned: false, select: true });
+
+  // Create as a pinned app
+  tabMgr()?.createTab(val, {
+    title: title || val,
+    pinned: true,
+    select: false,
+    hidden: false,
+  });
+
   const input = document.getElementById("url");
   if (input) {
     input.value = "";
@@ -270,46 +413,14 @@ function submitUrl(rawVal) {
   renderAll();
 }
 
-/* Places Autocomplete Implementation */
-let autocompleteDebounceTimer = null;
-let currentAutocompleteItems = [];
-let selectedAutocompleteIndex = -1;
-
-async function queryPlaces(searchQuery) {
-  if (!searchQuery || searchQuery.trim().length < 1) {
-    return [];
-  }
-  try {
-    const { PlacesUtils } = ChromeUtils.importESModule(
-      "resource://gre/modules/PlacesUtils.sys.mjs"
-    );
-    const conn = await PlacesUtils.promiseDBConnection();
-    const rows = await conn.executeCached(
-      `SELECT p.url, IFNULL(p.title, p.url) as title
-       FROM moz_places p
-       WHERE p.hidden = 0
-         AND (p.url LIKE :search OR p.title LIKE :search)
-       ORDER BY p.frecency DESC
-       LIMIT 6`,
-      { search: `%${searchQuery.trim()}%` }
-    );
-    return rows.map(r => ({
-      url: r.getResultByName("url"),
-      title: r.getResultByName("title"),
-    }));
-  } catch (e) {
-    console.error("Places query error:", e);
-    return [];
-  }
-}
-
+// Autocomplete Handlers
 function renderAutocomplete(items) {
   const dropdown = document.getElementById("autocomplete-dropdown");
   dropdown.replaceChildren();
   currentAutocompleteItems = items;
   selectedAutocompleteIndex = -1;
 
-  if (!items || items.length === 0) {
+  if (items.length === 0) {
     dropdown.style.display = "none";
     return;
   }
@@ -320,36 +431,28 @@ function renderAutocomplete(items) {
     el.className = "autocomplete-item";
     el.setAttribute("data-index", i);
 
-    let iconUrl = "chrome://global/skin/icons/defaultFavicon.svg";
-    try {
-      const domain = new URL(item.url).hostname;
-      if (domain) {
-        iconUrl = `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
-      }
-    } catch (e) {}
-
     const img = document.createElement("img");
     img.className = "item-icon";
-    img.src = iconUrl;
+    img.src = item.icon || "chrome://global/skin/icons/defaultFavicon.svg";
     img.alt = "";
 
-    const textWrap = document.createElement("div");
-    textWrap.className = "item-text";
+    const textWrapper = document.createElement("div");
+    textWrapper.className = "item-text";
 
-    const titleDiv = document.createElement("div");
-    titleDiv.className = "item-title";
-    titleDiv.textContent = item.title;
+    const titleEl = document.createElement("span");
+    titleEl.className = "item-title";
+    titleEl.textContent = item.title;
 
-    const urlDiv = document.createElement("div");
-    urlDiv.className = "item-url";
-    urlDiv.textContent = item.url;
+    const urlEl = document.createElement("span");
+    urlEl.className = "item-url";
+    urlEl.textContent = item.url;
 
-    textWrap.append(titleDiv, urlDiv);
-    el.append(img, textWrap);
+    textWrapper.append(titleEl, urlEl);
+    el.append(img, textWrapper);
 
     el.addEventListener("mousedown", e => {
       e.preventDefault();
-      submitUrl(item.url);
+      submitUrl(item.url, item.title);
     });
 
     dropdown.append(el);
@@ -360,14 +463,16 @@ function renderAutocomplete(items) {
 
 function closeAutocomplete() {
   const dropdown = document.getElementById("autocomplete-dropdown");
-  dropdown.style.display = "none";
+  if (dropdown) {
+    dropdown.style.display = "none";
+  }
   currentAutocompleteItems = [];
   selectedAutocompleteIndex = -1;
 }
 
 function updateAutocompleteSelection() {
   const dropdown = document.getElementById("autocomplete-dropdown");
-  const children = dropdown.querySelectorAll(".autocomplete-item");
+  const children = dropdown?.querySelectorAll(".autocomplete-item") || [];
   children.forEach((child, idx) => {
     if (idx === selectedAutocompleteIndex) {
       child.classList.add("selected");
@@ -382,16 +487,9 @@ function updateAutocompleteSelection() {
   });
 }
 
-// Input and Event Listeners Setup
+// Search input and form setup
 const urlInput = document.getElementById("url");
 const clearBtn = document.getElementById("search-clear-btn");
-const closePanelBtn = document.getElementById("panel-close-btn");
-
-if (closePanelBtn) {
-  closePanelBtn.addEventListener("click", () => {
-    ctl()?.hidePanel();
-  });
-}
 
 if (urlInput) {
   urlInput.addEventListener("input", e => {
@@ -452,12 +550,14 @@ if (clearBtn) {
   });
 }
 
-document.getElementById("add-form").addEventListener("submit", e => {
-  e.preventDefault();
-  const input = document.getElementById("url");
-  if (input && input.value.trim()) {
-    submitUrl(input.value);
-  }
-});
+const addForm = document.getElementById("add-form");
+if (addForm) {
+  addForm.addEventListener("submit", e => {
+    e.preventDefault();
+    if (urlInput && urlInput.value.trim()) {
+      submitUrl(urlInput.value);
+    }
+  });
+}
 
 renderAll();

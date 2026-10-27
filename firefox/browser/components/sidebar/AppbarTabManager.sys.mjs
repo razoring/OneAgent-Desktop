@@ -34,7 +34,43 @@ export class AppbarTabManager {
     return this.document.querySelector("appbar-main");
   }
 
-  init() {}
+  init() {
+    const defaultTools = [
+      {
+        title: "Bookmarks",
+        url: "chrome://browser/content/sidebar/sidebar-bookmarks.html",
+        iconUrl: "chrome://browser/skin/bookmark-hollow.svg",
+      },
+      {
+        title: "History",
+        url: "chrome://browser/content/sidebar/sidebar-history.html",
+        iconUrl: "chrome://browser/skin/history.svg",
+      },
+      {
+        title: "Passwords",
+        url: "chrome://global/content/megalist/megalist.html",
+        iconUrl: "chrome://browser/skin/login.svg",
+      },
+      {
+        title: "Synced Tabs",
+        url: "chrome://browser/content/sidebar/sidebar-syncedtabs.html",
+        iconUrl: "chrome://browser/skin/synced-tabs.svg",
+      },
+    ];
+
+    for (const tool of defaultTools) {
+      if (!this._tabs.some(t => t.url === tool.url)) {
+        this.createTab(tool.url, {
+          title: tool.title,
+          iconUrl: tool.iconUrl,
+          pinned: true,
+          isTool: true,
+          deferLoad: true,
+          hidden: false,
+        });
+      }
+    }
+  }
 
   createTab(url, options = {}) {
     this._tabCounter++;
@@ -62,6 +98,7 @@ export class AppbarTabManager {
       title: options.title || url,
       iconUrl: resolvedIcon,
       pinned: typeof options.pinned === "boolean" ? options.pinned : false,
+      hidden: typeof options.hidden === "boolean" ? options.hidden : false,
       isMobile:
         typeof options.isMobile === "boolean"
           ? options.isMobile
@@ -228,10 +265,30 @@ export class AppbarTabManager {
     }
     const targetPinned = this._tabs[toIndex].pinned;
     const [movedTab] = this._tabs.splice(fromIndex, 1);
-    movedTab.pinned = targetPinned;
-    const newToIndex = this._tabs.findIndex(t => t.id === toId);
     const insertIndex = fromIndex < toIndex ? newToIndex + 1 : newToIndex;
     this._tabs.splice(insertIndex, 0, movedTab);
+    this.appbarMain?.requestUpdate?.();
+  }
+
+  toggleTabVisibility(tabId, visible) {
+    const tab = this._tabs.find(t => t.id === tabId);
+    if (tab) {
+      tab.hidden = typeof visible === "boolean" ? !visible : !tab.hidden;
+      if (tab.hidden && this._selectedTabId === tabId) {
+        this.closePanel();
+      }
+      this.appbarMain?.requestUpdate?.();
+    }
+  }
+
+  reorderTabs(sourceId, targetId) {
+    const fromIndex = this._tabs.findIndex(t => t.id === sourceId);
+    const toIndex = this._tabs.findIndex(t => t.id === targetId);
+    if (fromIndex === -1 || toIndex === -1 || fromIndex === toIndex) {
+      return;
+    }
+    const [movedTab] = this._tabs.splice(fromIndex, 1);
+    this._tabs.splice(toIndex, 0, movedTab);
     this.appbarMain?.requestUpdate?.();
   }
 
@@ -336,6 +393,15 @@ export class AppbarTabManager {
     }
 
     const tab = this._tabs[index];
+    if (tab.isTool) {
+      tab.hidden = true;
+      if (this._selectedTabId === tabId) {
+        this.closePanel();
+      }
+      this.appbarMain?.requestUpdate?.();
+      return;
+    }
+
     this._tabs.splice(index, 1);
     this._unloadTab(tab);
 
