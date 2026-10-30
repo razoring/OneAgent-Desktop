@@ -198,6 +198,10 @@ var AppbarController = {
         const curWidth = appbarBox.getBoundingClientRect().width;
         if (curWidth > 150) {
           document.documentElement.style.setProperty("--appbar-panel-width", `${curWidth}px`);
+          Services.prefs.setIntPref(
+            "browser.appbar.panelWidth",
+            Math.round(curWidth)
+          );
         }
       });
       appbarSplitter.addEventListener("pointerdown", () => {
@@ -206,6 +210,10 @@ var AppbarController = {
       window.addEventListener("pointerup", () => {
         appbarSplitter.removeAttribute("state");
       });
+      const savedWidth = Services.prefs.getIntPref("browser.appbar.panelWidth", 0);
+      if (savedWidth > 220) {
+        document.documentElement.style.setProperty("--appbar-panel-width", `${savedWidth}px`);
+      }
     }
 
     // Set container visibility according to browser.appbar.enabled

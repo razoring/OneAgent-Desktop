@@ -14,20 +14,30 @@
     <script src="chrome://browser/content/contentTheme.js"></script>
     <style>
       :root {
-        --appbar-page-bg: var(--in-content-page-background, var(--sidebar-background-color, #1c1b22));
-        --appbar-page-color: var(--in-content-page-color, var(--sidebar-text-color, #fbfbfe));
-        --appbar-card-bg: var(--in-content-box-background, color-mix(in srgb, currentColor 5%, transparent));
-        --appbar-card-border: var(--in-content-box-border-color, color-mix(in srgb, currentColor 12%, transparent));
+        --appbar-page-bg: var(--sidebar-background-color, var(--background-color-canvas));
+        --appbar-page-color: var(--sidebar-text-color, var(--text-color));
+        --appbar-card-bg: var(--sidebar-box-background, var(--background-color-box));
+        --appbar-card-border: var(--border-color-deemphasized);
         --appbar-tile-bg: color-mix(in srgb, currentColor 4%, transparent);
         --appbar-tile-border: color-mix(in srgb, currentColor 10%, transparent);
         --appbar-tile-border-hover: color-mix(in srgb, currentColor 22%, transparent);
-        --appbar-item-hover: var(--in-content-item-hover, var(--in-content-button-background-hover, color-mix(in srgb, currentColor 8%, transparent)));
-        --appbar-deemphasized: var(--in-content-deemphasized-text, color-mix(in srgb, currentColor 65%, transparent));
-        --appbar-primary-bg: var(--in-content-primary-button-background, #0060df);
-        --appbar-primary-hover: var(--in-content-primary-button-background-hover, #0250bb);
-        --appbar-primary-active: var(--in-content-primary-button-background-active, #054096);
-        --appbar-primary-text: var(--in-content-primary-button-text-color, #ffffff);
-        --appbar-focus: var(--in-content-focus-outline-color, #0060df);
+        --appbar-item-hover: var(--button-background-color-ghost-hover, color-mix(in srgb, currentColor 8%, transparent));
+        --appbar-item-active: var(--button-background-color-ghost-active, color-mix(in srgb, currentColor 14%, transparent));
+        --appbar-deemphasized: var(--text-color-deemphasized);
+        --appbar-primary-bg: var(--button-background-color-primary);
+        --appbar-primary-hover: var(--button-background-color-primary-hover);
+        --appbar-primary-active: var(--button-background-color-primary-active);
+        --appbar-primary-text: var(--button-text-color-primary);
+        --appbar-focus: var(--focus-outline-color);
+
+        &[lwt-sidebar="light"] {
+          color-scheme: light;
+        }
+
+        &[lwt-sidebar="dark"] {
+          color-scheme: dark;
+        }
+
         background-color: var(--appbar-page-bg);
         color: var(--appbar-page-color);
       }
@@ -120,11 +130,6 @@
         gap: 8px;
       }
 
-      .freq-grid {
-        max-height: 172px;
-        overflow: hidden;
-      }
-
       .app-tile {
         display: flex;
         flex-direction: column;
@@ -136,17 +141,16 @@
         border: 1px solid var(--appbar-tile-border);
         cursor: pointer;
         text-align: center;
-        transition: background-color 150ms ease, border-color 150ms ease, transform 150ms ease;
+        transition: background-color 150ms ease, border-color 150ms ease;
       }
 
       .app-tile:hover {
         background-color: var(--appbar-item-hover);
-        border-color: var(--appbar-focus);
-        transform: translateY(-2px);
+        border-color: var(--appbar-tile-border-hover);
       }
 
       .app-tile:active {
-        transform: translateY(0);
+        background-color: var(--appbar-item-active);
       }
 
       .app-tile .tile-icon {
@@ -177,6 +181,11 @@
         right: 4px;
         width: 20px;
         height: 20px;
+        appearance: none;
+        margin: 0;
+        padding: 0;
+        min-width: 0;
+        min-height: 0;
         border-radius: 50%;
         border: none;
         background: transparent;
@@ -196,8 +205,8 @@
 
       .manage-tile .tile-close-btn:hover {
         opacity: 1;
-        background-color: var(--icon-color-critical, #e22850);
-        color: #ffffff;
+        background-color: var(--icon-color-critical);
+        color: var(--button-text-color-destructive);
       }
 
       .manage-tile .tile-close-btn img {
@@ -253,10 +262,14 @@
       .search-clear-btn {
         position: absolute;
         right: 8px;
+        appearance: none;
         background: transparent;
         border: none;
         cursor: pointer;
         color: inherit;
+        margin: 0;
+        min-width: 0;
+        min-height: 0;
         opacity: 0.5;
         padding: 2px;
         display: none;
@@ -265,9 +278,10 @@
         border-radius: 50%;
       }
 
-      .search-clear-btn:hover {
+      button.search-clear-btn:hover {
         opacity: 0.9;
         background-color: var(--appbar-item-hover);
+        border-color: transparent;
       }
 
       .search-clear-btn img {
@@ -287,7 +301,7 @@
         background-color: var(--appbar-page-bg);
         border: 1px solid var(--appbar-card-border);
         border-radius: var(--border-radius-medium, 6px);
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+        box-shadow: var(--box-shadow-level-3);
         max-height: 240px;
         overflow-y: auto;
         display: none;
@@ -435,12 +449,31 @@
         position: relative;
         width: 36px;
         height: 20px;
+        appearance: none;
         background: transparent;
         border: none;
         padding: 0;
+        margin: 0;
+        min-width: 0;
+        min-height: 0;
+        flex-shrink: 0;
+        color: inherit;
         cursor: pointer;
         display: inline-flex;
         align-items: center;
+      }
+
+      button.toggle-switch:hover {
+        background-color: transparent;
+        border-color: transparent;
+      }
+
+      .toggle-switch:hover .toggle-track {
+        background-color: color-mix(in srgb, currentColor 32%, transparent);
+      }
+
+      .toggle-switch.active:hover .toggle-track {
+        background-color: var(--appbar-primary-hover);
       }
 
       .toggle-track {
@@ -475,24 +508,30 @@
 
       /* Delete button */
       .btn-delete {
+        appearance: none;
         background: transparent;
         border: none;
         cursor: pointer;
         color: inherit;
         opacity: 0.6;
         padding: 4px;
+        margin: 0;
+        min-width: 0;
+        min-height: 0;
         border-radius: 4px;
         display: inline-flex;
         align-items: center;
         justify-content: center;
         width: 24px;
         height: 24px;
+        flex-shrink: 0;
         transition: opacity 150ms ease, background-color 150ms ease;
       }
 
-      .btn-delete:hover {
+      button.btn-delete:hover {
         opacity: 1;
-        background-color: color-mix(in srgb, currentColor 12%, transparent);
+        background-color: var(--appbar-item-hover);
+        border-color: transparent;
       }
 
       .btn-delete img {

@@ -173,6 +173,26 @@ async function renderFrequentlyVisited() {
 
     grid.append(tile);
   }
+
+  trimFreqGridToTwoRows();
+}
+
+function trimFreqGridToTwoRows() {
+  const grid = document.getElementById("freq-grid");
+  const tiles = grid ? Array.from(grid.children) : [];
+  if (!tiles.length) {
+    return;
+  }
+
+  // Show all tiles first so row positions reflect the current width
+  tiles.forEach(tile => {
+    tile.hidden = false;
+  });
+  const rowTops = new Set(tiles.map(tile => tile.offsetTop));
+  const visibleTops = new Set([...rowTops].sort((a, b) => a - b).slice(0, 2));
+  tiles.forEach(tile => {
+    tile.hidden = !visibleTops.has(tile.offsetTop);
+  });
 }
 
 function renderPinnedApps() {
@@ -319,7 +339,8 @@ function renderPinnedApps() {
 
 function renderManageApps() {
   const grid = document.getElementById("manage-grid");
-  if (!grid) {
+  const section = document.getElementById("section-manage-apps");
+  if (!grid || !section) {
     return;
   }
   grid.replaceChildren();
@@ -329,12 +350,10 @@ function renderManageApps() {
   const activeTabs = allTabs.filter(t => t.loaded);
 
   if (activeTabs.length === 0) {
-    const empty = document.createElement("p");
-    empty.className = "empty-state-text";
-    empty.textContent = "No active apps running";
-    grid.append(empty);
+    section.hidden = true;
     return;
   }
+  section.hidden = false;
 
   for (const tab of activeTabs) {
     const tile = document.createElement("div");
@@ -558,6 +577,11 @@ if (addForm) {
       submitUrl(urlInput.value);
     }
   });
+}
+
+const freqGrid = document.getElementById("freq-grid");
+if (freqGrid) {
+  new ResizeObserver(() => trimFreqGridToTwoRows()).observe(freqGrid);
 }
 
 renderAll();

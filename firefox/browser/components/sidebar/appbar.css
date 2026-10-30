@@ -49,6 +49,7 @@
 #appbar-splitter {
   order: 100 !important;
   cursor: ew-resize !important;
+  -moz-user-focus: normal;
   width: var(--space-medium, 8px) !important;
   min-width: 1px;
   background-color: transparent;
@@ -59,6 +60,10 @@
   z-index: var(--browser-area-z-index-sidebar-splitter, 10);
   transition: background-color 0.5s ease-in-out;
   margin-block-end: var(--space-small, 4px);
+
+  &:focus-visible {
+    outline: auto;
+  }
 }
 
 #appbar-splitter:hover,
