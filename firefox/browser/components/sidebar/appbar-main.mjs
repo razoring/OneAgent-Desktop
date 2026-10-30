@@ -264,14 +264,12 @@ export default class AppbarMain extends MozLitElement {
   }
 
   async showView(viewId) {
-    const isAlreadyOpen = this.controller?.isOpen && this.selectedView === viewId;
-    if (isAlreadyOpen) {
+    if (this.controller?.isToolShown(viewId)) {
       this.controller?.hidePanel();
-      this.selectedView = "";
     } else {
-      this.selectedView = viewId;
       await this.controller?.showTool(viewId);
     }
+    this.selectedView = this.controller?.isToolShown(viewId) ? viewId : "";
     this.requestUpdate();
   }
 
@@ -317,6 +315,7 @@ export default class AppbarMain extends MozLitElement {
     const tabs = this.tabManager?.tabs || [];
     const activeTabId = this.tabManager?.selectedTabId;
     const tools = this.controller?.getTools() || [];
+    const customizeOpen = this.controller?.isToolShown("viewCustomizeAppbar");
 
     const pinnedTabs = tabs.filter(t => t.pinned && !t.hidden);
     const unpinnedTabs = tabs.filter(t => !t.pinned && !t.hidden);
@@ -353,10 +352,10 @@ export default class AppbarMain extends MozLitElement {
             <moz-button
               class=${classMap({
                 "appbar-add-tab-button": true,
-                selected: this.selectedView === "viewCustomizeAppbar" && this.controller?.isOpen,
+                selected: customizeOpen,
               })}
               type="icon ghost"
-              aria-selected=${this.selectedView === "viewCustomizeAppbar" && this.controller?.isOpen}
+              aria-selected=${customizeOpen}
               title="Add to Appbar"
               iconsrc="chrome://global/skin/icons/plus.svg"
               .iconSrc="chrome://global/skin/icons/plus.svg"
@@ -373,7 +372,7 @@ export default class AppbarMain extends MozLitElement {
               tools,
               tool => tool.view,
               tool => {
-                const isSelected = this.selectedView === tool.view && this.controller?.isOpen;
+                const isSelected = this.controller?.isToolShown(tool.view);
                 return html`
                   <moz-button
                     class=${classMap({

@@ -49,6 +49,21 @@ var AppbarController = {
     return !!(container && !container.hidden);
   },
 
+  // Whether a tool is actually displayed in the appbar browser, ignoring any
+  // stale view state held by appbar-main.
+  isToolShown(viewId = "viewCustomizeAppbar") {
+    let browser = document.getElementById("appbar");
+    if (!browser || !this.isOpen) {
+      return false;
+    }
+    return (
+      browser.hasAttribute("selected") &&
+      browser.style.display !== "none" &&
+      browser.getAttribute("src") ===
+        this.tools.find(t => t.view === viewId)?.url
+    );
+  },
+
   getTools() {
     // Hide built-in tools (Bookmarks, History, Synced Tabs, AI Chatbot).
     // Customize Appbar is handled separately in bottom-actions.
@@ -334,6 +349,12 @@ var AppbarController = {
     }
     if (splitter) {
       splitter.hidden = true;
+    }
+
+    let toolBrowser = document.getElementById("appbar");
+    if (toolBrowser) {
+      toolBrowser.removeAttribute("selected");
+      toolBrowser.style.display = "none";
     }
 
     let contentArea = document.getElementById("tabbrowser-tabbox");

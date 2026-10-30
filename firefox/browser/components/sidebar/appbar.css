@@ -34,7 +34,7 @@
   background-color: var(--sidebar-background-color, var(--toolbar-bgcolor));
   color: var(--sidebar-text-color, inherit);
   position: relative;
-  z-index: 9;
+  z-index: var(--browser-area-z-index-sidebar);
   box-sizing: border-box;
   border-radius: var(--border-radius-medium, 8px) !important;
   overflow: clip !important;
@@ -47,32 +47,16 @@
 }
 
 #appbar-splitter {
+  /* Narrower drag indicator than the sidebar's 4px default */
+  --splitter-width: 2px;
+
   order: 100 !important;
-  cursor: ew-resize !important;
   -moz-user-focus: normal;
-  width: var(--space-medium, 8px) !important;
-  min-width: 1px;
-  background-color: transparent;
-  background-clip: padding-box;
-  border-inline: calc((var(--space-medium, 8px) - var(--splitter-width, 4px)) / 2) solid transparent;
-  margin-inline: 0 calc(-1 * var(--space-medium, 8px));
-  position: relative;
-  z-index: var(--browser-area-z-index-sidebar-splitter, 10);
-  transition: background-color 0.5s ease-in-out;
   margin-block-end: var(--space-small, 4px);
 
   &:focus-visible {
     outline: auto;
   }
-}
-
-#appbar-splitter:hover,
-#appbar-splitter[state="dragging"] {
-  background-color: var(--focus-outline-color, #0060df);
-}
-
-#appbar-splitter[hidden="true"] {
-  display: none !important;
 }
 
 .appbar-browser-stack {

@@ -299,7 +299,14 @@ export class AppbarTabManager {
     }
 
     const appbarBox = this.document.getElementById("appbar-box");
-    const isCurrentlyActive = this._selectedTabId === tabId && appbarBox && !appbarBox.hidden;
+    // Consider the app active only when it is actually displayed: re-clicking
+    // its tab toggles the panel closed, but not when a tool view (e.g. the
+    // Add apps panel) is currently on screen.
+    const isCurrentlyActive =
+      this._selectedTabId === tabId &&
+      appbarBox &&
+      !appbarBox.hidden &&
+      !!tab.browser?.hasAttribute?.("selected");
 
     // Confirmed requirement: Re-clicking active tab toggles (closes) the panel
     if (isCurrentlyActive) {
@@ -333,6 +340,12 @@ export class AppbarTabManager {
 
     // Update Bottom Bar
     this._updateBottomBar(tab);
+
+    // A web app is now displayed rather than a chrome tool
+    let appbarMain = this.appbarMain;
+    if (appbarMain) {
+      appbarMain.selectedView = "";
+    }
 
     // Open panel
     if (appbarBox) {
