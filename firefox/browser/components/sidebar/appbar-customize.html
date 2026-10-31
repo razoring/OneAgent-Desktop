@@ -13,13 +13,21 @@
     <link rel="stylesheet" href="chrome://browser/content/sidebar/sidebar.css" />
     <script src="chrome://browser/content/contentTheme.js"></script>
     <style>
-      @import url("chrome://global/content/elements/moz-box.tokens.css");
-      @import url("chrome://global/content/elements/moz-toggle.tokens.css");
-
       :root {
         --appbar-page-bg: var(--sidebar-background-color, var(--background-color-canvas));
         --appbar-page-color: var(--sidebar-text-color, var(--text-color));
+        --appbar-card-bg: var(--sidebar-box-background, var(--background-color-box));
+        --appbar-card-border: var(--border-color-deemphasized);
+        --appbar-tile-bg: color-mix(in srgb, currentColor 4%, transparent);
+        --appbar-tile-border: color-mix(in srgb, currentColor 10%, transparent);
+        --appbar-tile-border-hover: color-mix(in srgb, currentColor 22%, transparent);
+        --appbar-item-hover: var(--button-background-color-ghost-hover, color-mix(in srgb, currentColor 8%, transparent));
+        --appbar-item-active: var(--button-background-color-ghost-active, color-mix(in srgb, currentColor 14%, transparent));
         --appbar-deemphasized: var(--text-color-deemphasized);
+        --appbar-primary-bg: var(--button-background-color-primary);
+        --appbar-primary-hover: var(--button-background-color-primary-hover);
+        --appbar-primary-active: var(--button-background-color-primary-active);
+        --appbar-primary-text: var(--button-text-color-primary);
         --appbar-focus: var(--focus-outline-color);
 
         &[lwt-sidebar="light"] {
@@ -40,11 +48,12 @@
 
       body {
         margin: 0;
-        padding: var(--space-medium);
-        font: message-box;
-        font-size: inherit;
+        padding: 16px;
+        font: menu;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         background-color: transparent;
         color: inherit;
+        font-size: 13px;
         line-height: 1.4;
         user-select: none;
         overflow-x: hidden;
@@ -53,66 +62,63 @@
 
       /* Panel Header */
       .panel-header {
-        margin: 0 0 var(--space-large);
+        margin-bottom: 18px;
       }
 
       .panel-header h1 {
-        font-size: var(--font-size-xlarge, 1.46em);
+        font-size: 20px;
         font-weight: 600;
         margin: 0;
         color: inherit;
+        letter-spacing: -0.2px;
       }
 
       /* Sections & Cards */
       .section {
-        margin: 0 0 var(--space-xlarge);
+        margin-bottom: 20px;
       }
 
       .card {
-        border-radius: var(--box-border-radius);
-        outline: var(--box-border);
-        overflow: hidden;
-      }
-
-      .card > *:not(:last-child) {
-        border-block-end: var(--box-border);
-      }
-
-      .card-header-row,
-      .card-title-block,
-      .search-container {
-        padding: var(--box-padding);
+        background-color: var(--appbar-card-bg);
+        border: 1px solid var(--appbar-card-border);
+        border-radius: var(--border-radius-medium, 8px);
+        padding: 14px 16px;
       }
 
       .card-header-row {
         display: flex;
         align-items: center;
-        gap: var(--space-xsmall);
+        gap: 8px;
+        margin-bottom: 12px;
       }
 
       .card-header-icon {
-        width: var(--box-icon-size);
-        height: var(--box-icon-size);
+        width: 16px;
+        height: 16px;
         fill: currentColor;
         -moz-context-properties: fill;
       }
 
       .card-header-title {
-        font-size: 1em;
+        font-size: 14px;
         font-weight: 600;
         color: inherit;
         margin: 0;
       }
 
+      .card-title-block {
+        margin-bottom: 12px;
+      }
+
       .card-title-block h2 {
-        font-size: 1em;
+        font-size: 14px;
         font-weight: 600;
-        margin: 0 0 var(--space-xsmall);
+        margin: 0 0 4px;
         color: inherit;
       }
 
       .card-title-block p {
-        font-size: var(--font-size-small);
+        font-size: 12px;
         color: var(--appbar-deemphasized);
         margin: 0;
       }
@@ -121,8 +127,7 @@
       .tiles-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(74px, 1fr));
-        gap: var(--space-xsmall);
-        padding: var(--box-padding);
+        gap: 8px;
       }
 
       .app-tile {
@@ -130,35 +135,35 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        padding: var(--space-xsmall) var(--space-xxsmall);
-        border-radius: var(--box-border-radius-inner);
-        background-color: transparent;
-        border: var(--box-border);
+        padding: 10px 6px;
+        border-radius: var(--border-radius-medium, 8px);
+        background-color: var(--appbar-tile-bg);
+        border: 1px solid var(--appbar-tile-border);
         cursor: pointer;
         text-align: center;
-        transition: background-color 150ms ease;
+        transition: background-color 150ms ease, border-color 150ms ease;
       }
 
       .app-tile:hover {
-        background-color: var(--box-button-background-color-hover);
-        color: var(--box-button-text-color-hover);
+        background-color: var(--appbar-item-hover);
+        border-color: var(--appbar-tile-border-hover);
       }
 
       .app-tile:active {
-        background-color: var(--box-button-background-color-active);
-        color: var(--box-button-text-color-active);
+        background-color: var(--appbar-item-active);
       }
 
       .app-tile .tile-icon {
-        width: var(--box-icon-size);
-        height: var(--box-icon-size);
-        border-radius: var(--border-radius-small);
+        width: 24px;
+        height: 24px;
+        border-radius: 4px;
         object-fit: contain;
-        margin-bottom: var(--space-xsmall);
+        margin-bottom: 6px;
       }
 
       .app-tile .tile-title {
-        font-size: var(--font-size-small);
+        font-size: 11px;
+        font-weight: 500;
         max-width: 100%;
         white-space: nowrap;
         overflow: hidden;
@@ -172,8 +177,8 @@
 
       .manage-tile .tile-close-btn {
         position: absolute;
-        top: var(--space-xxsmall);
-        inset-inline-end: var(--space-xxsmall);
+        top: 4px;
+        right: 4px;
         width: 20px;
         height: 20px;
         appearance: none;
@@ -195,7 +200,7 @@
 
       .manage-tile:hover .tile-close-btn {
         opacity: 0.9;
-        background-color: var(--box-button-background-color-hover);
+        background-color: color-mix(in srgb, currentColor 14%, transparent);
       }
 
       .manage-tile .tile-close-btn:hover {
@@ -215,6 +220,7 @@
       .search-container {
         position: relative;
         width: 100%;
+        margin-bottom: 12px;
       }
 
       .search-form {
@@ -226,9 +232,9 @@
 
       .search-icon {
         position: absolute;
-        inset-inline-start: var(--space-xsmall);
-        width: var(--box-icon-size);
-        height: var(--box-icon-size);
+        left: 10px;
+        width: 14px;
+        height: 14px;
         color: var(--appbar-deemphasized);
         pointer-events: none;
         -moz-context-properties: fill;
@@ -236,18 +242,26 @@
       }
 
       .search-input {
-        padding-inline-start: calc(var(--box-icon-size) + 2 * var(--space-xsmall));
-        background-color: var(--background-color-box);
-        border-radius: var(--border-radius-medium);
+        width: 100%;
+        height: 32px;
+        padding: 0 28px 0 32px;
+        font-size: 13px;
+        border: 1px solid var(--appbar-card-border);
+        border-radius: 20px;
+        background-color: var(--appbar-tile-bg);
+        color: inherit;
+        outline: none;
+        transition: border-color 150ms ease, box-shadow 150ms ease;
       }
 
-      .search-input::placeholder {
-        color: var(--appbar-deemphasized);
+      .search-input:focus {
+        border-color: var(--appbar-focus);
+        box-shadow: 0 0 0 1px var(--appbar-focus);
       }
 
       .search-clear-btn {
         position: absolute;
-        inset-inline-end: var(--space-xsmall);
+        right: 8px;
         appearance: none;
         background: transparent;
         border: none;
@@ -256,7 +270,8 @@
         margin: 0;
         min-width: 0;
         min-height: 0;
-        padding: var(--space-xxsmall);
+        opacity: 0.5;
+        padding: 2px;
         display: none;
         align-items: center;
         justify-content: center;
@@ -264,7 +279,8 @@
       }
 
       button.search-clear-btn:hover {
-        background-color: var(--box-button-background-color-hover);
+        opacity: 0.9;
+        background-color: var(--appbar-item-hover);
         border-color: transparent;
       }
 
@@ -279,36 +295,38 @@
       .autocomplete-dropdown {
         position: absolute;
         top: calc(100% + 4px);
-        inset-inline: 0;
+        left: 0;
+        right: 0;
         z-index: 1000;
         background-color: var(--appbar-page-bg);
-        border: var(--box-border);
-        border-radius: var(--border-radius-medium);
+        border: 1px solid var(--appbar-card-border);
+        border-radius: var(--border-radius-medium, 6px);
         box-shadow: var(--box-shadow-level-3);
         max-height: 240px;
         overflow-y: auto;
         display: none;
-        padding: var(--space-xxsmall);
+        padding: 4px;
       }
 
       .autocomplete-item {
         display: flex;
         align-items: center;
-        gap: var(--space-xsmall);
-        padding: var(--space-xxsmall) var(--space-xsmall);
-        border-radius: var(--border-radius-small);
+        gap: 10px;
+        padding: 8px 10px;
+        border-radius: var(--border-radius-small, 4px);
         cursor: pointer;
-        transition: background-color 150ms ease;
+        transition: background-color 100ms ease;
       }
 
       .autocomplete-item:hover,
       .autocomplete-item.selected {
-        background-color: var(--box-button-background-color-hover);
+        background-color: var(--appbar-item-hover);
       }
 
       .autocomplete-item .item-icon {
-        width: var(--box-icon-size);
-        height: var(--box-icon-size);
+        width: 16px;
+        height: 16px;
+        border-radius: 2px;
         flex-shrink: 0;
         object-fit: contain;
       }
@@ -321,40 +339,44 @@
       }
 
       .autocomplete-item .item-title {
-        font-size: var(--font-size-small);
+        font-size: 12px;
+        font-weight: 500;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
       }
 
       .autocomplete-item .item-url {
-        font-size: var(--font-size-small);
+        font-size: 11px;
         color: var(--appbar-deemphasized);
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
       }
 
-      /* Pinned Apps List - rows segmented like moz-box-group items */
+      /* Pinned Apps List - Table taken from about:preferences#search */
       .pinned-list-container {
-        border-radius: var(--box-border-radius-inner);
+        border: 1px solid var(--appbar-card-border);
+        border-radius: var(--border-radius-medium, 8px);
         overflow: hidden;
+        background-color: var(--appbar-tile-bg);
       }
 
       .pinned-row {
         display: flex;
         align-items: center;
-        gap: var(--space-xsmall);
-        padding: var(--space-small) var(--box-padding);
-        cursor: default;
+        gap: 10px;
+        padding: 8px 12px;
+        border-bottom: 1px solid var(--appbar-card-border);
+        transition: background-color 150ms ease, opacity 150ms ease;
       }
 
-      .pinned-row + .pinned-row {
-        border-block-start: var(--box-border);
+      .pinned-row:last-child {
+        border-bottom: none;
       }
 
       .pinned-row:hover {
-        background-color: var(--box-button-background-color-hover);
+        background-color: var(--appbar-item-hover);
       }
 
       .pinned-row.dragging {
@@ -362,11 +384,11 @@
       }
 
       .pinned-row.drag-over-top {
-        border-block-start: 2px solid var(--appbar-focus);
+        border-top: 2px solid var(--appbar-focus);
       }
 
       .pinned-row.drag-over-bottom {
-        border-block-end: 2px solid var(--appbar-focus);
+        border-bottom: 2px solid var(--appbar-focus);
       }
 
       .drag-handle {
@@ -397,8 +419,9 @@
       }
 
       .pinned-icon {
-        width: var(--box-icon-size);
-        height: var(--box-icon-size);
+        width: 16px;
+        height: 16px;
+        border-radius: 2px;
         object-fit: contain;
         flex-shrink: 0;
         fill: currentColor;
@@ -407,6 +430,8 @@
 
       .pinned-title {
         flex: 1 1 auto;
+        font-size: 13px;
+        font-weight: 500;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -415,12 +440,15 @@
       .pinned-actions {
         display: flex;
         align-items: center;
-        gap: var(--space-xsmall);
+        gap: 10px;
         flex-shrink: 0;
       }
 
-      /* Toggle Switch - moz-toggle tokens, as rendered in about:preferences */
+      /* Toggle Switch - Firefox Settings style */
       .toggle-switch {
+        position: relative;
+        width: 36px;
+        height: 20px;
         appearance: none;
         background: transparent;
         border: none;
@@ -440,59 +468,42 @@
         border-color: transparent;
       }
 
+      .toggle-switch:hover .toggle-track {
+        background-color: color-mix(in srgb, currentColor 32%, transparent);
+      }
+
+      .toggle-switch.active:hover .toggle-track {
+        background-color: var(--appbar-primary-hover);
+      }
+
       .toggle-track {
-        width: var(--toggle-width);
-        height: var(--toggle-height);
-        border: var(--toggle-border-width) solid var(--toggle-border-color);
-        border-radius: var(--toggle-border-radius);
-        background-color: var(--toggle-background-color);
-        box-sizing: border-box;
+        width: 36px;
+        height: 20px;
+        border-radius: 10px;
+        background-color: color-mix(in srgb, currentColor 25%, transparent);
+        transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1);
         display: block;
         position: relative;
       }
 
-      button.toggle-switch:hover .toggle-track {
-        background-color: var(--toggle-background-color-hover);
-        border-color: var(--toggle-border-color-hover);
-      }
-
-      button.toggle-switch:active .toggle-track {
-        background-color: var(--toggle-background-color-active);
-        border-color: var(--toggle-border-color-active);
+      .toggle-switch.active .toggle-track {
+        background-color: var(--appbar-primary-bg);
       }
 
       .toggle-thumb {
         position: absolute;
-        top: var(--toggle-dot-margin);
-        inset-inline-start: var(--toggle-dot-margin);
-        width: var(--toggle-dot-width);
-        height: var(--toggle-dot-height);
-        border-radius: var(--toggle-border-radius);
-        background-color: var(--toggle-dot-background-color);
-      }
-
-      @media (prefers-reduced-motion: no-preference) {
-        .toggle-thumb {
-          transition: translate 100ms;
-        }
-      }
-
-      .toggle-switch.active .toggle-track {
-        background-color: var(--toggle-background-color-pressed);
-        border-color: transparent;
-      }
-
-      button.toggle-switch.active:hover .toggle-track {
-        background-color: var(--toggle-background-color-pressed-hover);
-      }
-
-      button.toggle-switch.active:active .toggle-track {
-        background-color: var(--toggle-background-color-pressed-active);
+        top: 3px;
+        left: 3px;
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background-color: #ffffff;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+        transition: transform 150ms cubic-bezier(0.4, 0, 0.2, 1);
       }
 
       .toggle-switch.active .toggle-thumb {
-        background-color: var(--toggle-dot-background-color-on-pressed);
-        translate: var(--toggle-dot-transform-x) 0;
+        transform: translateX(16px);
       }
 
       /* Delete button */
@@ -503,11 +514,11 @@
         cursor: pointer;
         color: inherit;
         opacity: 0.6;
-        padding: var(--space-xxsmall);
+        padding: 4px;
         margin: 0;
         min-width: 0;
         min-height: 0;
-        border-radius: var(--border-radius-small);
+        border-radius: 4px;
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -519,7 +530,7 @@
 
       button.btn-delete:hover {
         opacity: 1;
-        background-color: var(--box-button-background-color-hover);
+        background-color: var(--appbar-item-hover);
         border-color: transparent;
       }
 
@@ -532,13 +543,12 @@
 
       /* Empty State */
       .empty-state-text {
-        font-size: var(--font-size-small);
+        font-size: 12px;
         color: var(--appbar-deemphasized);
         text-align: center;
-        padding: var(--space-small);
+        padding: 16px 8px;
         margin: 0;
       }
-    </style>
     </style>
     <script src="chrome://browser/content/sidebar/appbar-customize.js" defer></script>
   </head>
