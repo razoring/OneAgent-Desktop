@@ -291,23 +291,13 @@ function renderPinnedApps() {
     const actions = document.createElement("div");
     actions.className = "pinned-actions";
 
-    // Visibility Toggle Switch
+    // Visibility Toggle Switch - native moz-toggle as used in Settings
     const isVisible = !tab.hidden;
-    const toggleBtn = document.createElement("button");
-    toggleBtn.type = "button";
-    toggleBtn.className = isVisible ? "toggle-switch active" : "toggle-switch";
-    toggleBtn.setAttribute("role", "switch");
-    toggleBtn.setAttribute("aria-checked", isVisible ? "true" : "false");
+    const toggleBtn = document.createElement("moz-toggle");
+    toggleBtn.pressed = isVisible;
     toggleBtn.title = isVisible ? "Visible in Appbar (click to hide)" : "Hidden in Appbar (click to show)";
 
-    const track = document.createElement("span");
-    track.className = "toggle-track";
-    const thumb = document.createElement("span");
-    thumb.className = "toggle-thumb";
-    track.append(thumb);
-    toggleBtn.append(track);
-
-    toggleBtn.addEventListener("click", () => {
+    toggleBtn.addEventListener("toggle", () => {
       tabMgr()?.toggleTabVisibility(tab.id);
       renderPinnedApps();
     });
