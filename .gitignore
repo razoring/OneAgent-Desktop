@@ -10,3 +10,13 @@ __pycache__/
 *.pdb
 .DS_Store
 Thumbs.db
+firefox/third_party/application-services/.gradle/9.2.0/fileHashes/fileHashes.bin
+firefox/third_party/application-services/.gradle/9.2.0/fileHashes/fileHashes.lock
+firefox/third_party/application-services/automation/kotlin-components-docs/.gradle/9.2.0/fileHashes/fileHashes.bin
+firefox/third_party/application-services/automation/kotlin-components-docs/.gradle/9.2.0/fileHashes/fileHashes.lock
+firefox/third_party/application-services/.gradle/9.2.0/checksums/checksums.lock
+firefox/third_party/application-services/.gradle/9.2.0/fileHashes/fileHashes.bin
+firefox/third_party/application-services/.gradle/9.2.0/fileHashes/fileHashes.lock
+firefox/third_party/application-services/.gradle/buildOutputCleanup/buildOutputCleanup.lock
+firefox/third_party/application-services/automation/kotlin-components-docs/.gradle/9.2.0/fileHashes/fileHashes.bin
+firefox/third_party/application-services/automation/kotlin-components-docs/.gradle/9.2.0/fileHashes/fileHashes.lock

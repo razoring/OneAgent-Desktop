@@ -31,8 +31,14 @@
   min-width: 220px;
   max-width: 75vw;
   width: var(--appbar-panel-width, 360px);
-  background-color: var(--sidebar-background-color, var(--toolbar-bgcolor));
+  background-color: #f7f6fb;
   color: var(--sidebar-text-color, inherit);
+
+  @media (prefers-color-scheme: dark) {
+    & {
+      background-color: #131215;
+    }
+  }
   position: relative;
   z-index: var(--browser-area-z-index-sidebar);
   box-sizing: border-box;
