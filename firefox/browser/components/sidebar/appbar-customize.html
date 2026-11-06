@@ -14,10 +14,10 @@
     <script src="chrome://browser/content/contentTheme.js"></script>
     <style>
       :root {
-        --appbar-page-bg: var(--sidebar-background-color, var(--background-color-canvas));
+        --appbar-page-bg: light-dark(#f7f6fb, #131215);
         --appbar-page-color: var(--sidebar-text-color, var(--text-color));
-        --appbar-card-bg: var(--sidebar-box-background, var(--background-color-box));
-        --appbar-card-border: var(--border-color-deemphasized);
+        --appbar-card-bg: var(--card-background-color, var(--background-color-box));
+        --appbar-card-border: var(--card-border-color);
         --appbar-tile-bg: color-mix(in srgb, currentColor 4%, transparent);
         --appbar-tile-border: color-mix(in srgb, currentColor 10%, transparent);
         --appbar-tile-border-hover: color-mix(in srgb, currentColor 22%, transparent);
@@ -80,8 +80,10 @@
 
       .card {
         background-color: var(--appbar-card-bg);
-        border: 1px solid var(--appbar-card-border);
-        border-radius: var(--border-radius-medium, 8px);
+        border: var(--card-border, var(--card-border-width, 1px) solid var(--card-border-color));
+        border-radius: var(--card-border-radius, var(--border-radius-large, 12px));
+        box-shadow: var(--card-box-shadow, 0 0.25px 0.75px var(--box-shadow-color-lighter-layer-1),
+          0 2px 6px var(--box-shadow-color-lighter-layer-2));
         padding: 14px 16px;
       }
 
