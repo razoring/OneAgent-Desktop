@@ -86,30 +86,62 @@ export class OneAgentOrchestrator {
     this.emit("state", { state: "idle" });
   }
 
+  getSessions() {
+    return Array.from(this.#sessions.keys()).map(id => ({
+      id,
+      title: this.#sessions.get(id)?.[0]?.content?.slice(0, 36) || "New Conversation",
+      count: this.#sessions.get(id)?.length || 0,
+    }));
+  }
+
+  getSessionMessages(conversationId) {
+    return this.#sessions.get(conversationId) || [];
+  }
+
+  clearSession(conversationId) {
+    this.#sessions.delete(conversationId);
+    this.emit("sessions_changed", this.getSessions());
+  }
+
   async runGoal(userPrompt, conversationId = "default") {
     this.stop();
     const abortController = new AbortController();
     this.#activeRun = { conversationId, abortController };
     this.#steeringQueue = [];
-    this.emit("state", { state: "active" });
+    this.emit("state", { state: "active", conversationId });
 
     let messages = this.#sessions.get(conversationId) || [];
     messages.push({ role: "user", content: userPrompt });
-    this.emit("message", { role: "user", content: userPrompt });
+    this.#sessions.set(conversationId, messages);
+    this.emit("message", { role: "user", content: userPrompt, conversationId });
+    this.emit("sessions_changed", this.getSessions());
 
     try {
       let turns = 0;
       while (turns < 15 && !abortController.signal.aborted) {
         turns++;
+        let streamedContent = "";
         const assistantMsg = await BrainEngine.runTurn({
           messages,
           signal: abortController.signal,
+          onDelta: chunk => {
+            streamedContent += chunk;
+            this.emit("message_stream", {
+              role: "assistant",
+              chunk,
+              content: streamedContent,
+              conversationId,
+            });
+          },
         });
 
         messages.push(assistantMsg);
-        if (assistantMsg.content) {
-          this.emit("message", { role: "assistant", content: assistantMsg.content });
-        }
+        this.emit("message", {
+          role: "assistant",
+          content: assistantMsg.content || "",
+          tool_calls: assistantMsg.tool_calls,
+          conversationId,
+        });
 
         if (!assistantMsg.tool_calls || assistantMsg.tool_calls.length === 0) {
           break;
@@ -120,8 +152,14 @@ export class OneAgentOrchestrator {
             break;
           }
           const { name, arguments: argsStr } = toolCall.function;
-          const args = JSON.parse(argsStr || "{}");
-          this.emit("trace", { type: "tool_start", name, args });
+          let args = {};
+          try {
+            args = JSON.parse(argsStr || "{}");
+          } catch (e) {
+            args = { raw: argsStr };
+          }
+          this.emit("trace", { type: "tool_start", name, args, tool_call_id: toolCall.id });
+          this.emit("tool_call", { status: "running", name, args, tool_call_id: toolCall.id });
 
           let result;
           if (name === "browser_exec") {
@@ -134,7 +172,8 @@ export class OneAgentOrchestrator {
             result = { error: `Unknown tool: ${name}` };
           }
 
-          this.emit("trace", { type: "tool_end", name, result });
+          this.emit("trace", { type: "tool_end", name, result, tool_call_id: toolCall.id });
+          this.emit("tool_call", { status: "finished", name, result, tool_call_id: toolCall.id });
           messages.push({
             role: "tool",
             tool_call_id: toolCall.id,
@@ -144,11 +183,12 @@ export class OneAgentOrchestrator {
       }
     } catch (err) {
       if (!abortController.signal.aborted) {
-        this.emit("error", { message: err.message });
+        this.emit("error", { message: err.message, conversationId });
       }
     } finally {
       this.stop();
       this.#sessions.set(conversationId, messages);
+      this.emit("sessions_changed", this.getSessions());
     }
   }
 

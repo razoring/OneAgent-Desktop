@@ -50,15 +50,25 @@
 
 /* OneAgent dedicated sidebar styles */
 #oneagent-box {
+  display: flex;
+  flex-direction: column;
   order: 95 !important;
-  min-width: 240px;
+  min-width: 280px;
   max-width: 75vw;
-  width: var(--oneagent-sidebar-width, 360px);
-  background-color: var(--toolbar-bgcolor, #1c1b22);
+  width: var(--oneagent-sidebar-width, 380px);
+  padding-block-end: var(--space-small);
+  background-color: transparent;
   color: var(--sidebar-text-color, inherit);
   position: relative;
-  z-index: var(--browser-area-z-index-sidebar, 4);
+  z-index: var(--browser-area-z-index-sidebar);
   box-sizing: border-box;
+
+  :root[lwt-sidebar="light"] & {
+    color-scheme: light;
+  }
+  :root[lwt-sidebar="dark"] & {
+    color-scheme: dark;
+  }
 }
 
 #oneagent-box[hidden="true"],
@@ -68,14 +78,26 @@
 
 .oneagent-browser-stack {
   position: relative;
+  display: flex;
   flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
   width: 100%;
   height: 100%;
 }
 
-.oneagent-browser-stack > browser {
+#oneagent-browser {
+  flex: 1 1 auto;
   width: 100%;
   height: 100%;
+  min-height: 0;
+  min-width: 0;
+  border-radius: var(--border-radius-medium);
+  box-shadow: var(--content-area-shadow);
+  outline: 0.5px solid var(--sidebar-border-color, var(--chrome-content-separator-color));
+  background-color: var(--sidebar-background-color, var(--toolbar-bgcolor));
+  color: var(--sidebar-text-color, inherit);
+  overflow: clip;
 }
 
 #oneagent-splitter {
@@ -85,7 +107,7 @@
   border-inline: calc((var(--space-medium, 8px) - var(--splitter-width, 2px)) / 2) solid transparent;
   margin-inline: 0 calc(-1 * var(--space-medium, 8px));
   width: var(--space-medium, 8px);
-  z-index: var(--browser-area-z-index-sidebar-splitter, 5);
+  z-index: var(--browser-area-z-index-sidebar-splitter);
 }
 
 #oneagent-splitter[hidden="true"],
@@ -94,7 +116,7 @@
 }
 
 #oneagent-splitter:hover {
-  background-color: var(--focus-outline-color, #0a84ff);
+  background-color: var(--focus-outline-color);
 }
 
 #oneagent-button,

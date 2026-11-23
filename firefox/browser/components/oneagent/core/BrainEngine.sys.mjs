@@ -95,6 +95,7 @@ Be efficient. When a goal requires multiple steps, write robust async JavaScript
       tool_choice: "auto",
       temperature,
       max_tokens: maxTokens,
+      stream: typeof onDelta === "function",
     };
 
     const headers = { "Content-Type": "application/json" };
@@ -111,6 +112,75 @@ Be efficient. When a goal requires multiple steps, write robust async JavaScript
 
     if (!response.ok) {
       throw new Error(`BrainEngine HTTP ${response.status}: ${await response.text()}`);
+    }
+
+    if (body.stream && response.body) {
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder("utf-8");
+      let buffer = "";
+      let aggregatedContent = "";
+      let aggregatedToolCalls = [];
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) {
+          break;
+        }
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop();
+
+        for (const line of lines) {
+          const trimmed = line.trim();
+          if (!trimmed || !trimmed.startsWith("data:")) {
+            continue;
+          }
+          const dataStr = trimmed.slice(5).trim();
+          if (dataStr === "[DONE]") {
+            continue;
+          }
+          try {
+            const parsed = JSON.parse(dataStr);
+            const delta = parsed.choices?.[0]?.delta;
+            if (!delta) {
+              continue;
+            }
+            if (delta.content) {
+              aggregatedContent += delta.content;
+              onDelta(delta.content);
+            }
+            if (delta.tool_calls) {
+              for (const tc of delta.tool_calls) {
+                const idx = tc.index ?? 0;
+                if (!aggregatedToolCalls[idx]) {
+                  aggregatedToolCalls[idx] = {
+                    id: tc.id || `call_${idx}_${Date.now()}`,
+                    type: "function",
+                    function: { name: "", arguments: "" },
+                  };
+                }
+                if (tc.id) {
+                  aggregatedToolCalls[idx].id = tc.id;
+                }
+                if (tc.function?.name) {
+                  aggregatedToolCalls[idx].function.name += tc.function.name;
+                }
+                if (tc.function?.arguments) {
+                  aggregatedToolCalls[idx].function.arguments += tc.function.arguments;
+                }
+              }
+            }
+          } catch (e) {
+            // Ignore parse errors on incomplete chunk
+          }
+        }
+      }
+
+      return {
+        role: "assistant",
+        content: aggregatedContent,
+        tool_calls: aggregatedToolCalls.length > 0 ? aggregatedToolCalls : undefined,
+      };
     }
 
     const resJson = await response.json();

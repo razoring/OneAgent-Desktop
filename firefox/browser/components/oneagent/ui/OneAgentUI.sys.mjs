@@ -53,6 +53,7 @@ export class OneAgentUI {
       return;
     }
     win.OneAgentUI = OneAgentUI;
+    win.OneAgentOrchestrator = OneAgentOrchestrator;
     const isOpen = Services.prefs.getBoolPref("browser.oneagent.sidebar.open", false);
     if (isOpen) {
       this.toggleSidebar(win, true);

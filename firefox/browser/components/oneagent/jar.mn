@@ -4,6 +4,7 @@
 
 browser.jar:
     content/browser/oneagent/sidebar.html (ui/sidebar.html)
+    content/browser/oneagent/sidebar-host.css (ui/sidebar-host.css)
     content/browser/oneagent/sidebar.css (ui/sidebar.css)
     content/browser/oneagent/oneagent-sidebar.mjs (ui/oneagent-sidebar.mjs)
     content/browser/oneagent/oneagent-tab-overlay.mjs (ui/oneagent-tab-overlay.mjs)

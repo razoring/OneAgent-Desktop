@@ -40,8 +40,10 @@
   ChromeUtils.importESModule("chrome://browser/content/urlbar/SearchbarInput.mjs", { global: "current" });
   try {
     const { OneAgentUI } = ChromeUtils.importESModule("moz-src:///browser/components/oneagent/ui/OneAgentUI.sys.mjs");
+    const { OneAgentOrchestrator } = ChromeUtils.importESModule("moz-src:///browser/components/oneagent/core/OneAgentOrchestrator.sys.mjs");
     ChromeUtils.importESModule("chrome://browser/content/oneagent/oneagent-tab-overlay.mjs", { global: "current" });
     window.OneAgentUI = OneAgentUI;
+    window.OneAgentOrchestrator = OneAgentOrchestrator;
     if (document.readyState === "complete") {
       OneAgentUI.initWindow(window);
     } else {
