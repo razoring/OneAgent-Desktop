@@ -47,3 +47,58 @@
 #tabbrowser-tabbox[ai-window-open] {
   min-width: calc(var(--content-area-min-size) + var(--devtools-toolbox-width, 0px));
 }
+
+/* OneAgent dedicated sidebar styles */
+#oneagent-box {
+  order: 95 !important;
+  min-width: 240px;
+  max-width: 75vw;
+  width: var(--oneagent-sidebar-width, 360px);
+  background-color: var(--toolbar-bgcolor, #1c1b22);
+  color: var(--sidebar-text-color, inherit);
+  position: relative;
+  z-index: var(--browser-area-z-index-sidebar, 4);
+  box-sizing: border-box;
+}
+
+#oneagent-box[hidden="true"],
+#oneagent-box[collapsed="true"] {
+  display: none !important;
+}
+
+.oneagent-browser-stack {
+  position: relative;
+  flex: 1 1 auto;
+  width: 100%;
+  height: 100%;
+}
+
+.oneagent-browser-stack > browser {
+  width: 100%;
+  height: 100%;
+}
+
+#oneagent-splitter {
+  order: 94 !important;
+  background-clip: padding-box;
+  background-color: transparent;
+  border-inline: calc((var(--space-medium, 8px) - var(--splitter-width, 2px)) / 2) solid transparent;
+  margin-inline: 0 calc(-1 * var(--space-medium, 8px));
+  width: var(--space-medium, 8px);
+  z-index: var(--browser-area-z-index-sidebar-splitter, 5);
+}
+
+#oneagent-splitter[hidden="true"],
+#oneagent-splitter[collapsed="true"] {
+  display: none !important;
+}
+
+#oneagent-splitter:hover {
+  background-color: var(--focus-outline-color, #0a84ff);
+}
+
+#oneagent-button,
+#oneagent-button .toolbarbutton-icon {
+  list-style-image: url("chrome://global/skin/icons/highlights.svg") !important;
+}
+

@@ -1,0 +1,35 @@
+<!doctype html>
+<!-- This Source Code Form is subject to the terms of the Mozilla Public
+   - License, v. 2.0. If a copy of the MPL was not distributed with this file,
+   - You can obtain one at http://mozilla.org/MPL/2.0/. -->
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src resource: chrome:; object-src 'none'; img-src data: chrome: https:;"
+    />
+    <meta name="color-scheme" content="light dark" />
+    <title>OneAgent AI</title>
+    <link rel="stylesheet" href="chrome://global/skin/in-content/common.css" />
+    <script type="module" src="chrome://browser/content/oneagent/oneagent-sidebar.mjs"></script>
+    <style>
+      body, html {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background-color: var(--toolbar-bgcolor, #1c1b22);
+      }
+      oneagent-sidebar {
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <oneagent-sidebar></oneagent-sidebar>
+  </body>
+</html>

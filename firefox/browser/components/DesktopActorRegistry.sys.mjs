@@ -96,6 +96,25 @@ let JSWINDOWACTORS = {
     remoteTypes: ["parent"],
   },
 
+  OneAgentContent: {
+    parent: {
+      esModuleURI:
+        "moz-src:///browser/components/oneagent/actors/OneAgentContentParent.sys.mjs",
+    },
+    child: {
+      esModuleURI:
+        "moz-src:///browser/components/oneagent/actors/OneAgentContentChild.sys.mjs",
+      events: {
+        DOMContentLoaded: {},
+        pageshow: { mozSystemGroup: true },
+      },
+    },
+    allFrames: true,
+    includeChrome: false,
+    messageManagerGroups: ["browsers"],
+    safeForUntrustedWebProcess: true,
+  },
+
   AboutLogins: {
     parent: {
       esModuleURI:

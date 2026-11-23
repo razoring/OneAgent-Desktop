@@ -1,0 +1,31 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+with Files("**"):
+    BUG_COMPONENT = ("Firefox", "OneAgent")
+
+JAR_MANIFESTS += ["jar.mn"]
+
+MOZ_SRC_FILES += [
+    "actors/OneAgentContentChild.sys.mjs",
+    "actors/OneAgentContentParent.sys.mjs",
+    "core/AuxEngine.sys.mjs",
+    "core/BrainEngine.sys.mjs",
+    "core/DecisionEngine.sys.mjs",
+    "core/LocalDecisionAdapter.sys.mjs",
+    "core/OneAgentOrchestrator.sys.mjs",
+    "core/TypeStubRouter.sys.mjs",
+    "runtime/BrowserSandbox.sys.mjs",
+    "runtime/GuardrailPolicy.sys.mjs",
+    "runtime/SharedStash.sys.mjs",
+    "runtime/SystemSandbox.sys.mjs",
+    "services/BackgroundSearch.sys.mjs",
+    "services/BlindCredentialBroker.sys.mjs",
+    "services/InternalBrowserAPI.sys.mjs",
+    "services/MCPClientManager.sys.mjs",
+    "services/OneAgentCron.sys.mjs",
+    "services/OneAgentMemory.sys.mjs",
+    "services/SkillManager.sys.mjs",
+    "ui/OneAgentUI.sys.mjs",
+]

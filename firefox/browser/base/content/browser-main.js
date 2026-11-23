@@ -38,6 +38,18 @@
   }
   ChromeUtils.importESModule("chrome://browser/content/urlbar/UrlbarInput.mjs", { global: "current" });
   ChromeUtils.importESModule("chrome://browser/content/urlbar/SearchbarInput.mjs", { global: "current" });
+  try {
+    const { OneAgentUI } = ChromeUtils.importESModule("moz-src:///browser/components/oneagent/ui/OneAgentUI.sys.mjs");
+    ChromeUtils.importESModule("chrome://browser/content/oneagent/oneagent-tab-overlay.mjs", { global: "current" });
+    window.OneAgentUI = OneAgentUI;
+    if (document.readyState === "complete") {
+      OneAgentUI.initWindow(window);
+    } else {
+      window.addEventListener("load", () => OneAgentUI.initWindow(window), { once: true });
+    }
+  } catch (e) {
+    console.error("Failed to initialize OneAgent:", e);
+  }
 }
 
 window.onload = gBrowserInit.onLoad.bind(gBrowserInit);

@@ -2352,6 +2352,45 @@ pref("sidebar.visibility", "always-show");
 pref("browser.appbar.enabled", true);
 pref("browser.appbar.warnOnClose", true);
 pref("browser.appbar.defaultMobile", true);
+
+// OneAgent AI Automation Subsystem
+pref("browser.oneagent.enabled", true);
+pref("browser.oneagent.sidebar.open", false);
+pref("browser.oneagent.sidebar.width", 360);
+pref("browser.oneagent.logLevel", "Warn");
+
+// System 2: Brain Model (OpenAI-compatible /v1/chat/completions)
+pref("browser.oneagent.brain.endpoint", "http://127.0.0.1:11434/v1");
+pref("browser.oneagent.brain.apiKey", "");
+pref("browser.oneagent.brain.model", "glm-4.7-flash:30b-a3b");
+pref("browser.oneagent.brain.temperature", "0.2");
+pref("browser.oneagent.brain.maxTokens", 4096);
+
+// System 1b: Auxiliary Model (Fast Local LLM, OpenAI-compatible)
+pref("browser.oneagent.aux.endpoint", "http://127.0.0.1:11434/v1");
+pref("browser.oneagent.aux.apiKey", "");
+pref("browser.oneagent.aux.model", "qwen3:1.7b-it");
+pref("browser.oneagent.aux.noThink", true);
+
+// System 1a: Decision Model (POST /v1/decisions or local-adapter)
+pref("browser.oneagent.decision.mode", "local-adapter");
+pref("browser.oneagent.decision.endpoint", "https://api.openai.com/v1/decisions");
+pref("browser.oneagent.decision.apiKey", "");
+pref("browser.oneagent.decision.model", "gpt-6-luna-decision");
+pref("browser.oneagent.decision.confidenceThreshold", "0.70");
+
+// Background Web Search (auto-background uses tabless fetch + hidden windowless browser)
+pref("browser.oneagent.search.provider", "auto-background");
+pref("browser.oneagent.search.endpoint", "");
+pref("browser.oneagent.search.apiKey", "");
+pref("browser.oneagent.search.maxPages", 3);
+pref("browser.oneagent.search.timeoutMs", 12000);
+
+// Host Access, Memory & Guardrails
+pref("browser.oneagent.fs.allowedRoots", "[]");
+pref("browser.oneagent.guardrails.requireApprovalTier2", true);
+pref("browser.oneagent.memory.enabled", true);
+pref("browser.oneagent.cron.enabled", true);
 // Sidebar UI state is stored per-window via session restore. Use this pref
 // as a backup to restore the sidebar UI state when a user has PPB mode on
 // or has history cleared on browser close.
