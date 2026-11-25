@@ -315,6 +315,37 @@ export const CustomizableWidgets = [
     },
   },
   {
+    id: "oneagent-button",
+    label: "OneAgent",
+    tooltiptext: "Toggle OneAgent AI Sidebar",
+    defaultArea: "nav-bar",
+    onCommand(aEvent) {
+      const win =
+        aEvent.target?.ownerGlobal ||
+        aEvent.currentTarget?.ownerGlobal ||
+        aEvent.view ||
+        aEvent.target?.documentGlobal;
+      if (!win) {
+        return;
+      }
+      try {
+        const OneAgentUI =
+          win.OneAgentUI ||
+          ChromeUtils.importESModule(
+            "moz-src:///browser/components/oneagent/ui/OneAgentUI.sys.mjs"
+          ).OneAgentUI;
+        OneAgentUI.toggleSidebar(win);
+      } catch (err) {
+        console.error("OneAgent toggle error:", err);
+      }
+    },
+    onCreated(aNode) {
+      aNode.setAttribute("label", "OneAgent");
+      aNode.setAttribute("tooltiptext", "Toggle OneAgent AI Sidebar (Ctrl+Shift+A)");
+      aNode.classList.add("toolbarbutton-1", "chromeclass-toolbar-additional");
+    },
+  },
+  {
     id: "zoom-controls",
     type: "custom",
     tooltiptext: "zoom-controls.tooltiptext2",

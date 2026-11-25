@@ -48,9 +48,84 @@
   min-width: calc(var(--content-area-min-size) + var(--devtools-toolbox-width, 0px));
 }
 
-/* Desktop Mode prototype (button visually hidden; code retained) */
-#desktop-mode-button {
+/* OneAgent dedicated sidebar styles */
+#oneagent-box {
+  display: flex;
+  flex-direction: column;
+  order: 95 !important;
+  min-width: 280px;
+  max-width: 75vw;
+  width: var(--oneagent-sidebar-width, 380px);
+  padding-block-end: var(--space-small);
+  background-color: transparent;
+  color: var(--sidebar-text-color, inherit);
+  position: relative;
+  z-index: var(--browser-area-z-index-sidebar);
+  box-sizing: border-box;
+
+  :root[lwt-sidebar="light"] & {
+    color-scheme: light;
+  }
+  :root[lwt-sidebar="dark"] & {
+    color-scheme: dark;
+  }
+}
+
+#oneagent-box[hidden="true"],
+#oneagent-box[collapsed="true"] {
   display: none !important;
+}
+
+.oneagent-browser-stack {
+  position: relative;
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
+  width: 100%;
+  height: 100%;
+}
+
+#oneagent-browser {
+  flex: 1 1 auto;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  min-width: 0;
+  border-radius: var(--border-radius-medium);
+  box-shadow: var(--content-area-shadow);
+  outline: 0.5px solid var(--sidebar-border-color, var(--chrome-content-separator-color));
+  background-color: var(--sidebar-background-color, var(--toolbar-bgcolor));
+  color: var(--sidebar-text-color, inherit);
+  overflow: clip;
+}
+
+#oneagent-splitter {
+  order: 94 !important;
+  background-clip: padding-box;
+  background-color: transparent;
+  border-inline: calc((var(--space-medium, 8px) - var(--splitter-width, 2px)) / 2) solid transparent;
+  margin-inline: 0 calc(-1 * var(--space-medium, 8px));
+  width: var(--space-medium, 8px);
+  z-index: var(--browser-area-z-index-sidebar-splitter);
+}
+
+#oneagent-splitter[hidden="true"],
+#oneagent-splitter[collapsed="true"] {
+  display: none !important;
+}
+
+#oneagent-splitter:hover {
+  background-color: var(--focus-outline-color);
+}
+
+#oneagent-button,
+#oneagent-button .toolbarbutton-icon {
+  list-style-image: url("chrome://global/skin/icons/highlights.svg") !important;
+}
+
+/* Desktop Mode prototype */
+#desktop-mode-button {
   list-style-image: url("chrome://browser/skin/device-desktop.svg");
   -moz-window-dragging: no-drag;
   flex-direction: row !important;

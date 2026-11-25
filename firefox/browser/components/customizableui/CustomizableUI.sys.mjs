@@ -351,6 +351,7 @@ var CustomizableUIInternal = {
       "downloads-button",
       "fxa-toolbar-menu-button",
       "sidebar-button",
+      "oneagent-button",
     ];
 
     this.registerArea(
@@ -1043,6 +1044,13 @@ var CustomizableUIInternal = {
           }
         }
         gSavedState.placements[CustomizableUI.AREA_NAVBAR] = newNavbar;
+      }
+    }
+
+    if (currentVersion < 31) {
+      let navbarPlacements = gSavedState?.placements?.[CustomizableUI.AREA_NAVBAR];
+      if (navbarPlacements && !navbarPlacements.includes("oneagent-button")) {
+        navbarPlacements.push("oneagent-button");
       }
     }
   },
