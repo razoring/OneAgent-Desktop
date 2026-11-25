@@ -1068,12 +1068,21 @@ tab-split-view-wrapper[dragtarget] {
   .tabbrowser-tab:hover > .tab-stack > &:not([selected], [multiselected]) {
     background-color: var(--tab-background-color-hover);
     outline-color: var(--tab-border-color-hover);
+
+    @media not (forced-colors) {
+      box-shadow: inset 0 1px 0 0 var(--oa-edge-top);
+    }
   }
 
   &:is([selected], [multiselected]) {
     background-color: var(--tab-background-color-selected);
     outline-color: var(--tab-border-color-selected);
     box-shadow: var(--tab-box-shadow-selected);
+
+    @media not (forced-colors) {
+      background-image: var(--oa-sheen-surface);
+      box-shadow: var(--oa-shadow-glow-active);
+    }
   }
 
   @media -moz-pref("browser.nova.enabled") {

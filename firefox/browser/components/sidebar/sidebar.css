@@ -8,12 +8,14 @@
 @import url("chrome://browser/skin/identity-block/identity-block.css");
 
 :root {
-  --sidebar-box-border-color: light-dark(color-mix(in srgb, currentColor 10%, transparent), var(--border-color-deemphasized));
-  --sidebar-box-border-width: 0.5px;
+  --sidebar-box-border-color: var(--oa-border-hairline, light-dark(color-mix(in srgb, currentColor 10%, transparent), var(--border-color-deemphasized)));
+  --sidebar-box-border-width: 1px;
   --sidebar-box-border: var(--sidebar-box-border-width) solid var(--sidebar-box-border-color);
-  --sidebar-box-background: light-dark(rgba(0, 0, 0, 0.03), rgba(255, 255, 255, 0.05));
+  --sidebar-box-background: var(--oa-surface-card, light-dark(rgba(0, 0, 0, 0.03), rgba(255, 255, 255, 0.05)));
   --sidebar-box-color: currentColor;
-  background-color: transparent;
+  background-color: var(--oa-surface-canvas, transparent);
+  background-image: var(--oa-sheen-ambient-canvas);
+  background-attachment: fixed;
   color: var(--sidebar-text-color);
   font: menu;
   height: 100%;

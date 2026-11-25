@@ -192,3 +192,50 @@ panel[type="arrow"] {
     pointer-events: none;
   }
 }
+
+/* OneAgent Architectural Smoked Glass — Menus & Arrow Panels */
+@media not (forced-colors) {
+  panel[type="arrow"] {
+    --panel-background-color: var(--oa-surface-glass-elevated);
+    --panel-border-color: var(--oa-border-hairline);
+    --panel-border-radius: var(--oa-radius-panel);
+    --panel-box-shadow: var(--oa-shadow-panel);
+
+    @media not (-moz-platform: macos) {
+      --panel-box-shadow-margin: 14px;
+    }
+
+    &::part(content) {
+      background-color: var(--oa-surface-glass-elevated);
+      background-image: var(--oa-sheen-elevated);
+      backdrop-filter: var(--oa-blur-panel);
+      border: var(--oa-border-width) solid var(--oa-border-hairline);
+      border-radius: var(--oa-radius-panel);
+      box-shadow: var(--oa-shadow-panel);
+    }
+  }
+
+  menupopup {
+    @media not (-moz-platform: macos) {
+      @media not (-moz-windows-mica-popups) {
+        --panel-background-color: var(--oa-surface-glass-elevated);
+        --panel-border-color: var(--oa-border-hairline);
+        --panel-border-radius: var(--oa-radius-panel);
+        --panel-box-shadow: var(--oa-shadow-panel);
+        --panel-box-shadow-margin: 12px;
+      }
+
+      &::part(content) {
+        background-image: var(--oa-sheen-elevated);
+        backdrop-filter: var(--oa-blur-panel);
+      }
+
+      @media (-moz-windows-mica-popups) {
+        &::part(content) {
+          background-color: color-mix(in srgb, var(--oa-surface-glass-elevated) 72%, transparent);
+          box-shadow: inset 0 1px 0 0 var(--oa-edge-top);
+        }
+      }
+    }
+  }
+}

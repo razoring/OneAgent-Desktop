@@ -92,8 +92,9 @@
 .tools-and-extensions moz-button:not(.selected, [aria-selected="true"]):hover::part(button),
 .bottom-actions moz-button:not(.selected, [aria-selected="true"]):hover::part(button),
 .appbar-add-tab-button:not(.selected, [aria-selected="true"]):hover::part(button) {
-  background-color: var(--tab-background-color-hover, color-mix(in srgb, currentColor 17%, transparent));
-  outline-color: var(--tab-border-color-hover, transparent);
+  background-color: var(--tab-background-color-hover, var(--oa-surface-hover));
+  outline-color: var(--tab-border-color-hover, var(--oa-border-hairline));
+  box-shadow: inset 0 1px 0 0 var(--oa-edge-top);
 }
 
 /* Pinned tabs not loaded into memory are slightly transparent until loaded */
@@ -105,38 +106,38 @@ moz-button[unloaded].appbar-tab-button {
 
 .appbar-tab-button.unloaded:hover,
 moz-button[unloaded].appbar-tab-button:hover {
-  opacity: 0.8;
+  opacity: 0.85;
 }
 
-/* Active app / tab styling matching vertical tabs and current theme */
+/* Active app / tab styling matching vertical tabs and Nocturne Glass light source */
 .appbar-tab-button:is(.selected, [aria-selected="true"])::part(button),
 .tools-and-extensions moz-button:is(.selected, [aria-selected="true"])::part(button),
 .bottom-actions moz-button:is(.selected, [aria-selected="true"])::part(button),
 .appbar-add-tab-button:is(.selected, [aria-selected="true"])::part(button) {
   border-radius: var(--border-radius-circle, 50%) !important;
-  outline: 1px solid var(--tab-border-color-selected, transparent);
+  outline: 1px solid var(--tab-border-color-selected, var(--oa-border-glow));
   outline-offset: var(--tab-outline-offset, -1px);
   border: 1px solid transparent;
   background: var(
     --appbar-selected-background,
     var(--tab-background-color-selected, var(--toolbar-background-color))
   );
-  box-shadow: var(--tab-box-shadow-selected, none);
+  box-shadow: var(--oa-shadow-glow-active, var(--tab-box-shadow-selected, none));
   color: var(--tab-text-color-selected, inherit);
 }
 
 .appbar-pinned-divider {
-  width: 24px;
+  width: 22px;
   height: 1px;
-  background-color: var(--chrome-content-separator-color, color-mix(in srgb, currentColor 15%, transparent));
+  background-color: var(--oa-divider, var(--chrome-content-separator-color));
   margin-block: var(--space-xxsmall, 4px);
   flex-shrink: 0;
 }
 
 .appbar-separator {
-  width: 24px;
+  width: 22px;
   height: 1px;
-  background-color: var(--chrome-content-separator-color, color-mix(in srgb, currentColor 15%, transparent));
+  background-color: var(--oa-divider, var(--chrome-content-separator-color));
   margin-block: 4px;
   flex-shrink: 0;
 }

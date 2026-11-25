@@ -122,6 +122,24 @@ button {
   justify-content: var(--button-content-alignment);
   align-items: center;
   position: relative;
+  transition:
+    background-color var(--oa-duration-fast, 140ms) var(--oa-ease, ease),
+    border-color var(--oa-duration-fast, 140ms) var(--oa-ease, ease),
+    box-shadow var(--oa-duration-fast, 140ms) var(--oa-ease, ease);
+
+  @media not (forced-colors) {
+    &:not([type*="ghost"], [type*="menu"]) {
+      box-shadow: var(--oa-shadow-control, none);
+    }
+
+    &[type="primary"] {
+      box-shadow: inset 0 1px 0 0 var(--oa-edge-top-strong, transparent), 0 2px 8px -2px var(--oa-glow-accent, transparent);
+    }
+
+    button:hover > &[type="primary"] {
+      box-shadow: inset 0 1px 0 0 var(--oa-edge-top-strong, transparent), 0 0 16px -3px var(--oa-glow-accent, transparent);
+    }
+  }
 
   &[size="small"] {
     min-height: var(--button-min-height-small);

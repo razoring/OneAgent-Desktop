@@ -23,8 +23,11 @@ xul|findbar {
   transition-duration: 150ms, 0s;
   transition-timing-function: ease-in-out, linear;
   padding-block: var(--findbar-padding-block);
-  border-top: var(--findbar-border-top-width) solid var(--chrome-content-separator-color);
-  background-color: var(--toolbar-background-color);
+  border-top: var(--findbar-border-top-width) solid var(--oa-border-hairline, var(--chrome-content-separator-color));
+  background-color: var(--oa-surface-glass, var(--toolbar-background-color));
+  background-image: var(--oa-sheen-surface);
+  backdrop-filter: var(--oa-blur-subtle);
+  box-shadow: inset 0 1px 0 0 var(--oa-edge-top);
   color: -moz-dialogtext;
 
   @media not -moz-pref("browser.nova.enabled") {
@@ -81,13 +84,22 @@ xul|findbar {
 
 .findbar-textbox {
   appearance: none;
-  background-color: var(--toolbar-field-background-color);
+  background-color: var(--oa-surface-recessed, var(--toolbar-field-background-color));
   color: var(--toolbar-field-text-color);
   min-height: 28px;
-  border: var(--border-width) solid var(--border-color-interactive);
-  border-radius: var(--border-radius-xlarge);
+  border: var(--oa-border-width, var(--border-width)) solid var(--oa-border-hairline, var(--border-color-interactive));
+  border-radius: var(--oa-radius-pill, var(--border-radius-xlarge));
+  box-shadow: var(--oa-shadow-recessed);
   outline: none;
   margin: 0;
+  transition:
+    border-color var(--oa-duration-fast, 140ms) var(--oa-ease, ease),
+    box-shadow var(--oa-duration-fast, 140ms) var(--oa-ease, ease);
+
+  &:focus {
+    border-color: var(--oa-border-glow);
+    box-shadow: var(--oa-shadow-recessed), 0 0 14px -4px var(--oa-glow-accent);
+  }
   padding-inline-start: var(--space-medium);
   padding-block: var(--space-xsmall);
   width: 18em;

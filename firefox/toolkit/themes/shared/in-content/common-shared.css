@@ -4,6 +4,7 @@
 
 @import url("chrome://global/skin/design-system/tokens-brand.css");
 @import url("chrome://global/skin/design-system/text-and-typography.css");
+@import url("chrome://global/skin/design-system/oneagent-glass.css");
 
 @namespace html "http://www.w3.org/1999/xhtml";
 @namespace xul "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
@@ -1012,4 +1013,88 @@ xul|*.addons-icon {
 .back-button:-moz-locale-dir(rtl),
 .back-button:dir(rtl) {
   transform: scaleX(-1);
+}
+
+/* ==========================================================================
+ * OneAgent Architectural Smoked Glass — In-Content Pages (Settings, Add-ons,
+ * about:config, Passwords, Downloads, etc.)
+ * ========================================================================== */
+@media not (forced-colors) {
+  :root {
+    --background-color-canvas: var(--oa-surface-canvas);
+    --background-color-box: var(--oa-surface-card);
+    --border-color: var(--oa-border-hairline);
+    background-image: var(--oa-sheen-ambient-canvas);
+    background-attachment: fixed;
+  }
+
+  .card {
+    background-color: var(--oa-surface-card);
+    background-image: var(--oa-sheen-surface);
+    backdrop-filter: var(--oa-blur-subtle);
+    border: var(--oa-border-width) solid var(--oa-border-hairline);
+    border-radius: var(--oa-radius-card);
+    box-shadow: var(--oa-shadow-card);
+    transition:
+      border-color var(--oa-duration-base) var(--oa-ease),
+      box-shadow var(--oa-duration-base) var(--oa-ease);
+  }
+
+  #categories > .category {
+    border: var(--oa-border-width) solid transparent;
+    border-radius: var(--oa-radius-control);
+    transition:
+      background-color var(--oa-duration-fast) var(--oa-ease),
+      border-color var(--oa-duration-fast) var(--oa-ease),
+      box-shadow var(--oa-duration-fast) var(--oa-ease),
+      color var(--oa-duration-fast) var(--oa-ease);
+
+    &:hover {
+      background-color: var(--oa-surface-hover);
+      border-color: var(--oa-border-hairline);
+      box-shadow: inset 0 1px 0 0 var(--oa-edge-top);
+    }
+
+    &[selected],
+    &.selected {
+      background-color: var(--oa-surface-active);
+      background-image: var(--oa-sheen-surface);
+      border-color: var(--oa-border-glow);
+      box-shadow: var(--oa-shadow-glow-active);
+      color: var(--text-color);
+    }
+  }
+
+  html|input:is([type="text"], [type="search"], [type="url"], [type="email"], [type="number"], [type="password"]),
+  html|textarea,
+  html|select,
+  xul|menulist {
+    background-color: var(--oa-surface-recessed);
+    border: var(--oa-border-width) solid var(--oa-border-hairline);
+    border-radius: var(--oa-radius-control);
+    box-shadow: var(--oa-shadow-recessed);
+    transition:
+      border-color var(--oa-duration-fast) var(--oa-ease),
+      box-shadow var(--oa-duration-fast) var(--oa-ease);
+
+    &:hover:not(:disabled) {
+      border-color: var(--oa-border-hover);
+    }
+
+    &:focus,
+    &:focus-visible {
+      border-color: var(--oa-border-glow);
+      box-shadow: var(--oa-shadow-recessed), 0 0 14px -4px var(--oa-glow-accent);
+    }
+  }
+
+  .dialogBox,
+  html|dialog {
+    background-color: var(--oa-surface-glass-elevated);
+    background-image: var(--oa-sheen-elevated);
+    backdrop-filter: var(--oa-blur-panel);
+    border: var(--oa-border-width) solid var(--oa-border-hairline);
+    border-radius: var(--oa-radius-panel);
+    box-shadow: var(--oa-shadow-panel);
+  }
 }

@@ -1,0 +1,238 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+/* ==========================================================================
+ * OneAgent Architectural Smoked Glass Design System ("Nocturne Glass")
+ *
+ * Core Laws (see .agents/DESIGN_PHILOSOPHY.md):
+ * 1. Single Light Source: 155deg overhead top-leading key light everywhere.
+ *    - Elevated surfaces catch a razor 1px top specular bevel + gentle sheen.
+ *    - Recessed wells catch a dark top inner shadow + faint bottom lip.
+ * 2. Zero White Tint: Smoked obsidian glass in dark mode, clean cool crystal
+ *    in light mode. Never milky white frost.
+ * 3. Subtle Blur Budget: 8px–11px backdrop blur max. Crisp, never liquid/mushy.
+ * 4. Invisible Restraint: Strictly 1px low-opacity hairline borders; whisper
+ *    edge glow & ambient shadow glow only on elevation, hover, or focus.
+ * ========================================================================== */
+
+@media not (forced-colors) {
+  :root,
+  :host,
+  :host(.anonymous-content-host) {
+    /* Light source geometry */
+    --oa-light-angle: 155deg;
+
+    /* Subtle frosted blur budget (macOS / Safari restraint) */
+    --oa-blur-subtle: blur(8px) saturate(1.16);
+    --oa-blur-panel: blur(11px) saturate(1.22);
+
+    /* Radii (concentric geometry) */
+    --oa-radius-panel: 12px;
+    --oa-radius-card: 12px;
+    --oa-radius-control: 8px;
+    --oa-radius-item: 6px;
+    --oa-radius-pill: 9999px;
+
+    /* Smoked glass surfaces — zero milky white tint */
+    --oa-surface-canvas: light-dark(#f3f4f8, #0c0d11);
+    --oa-surface-glass: light-dark(rgba(249, 250, 253, 0.82), rgba(16, 17, 23, 0.78));
+    --oa-surface-glass-elevated: light-dark(rgba(252, 253, 255, 0.88), rgba(18, 19, 25, 0.86));
+    --oa-surface-card: light-dark(rgba(255, 255, 255, 0.86), rgba(20, 21, 28, 0.78));
+    --oa-surface-recessed: light-dark(rgba(15, 20, 34, 0.045), rgba(7, 8, 12, 0.56));
+    --oa-surface-hover: light-dark(rgba(15, 20, 34, 0.055), rgba(255, 255, 255, 0.055));
+    --oa-surface-active: color-mix(in srgb, var(--color-accent-primary, #7c6cff) 14%, transparent);
+
+    /* Directional overhead light sheen (felt, not noticed) */
+    --oa-sheen-surface: linear-gradient(
+      var(--oa-light-angle),
+      light-dark(rgba(255, 255, 255, 0.38), rgba(255, 255, 255, 0.032)) 0%,
+      transparent 48%
+    );
+    --oa-sheen-elevated: linear-gradient(
+      var(--oa-light-angle),
+      light-dark(rgba(255, 255, 255, 0.52), rgba(255, 255, 255, 0.046)) 0%,
+      transparent 44%
+    );
+    --oa-sheen-ambient-canvas: radial-gradient(
+      ellipse 72% 38% at 22% -8%,
+      light-dark(
+        color-mix(in srgb, var(--color-accent-primary, #6366f1) 7%, transparent),
+        color-mix(in srgb, var(--color-accent-primary, #8b7cff) 11%, transparent)
+      ) 0%,
+      transparent 72%
+    );
+
+    /* Specular edge highlights (top light source) */
+    --oa-edge-top: light-dark(rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.085));
+    --oa-edge-top-strong: light-dark(rgba(255, 255, 255, 0.90), rgba(255, 255, 255, 0.125));
+    --oa-edge-top-glow: color-mix(in srgb, var(--color-accent-primary, #8b7cff) 34%, var(--oa-edge-top-strong));
+
+    /* Hairline borders — strictly 1px, ultra-quiet */
+    --oa-border-width: 1px;
+    --oa-border-hairline: light-dark(rgba(15, 20, 34, 0.085), rgba(255, 255, 255, 0.072));
+    --oa-border-hover: light-dark(rgba(15, 20, 34, 0.15), rgba(255, 255, 255, 0.135));
+    --oa-border-glow: color-mix(in srgb, var(--color-accent-primary, #8b7cff) 34%, var(--oa-border-hairline));
+    --oa-divider: light-dark(rgba(15, 20, 34, 0.065), rgba(255, 255, 255, 0.06));
+
+    /* Theme-aware soft glows */
+    --oa-glow-accent: light-dark(
+      color-mix(in srgb, var(--color-accent-primary, #6366f1) 18%, transparent),
+      color-mix(in srgb, var(--color-accent-primary, #8b7cff) 22%, transparent)
+    );
+    --oa-glow-ambient: light-dark(
+      color-mix(in srgb, var(--color-accent-primary, #6366f1) 7%, transparent),
+      color-mix(in srgb, var(--color-accent-primary, #8b7cff) 12%, transparent)
+    );
+
+    /* Elevation shadows (directional overhead falloff + subtle shadow glow) */
+    --oa-shadow-card:
+      inset 0 1px 0 0 var(--oa-edge-top),
+      0 1px 2px light-dark(rgba(15, 20, 34, 0.05), rgba(0, 0, 0, 0.28)),
+      0 8px 22px -8px light-dark(rgba(15, 20, 34, 0.09), rgba(0, 0, 0, 0.46));
+
+    --oa-shadow-card-hover:
+      inset 0 1px 0 0 var(--oa-edge-top-strong),
+      0 2px 4px light-dark(rgba(15, 20, 34, 0.07), rgba(0, 0, 0, 0.34)),
+      0 12px 28px -8px light-dark(rgba(15, 20, 34, 0.13), rgba(0, 0, 0, 0.56)),
+      0 0 18px -6px var(--oa-glow-ambient);
+
+    --oa-shadow-panel:
+      inset 0 1px 0 0 var(--oa-edge-top-strong),
+      0 0 0 0.5px light-dark(rgba(15, 20, 34, 0.06), rgba(0, 0, 0, 0.48)),
+      0 12px 32px -6px light-dark(rgba(15, 20, 34, 0.16), rgba(0, 0, 0, 0.60)),
+      0 0 22px -8px var(--oa-glow-ambient);
+
+    --oa-shadow-glow-active:
+      inset 0 1px 0 0 var(--oa-edge-top-glow),
+      0 0 14px -3px var(--oa-glow-accent),
+      0 4px 12px -4px light-dark(rgba(15, 20, 34, 0.12), rgba(0, 0, 0, 0.42));
+
+    --oa-shadow-recessed:
+      inset 0 1px 2px light-dark(rgba(15, 20, 34, 0.06), rgba(0, 0, 0, 0.36)),
+      inset 0 -1px 0 0 light-dark(rgba(255, 255, 255, 0.65), rgba(255, 255, 255, 0.04));
+
+    --oa-shadow-control:
+      inset 0 1px 0 0 var(--oa-edge-top),
+      0 1px 2px light-dark(rgba(15, 20, 34, 0.06), rgba(0, 0, 0, 0.24));
+
+    /* Motion */
+    --oa-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+    --oa-duration-fast: 140ms;
+    --oa-duration-base: 180ms;
+
+    /* -----------------------------------------------------------------------
+     * Map Firefox core design tokens so every native widget, card, box-group,
+     * popup, and internal page automatically adopts the Nocturne Glass system.
+     * ----------------------------------------------------------------------- */
+    --card-background-color: var(--oa-surface-card);
+    --card-border-color: var(--oa-border-hairline);
+    --card-border-radius: var(--oa-radius-card);
+    --card-border-width: var(--oa-border-width);
+    --card-box-shadow: var(--oa-shadow-card);
+    --card-box-shadow-hover: var(--oa-shadow-card-hover);
+
+    --box-border-color: var(--oa-border-hairline);
+    --box-border-radius: var(--oa-radius-control);
+
+    --panel-border-radius: var(--oa-radius-panel);
+    --popup-border-radius: var(--oa-radius-panel);
+    --panel-border-color: var(--oa-border-hairline);
+    --panel-separator-color: var(--oa-divider);
+  }
+
+  /* Respect active lightweight themes by tinting smoked glass subtly with the
+   * theme accent/frame color instead of neutral gray or white. */
+  :root[lwtheme] {
+    --oa-surface-glass: color-mix(
+      in srgb,
+      var(--lwt-accent-color, #121318) 68%,
+      light-dark(rgba(250, 251, 254, 0.84), rgba(10, 11, 15, 0.82))
+    );
+    --oa-surface-glass-elevated: color-mix(
+      in srgb,
+      var(--lwt-accent-color, #14151c) 56%,
+      light-dark(rgba(252, 253, 255, 0.88), rgba(14, 15, 20, 0.88))
+    );
+  }
+
+  /* ========================================================================
+   * Reusable Architectural Smoked Glass Primitives
+   * Use these classes across all new and existing HTML/XUL surfaces.
+   * ======================================================================== */
+
+  .oa-glass-surface {
+    background-color: var(--oa-surface-glass-elevated);
+    background-image: var(--oa-sheen-elevated);
+    backdrop-filter: var(--oa-blur-panel);
+    border: var(--oa-border-width) solid var(--oa-border-hairline);
+    border-radius: var(--oa-radius-panel);
+    box-shadow: var(--oa-shadow-panel);
+  }
+
+  .oa-glass-card {
+    background-color: var(--oa-surface-card);
+    background-image: var(--oa-sheen-surface);
+    backdrop-filter: var(--oa-blur-subtle);
+    border: var(--oa-border-width) solid var(--oa-border-hairline);
+    border-radius: var(--oa-radius-card);
+    box-shadow: var(--oa-shadow-card);
+    transition:
+      border-color var(--oa-duration-base) var(--oa-ease),
+      box-shadow var(--oa-duration-base) var(--oa-ease);
+  }
+
+  .oa-glass-well {
+    background-color: var(--oa-surface-recessed);
+    border: var(--oa-border-width) solid var(--oa-border-hairline);
+    border-radius: var(--oa-radius-control);
+    box-shadow: var(--oa-shadow-recessed);
+    overflow: hidden;
+  }
+
+  .oa-glass-chip {
+    background-color: var(--oa-surface-glass);
+    background-image: var(--oa-sheen-surface);
+    border: var(--oa-border-width) solid var(--oa-border-hairline);
+    border-radius: var(--oa-radius-control);
+    box-shadow: var(--oa-shadow-control);
+    transition:
+      background-color var(--oa-duration-fast) var(--oa-ease),
+      border-color var(--oa-duration-fast) var(--oa-ease),
+      box-shadow var(--oa-duration-fast) var(--oa-ease);
+
+    &:hover {
+      background-color: var(--oa-surface-hover);
+      border-color: var(--oa-border-hover);
+      box-shadow: var(--oa-shadow-card-hover);
+    }
+
+    &:is(.active, [aria-selected="true"], [aria-pressed="true"]) {
+      background-color: var(--oa-surface-active);
+      border-color: var(--oa-border-glow);
+      box-shadow: var(--oa-shadow-glow-active);
+    }
+  }
+
+  .oa-glass-input {
+    background-color: var(--oa-surface-recessed);
+    border: var(--oa-border-width) solid var(--oa-border-hairline);
+    border-radius: var(--oa-radius-pill);
+    box-shadow: var(--oa-shadow-recessed);
+    transition:
+      border-color var(--oa-duration-fast) var(--oa-ease),
+      box-shadow var(--oa-duration-fast) var(--oa-ease),
+      background-color var(--oa-duration-fast) var(--oa-ease);
+
+    &:hover {
+      border-color: var(--oa-border-hover);
+    }
+
+    &:focus,
+    &:focus-within {
+      border-color: var(--oa-border-glow);
+      box-shadow: var(--oa-shadow-recessed), 0 0 14px -4px var(--oa-glow-accent);
+      outline: none;
+    }
+  }
+}

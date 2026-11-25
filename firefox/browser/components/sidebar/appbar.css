@@ -37,17 +37,18 @@
   min-width: 220px;
   max-width: 75vw;
   width: var(--appbar-panel-width, 360px);
-  background-color: light-dark(#f7f6fb, #131215);
+  background-color: var(--oa-surface-glass, light-dark(#f3f4f8, #0c0d11));
+  background-image: var(--oa-sheen-surface);
+  backdrop-filter: var(--oa-blur-subtle);
   color: var(--sidebar-text-color, inherit);
   position: relative;
   z-index: var(--browser-area-z-index-sidebar);
   box-sizing: border-box;
-  border-radius: var(--border-radius-medium, 8px) !important;
+  border-radius: var(--oa-radius-panel, 12px) !important;
   overflow: clip !important;
   margin-block-end: var(--urlbar-container-padding-block, 4px) !important;
-  border: var(--card-border-width, 1px) solid var(--card-border-color, var(--chrome-content-separator-color));
-  box-shadow: var(--card-box-shadow, 0 0.25px 0.75px var(--box-shadow-color-lighter-layer-1),
-    0 2px 6px var(--box-shadow-color-lighter-layer-2));
+  border: var(--oa-border-width, 1px) solid var(--oa-border-hairline, var(--chrome-content-separator-color));
+  box-shadow: var(--oa-shadow-panel);
 }
 
 #appbar-box[hidden="true"] {
@@ -72,15 +73,15 @@
   flex: 1 1 auto;
   width: 100%;
   height: 100%;
-  border-radius: var(--border-radius-medium, 8px) var(--border-radius-medium, 8px) 0 0 !important;
+  border-radius: var(--oa-radius-panel, 12px) var(--oa-radius-panel, 12px) 0 0 !important;
   overflow: clip !important;
 }
 
 .appbar-browser-stack > browser {
   width: 100%;
   height: 100%;
-  background-color: light-dark(#f7f6fb, #131215);
-  border-radius: var(--border-radius-medium, 8px) var(--border-radius-medium, 8px) 0 0 !important;
+  background-color: var(--oa-surface-canvas, light-dark(#f3f4f8, #0c0d11));
+  border-radius: var(--oa-radius-panel, 12px) var(--oa-radius-panel, 12px) 0 0 !important;
   overflow: clip !important;
 }
 
@@ -93,11 +94,14 @@
   display: flex;
   align-items: center;
   gap: 4px;
-  padding: 4px 6px;
-  background-color: var(--toolbar-background-color, light-dark(#f7f6fb, #131215));
-  border-top: 1px solid var(--chrome-content-separator-color, color-mix(in srgb, currentColor 12%, transparent));
-  border-radius: 0 0 calc(var(--border-radius-medium, 8px) - 1px) calc(var(--border-radius-medium, 8px) - 1px);
-  min-height: 38px;
+  padding: 5px 8px;
+  background-color: var(--oa-surface-glass-elevated, var(--toolbar-background-color));
+  background-image: var(--oa-sheen-surface);
+  backdrop-filter: var(--oa-blur-subtle);
+  border-top: var(--oa-border-width, 1px) solid var(--oa-divider, var(--chrome-content-separator-color));
+  box-shadow: inset 0 1px 0 0 var(--oa-edge-top);
+  border-radius: 0 0 calc(var(--oa-radius-panel, 12px) - 1px) calc(var(--oa-radius-panel, 12px) - 1px);
+  min-height: 40px;
   box-sizing: border-box;
   flex-shrink: 0;
   margin: 0;
@@ -113,23 +117,27 @@
   display: none !important;
 }
 
-/* Integrated URL bar container */
+/* Integrated URL bar container — recessed Safari smoked glass pill */
 #appbar-urlbar-container {
   display: flex;
   align-items: center;
   flex: 1 1 auto;
   min-width: 0;
   height: 28px;
-  background: var(--toolbar-field-background-color, color-mix(in srgb, currentColor 8%, transparent));
-  border: 1px solid var(--toolbar-field-border-color, transparent);
-  border-radius: var(--border-radius-medium, 8px);
-  padding: 0 4px;
+  background-color: var(--oa-surface-recessed);
+  border: var(--oa-border-width, 1px) solid var(--oa-border-hairline);
+  border-radius: var(--oa-radius-pill, 9999px);
+  box-shadow: var(--oa-shadow-recessed);
+  padding: 0 6px;
   box-sizing: border-box;
+  transition:
+    border-color var(--oa-duration-fast, 140ms) var(--oa-ease, ease),
+    box-shadow var(--oa-duration-fast, 140ms) var(--oa-ease, ease);
 }
 
 #appbar-urlbar-container:focus-within {
-  border-color: var(--focus-outline-color, #0060df);
-  background: var(--toolbar-field-focus-background-color, var(--toolbar-field-background-color));
+  border-color: var(--oa-border-glow, var(--focus-outline-color));
+  box-shadow: var(--oa-shadow-recessed), 0 0 14px -4px var(--oa-glow-accent);
 }
 
 #appbar-identity-box {

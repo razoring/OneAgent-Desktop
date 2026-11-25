@@ -549,15 +549,17 @@ menuseparator + #sidebar-extensions-separator {
       inset-inline-start: 0;
       inset-inline-end: unset;
       width: var(--sidebar-launcher-width, 240px) !important;
-      border-inline-end: 1px solid var(--sidebar-border-color);
+      border-inline-end: 1px solid var(--oa-border-hairline, var(--sidebar-border-color));
       border-radius: 0 !important;
       overflow: visible !important;
+      backdrop-filter: var(--oa-blur-panel);
+      box-shadow: var(--oa-shadow-panel);
     }
 
     &[sidebar-launcher-expanded][sidebar-positionend] {
       inset-inline-start: unset;
       inset-inline-end: 0;
-      border-inline-start: 1px solid var(--sidebar-border-color);
+      border-inline-start: 1px solid var(--oa-border-hairline, var(--sidebar-border-color));
       border-inline-end: none;
       border-radius: 0 !important;
     }

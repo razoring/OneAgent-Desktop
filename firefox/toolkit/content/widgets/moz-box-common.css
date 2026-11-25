@@ -14,6 +14,7 @@
     border-start-end-radius: var(--box-border-radius-start, var(--box-border-radius));
     border-end-start-radius: var(--box-border-radius-end, var(--box-border-radius));
     border-end-end-radius: var(--box-border-radius-end, var(--box-border-radius));
+    box-shadow: var(--oa-shadow-control, none);
     display: block;
     position: relative;
   }

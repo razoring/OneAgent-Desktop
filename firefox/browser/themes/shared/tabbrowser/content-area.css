@@ -71,8 +71,8 @@
     }
 
     outline: none;
-    box-shadow: none;
-    border-block-start: var(--border-width) solid var(--chrome-content-separator-color);
+    box-shadow: var(--oa-shadow-card, none);
+    border: var(--oa-border-width, 1px) solid var(--oa-border-hairline, var(--chrome-content-separator-color));
 
     /* Fullscreen slides the toolbox off-screen (and DOM fullscreen hides the
      * chrome outright), so the block-start edge then meets the screen and the
@@ -84,7 +84,8 @@
       margin-inline-end: 0 !important;
       margin-inline-start: 0 !important;
 
-      border-block-start: none;
+      border: none;
+      box-shadow: none;
     }
 
     /* A .browserContainer edge is only separated and rounded when it faces chrome.
