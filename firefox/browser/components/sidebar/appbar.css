@@ -2,19 +2,25 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
-:root {
-  --appbar-width: 44px;
-}
-
 #appbar-container {
   order: 103 !important;
-  width: var(--appbar-width, 44px) !important;
-  min-width: var(--appbar-width, 44px) !important;
-  max-width: var(--appbar-width, 44px) !important;
-  background-color: var(--toolbar-bgcolor);
+  width: var(--tab-collapsed-width, 42px) !important;
+  min-width: var(--tab-collapsed-width, 42px) !important;
+  max-width: var(--tab-collapsed-width, 42px) !important;
+  background-color: transparent;
   position: relative;
   z-index: 10;
   box-sizing: border-box;
+}
+
+@media -moz-pref("browser.nova.enabled") {
+  @media not ((prefers-contrast) or (-moz-native-theme)) {
+    :root[theme-in-app] #appbar-container {
+      --appbar-selected-background:
+        var(--tab-border-color-accent) border-box border-area,
+        var(--tab-background-color-selected) padding-box;
+    }
+  }
 }
 
 #appbar-container[hidden="true"] {
@@ -88,7 +94,7 @@
   align-items: center;
   gap: 4px;
   padding: 4px 6px;
-  background-color: var(--toolbar-bgcolor);
+  background-color: var(--toolbar-background-color, light-dark(#f7f6fb, #131215));
   border-top: 1px solid var(--chrome-content-separator-color, color-mix(in srgb, currentColor 12%, transparent));
   border-radius: 0 0 calc(var(--border-radius-medium, 8px) - 1px) calc(var(--border-radius-medium, 8px) - 1px);
   min-height: 38px;
@@ -242,21 +248,4 @@
 
 #appbar-toggle-mobile-button[aria-pressed="true"] {
   background-color: color-mix(in srgb, currentColor 18%, transparent) !important;
-}
-
-/* Appbar panel background color by theme */
-#appbar-container {
-  background-color: light-dark("#f7f6fb", "#131215");
-}
-
-#appbar-box {
-  background-color: light-dark("#f7f6fb", "#131215");
-}
-
-.appbar-browser-stack > browser {
-  background-color: light-dark("#f7f6fb", "#131215");
-}
-
-#appbar-bottom-bar {
-  background-color: light-dark("#f7f6fb", "#131215");
 }

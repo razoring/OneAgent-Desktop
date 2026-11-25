@@ -34,6 +34,16 @@ export class AppbarTabManager {
     return this.document.querySelector("appbar-main");
   }
 
+  _notifyTabsChanged() {
+    this.appbarMain?.requestUpdate?.();
+    this._window.dispatchEvent(new this._window.CustomEvent("appbar-tabs-changed"));
+  }
+
+  _notifyTabsChanged() {
+    this.appbarMain?.requestUpdate?.();
+    this._window.dispatchEvent(new this._window.CustomEvent("appbar-tabs-changed"));
+  }
+
   init() {
     const defaultTools = [
       {
@@ -80,17 +90,27 @@ export class AppbarTabManager {
       return null;
     }
 
+    const isInternal =
+      !!options.isTool ||
+      url.startsWith("chrome://") ||
+      url.startsWith("about:") ||
+      url.startsWith("resource://");
+
     let resolvedIcon = options.iconUrl;
     if (!resolvedIcon) {
-      try {
-        let domain = new URL(url).hostname;
-        resolvedIcon = `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
-      } catch (e) {
-        resolvedIcon = "chrome://global/skin/icons/defaultFavicon.svg";
+      if (!isInternal) {
+        try {
+          const parsed = new URL(url);
+          if (
+            (parsed.protocol === "http:" || parsed.protocol === "https:") &&
+            parsed.hostname
+          ) {
+            resolvedIcon = `https://www.google.com/s2/favicons?domain=${parsed.hostname}&sz=32`;
+          }
+        } catch (e) {}
       }
+      resolvedIcon ||= "chrome://global/skin/icons/defaultFavicon.svg";
     }
-
-    const isInternal = !!options.isTool || url.startsWith("chrome://") || url.startsWith("about:");
 
     const tab = {
       id,
@@ -111,13 +131,13 @@ export class AppbarTabManager {
 
     if (options.deferLoad) {
       this._tabs.push(tab);
-      this.appbarMain?.requestUpdate?.();
+      this._notifyTabsChanged();
       return tab;
     }
 
     this._ensureTabLoaded(tab);
     this._tabs.push(tab);
-    this.appbarMain?.requestUpdate?.();
+    this._notifyTabsChanged();
 
     if (options.select) {
       this.selectTab(id);
@@ -203,16 +223,18 @@ export class AppbarTabManager {
         }
         if (browser.currentURI?.spec) {
           tab.url = browser.currentURI.spec;
-          let domain = browser.currentURI.host;
-          if (domain) {
-            tab.iconUrl = `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
+          const isHttp =
+            browser.currentURI.schemeIs("http") ||
+            browser.currentURI.schemeIs("https");
+          if (!isInternal && isHttp && browser.currentURI.host) {
+            tab.iconUrl = `https://www.google.com/s2/favicons?domain=${browser.currentURI.host}&sz=32`;
           }
         }
         tab.loaded = true;
         if (this._selectedTabId === tab.id) {
           this._updateBottomBar(tab);
         }
-        this.appbarMain?.requestUpdate?.();
+        this._notifyTabsChanged();
       } catch (e) {}
     };
 
@@ -245,7 +267,7 @@ export class AppbarTabManager {
     const tab = this._tabs.find(t => t.id === tabId);
     if (tab) {
       tab.pinned = true;
-      this.appbarMain?.requestUpdate?.();
+      this._notifyTabsChanged();
     }
   }
 
@@ -253,7 +275,7 @@ export class AppbarTabManager {
     const tab = this._tabs.find(t => t.id === tabId);
     if (tab) {
       tab.pinned = false;
-      this.appbarMain?.requestUpdate?.();
+      this._notifyTabsChanged();
     }
   }
 
@@ -265,9 +287,11 @@ export class AppbarTabManager {
     }
     const targetPinned = this._tabs[toIndex].pinned;
     const [movedTab] = this._tabs.splice(fromIndex, 1);
+    movedTab.pinned = targetPinned;
+    const newToIndex = this._tabs.findIndex(t => t.id === toId);
     const insertIndex = fromIndex < toIndex ? newToIndex + 1 : newToIndex;
     this._tabs.splice(insertIndex, 0, movedTab);
-    this.appbarMain?.requestUpdate?.();
+    this._notifyTabsChanged();
   }
 
   toggleTabVisibility(tabId, visible) {
@@ -277,7 +301,7 @@ export class AppbarTabManager {
       if (tab.hidden && this._selectedTabId === tabId) {
         this.closePanel();
       }
-      this.appbarMain?.requestUpdate?.();
+      this._notifyTabsChanged();
     }
   }
 
@@ -289,7 +313,7 @@ export class AppbarTabManager {
     }
     const [movedTab] = this._tabs.splice(fromIndex, 1);
     this._tabs.splice(toIndex, 0, movedTab);
-    this.appbarMain?.requestUpdate?.();
+    this._notifyTabsChanged();
   }
 
   selectTab(tabId) {
@@ -359,7 +383,7 @@ export class AppbarTabManager {
     const contentArea = this.document.getElementById("tabbrowser-tabbox");
     contentArea?.setAttribute("appbar-panel-open", "true");
 
-    this.appbarMain?.requestUpdate?.();
+    this._notifyTabsChanged();
   }
 
   closePanel() {
@@ -396,7 +420,7 @@ export class AppbarTabManager {
       }
     }
 
-    this.appbarMain?.requestUpdate?.();
+    this._notifyTabsChanged();
   }
 
   removeTab(tabId) {
@@ -411,7 +435,7 @@ export class AppbarTabManager {
       if (this._selectedTabId === tabId) {
         this.closePanel();
       }
-      this.appbarMain?.requestUpdate?.();
+      this._notifyTabsChanged();
       return;
     }
 
@@ -427,7 +451,7 @@ export class AppbarTabManager {
       }
     }
 
-    this.appbarMain?.requestUpdate?.();
+    this._notifyTabsChanged();
   }
 
   reloadTab(tabId) {

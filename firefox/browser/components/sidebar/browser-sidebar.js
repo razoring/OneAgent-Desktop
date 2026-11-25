@@ -1501,6 +1501,9 @@ var SidebarController = {
     if (!toolbarButton || this.inSingleTabWindow) {
       return;
     }
+    if (toolbarButton.id === "sidebar-button" && window.AppbarController) {
+      return;
+    }
     if (!this.sidebarRevampEnabled) {
       toolbarButton.dataset.l10nId = "show-sidebars";
       toolbarButton.checked = this.isOpen;

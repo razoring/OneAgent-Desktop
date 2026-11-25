@@ -35,6 +35,10 @@
   }
 }
 
+#sidebar-container {
+  background-color: transparent;
+}
+
 #sidebar-container,
 #sidebar-box {
   text-shadow: none;
@@ -478,6 +482,19 @@ menuseparator + #sidebar-extensions-separator {
   --sidebar-divider-position: calc(50% - 7px) center, calc(50% + 7px) center, center;
 }
 
+:root[lwtheme][sidebar-expand-on-hover] #sidebar-container:is([sidebar-launcher-expanded], [sidebar-launcher-collapsing]) {
+  background-color: var(--lwt-accent-color);
+  background-image: var(--toolbox-background-image), image(var(--toolbox-background-color));
+  background-repeat: var(--toolbox-background-repeat), no-repeat;
+  background-position: var(--toolbox-background-position), top left;
+  background-size: var(--toolbox-background-size), auto;
+  background-attachment: fixed;
+}
+
+:root[lwtheme]:not([lwtheme-image])[sidebar-expand-on-hover]:-moz-window-inactive #sidebar-container:is([sidebar-launcher-expanded], [sidebar-launcher-collapsing]) {
+  background-color: var(--lwt-accent-color-inactive, var(--lwt-accent-color));
+}
+
 /* Expand on hover */
 
 :root[sidebar-expand-on-hover] {
@@ -491,13 +508,20 @@ menuseparator + #sidebar-extensions-separator {
     transition: width var(--sidebar-expand-on-hover-duration, 200ms) var(--motion-ease-emphasized);
     overflow: clip;
 
-    /* Always apply toolbox colors and opaque backdrop */
+    /* Match body/Appbar translucency when collapsed; only apply an opaque
+     * theme-aware backdrop when expanded over web content. */
     color: var(--toolbox-text-color);
-    background-image: var(--toolbox-background-gradient), image(var(--toolbox-background-color));
-    background-size:
-      100vw 100vh,
-      auto;
-    background-color: light-dark(#e8e8e8, #202020);
+    background-color: transparent;
+    background-image: none;
+
+    &[sidebar-launcher-expanded],
+    &[sidebar-launcher-collapsing] {
+      background-color: light-dark(#e8e8e8, #202020);
+      background-image: var(--toolbox-background-gradient), image(var(--toolbox-background-color));
+      background-size:
+        100vw 100vh,
+        auto;
+    }
 
     &[sidebar-positionend]:-moz-locale-dir(ltr),
     &:not([sidebar-positionend]):-moz-locale-dir(rtl) {

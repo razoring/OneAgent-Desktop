@@ -170,6 +170,7 @@ export default class AppbarMain extends MozLitElement {
 
   onDragOver(e) {
     if (this._draggedTabId) {
+      this.onTabsListDragOver(e);
       return;
     }
     let types = Array.from(e.dataTransfer.types);
@@ -192,6 +193,10 @@ export default class AppbarMain extends MozLitElement {
   }
 
   onDrop(e) {
+    if (this._draggedTabId) {
+      this.onTabDrop(e);
+      return;
+    }
     e.preventDefault();
     this.isDragOver = false;
     let url;
@@ -220,19 +225,132 @@ export default class AppbarMain extends MozLitElement {
   onTabDragStart(e, tabId) {
     e.dataTransfer.setData("application/x-appbar-tab", tabId);
     e.dataTransfer.effectAllowed = "move";
+    // Hide the browser's default drag ghost image, matching vertical tabs
+    if (!this._emptyDragImg) {
+      const canvas = document.createElement("canvas");
+      canvas.width = 1;
+      canvas.height = 1;
+      this._emptyDragImg = canvas;
+    }
+    e.dataTransfer.setDragImage(this._emptyDragImg, 0, 0);
     this._draggedTabId = tabId;
+    this._dragStartY = e.clientY;
+    this._dragLastY = e.clientY;
+    this._dragLastDeltaY = 0;
     this.requestUpdate();
+  }
+
+  _getDraggedButton() {
+    if (!this._draggedTabId) {
+      return null;
+    }
+    return this.shadowRoot?.querySelector(
+      `.appbar-tab-button[data-tab-id="${CSS.escape(this._draggedTabId)}"]`
+    );
+  }
+
+  _animateReorder(action) {
+    const buttons = Array.from(
+      this.shadowRoot?.querySelectorAll(".appbar-tab-button") || []
+    );
+    const prevTops = new Map();
+    for (const btn of buttons) {
+      const id = btn.getAttribute("data-tab-id");
+      if (id) {
+        prevTops.set(id, btn.getBoundingClientRect().top);
+      }
+    }
+    const draggedPrevTop = prevTops.get(this._draggedTabId);
+    const draggedOldNaturalTop =
+      draggedPrevTop !== undefined ? draggedPrevTop - (this._dragLastDeltaY || 0) : undefined;
+    action();
+    this.updateComplete.then(() => {
+      const nextButtons = Array.from(
+        this.shadowRoot?.querySelectorAll(".appbar-tab-button") || []
+      );
+      for (const btn of nextButtons) {
+        const id = btn.getAttribute("data-tab-id");
+        if (!id || !prevTops.has(id)) {
+          continue;
+        }
+        if (id === this._draggedTabId) {
+          if (draggedOldNaturalTop !== undefined) {
+            const match = btn.style.transform.match(/translateY\(([-\d.]+)px\)/);
+            const currentTranslate = match ? parseFloat(match[1]) : 0;
+            const newNaturalTop = btn.getBoundingClientRect().top - currentTranslate;
+            this._dragStartY += newNaturalTop - draggedOldNaturalTop;
+            const deltaY = (this._dragLastY ?? this._dragStartY) - this._dragStartY;
+            this._dragLastDeltaY = deltaY;
+            btn.style.transform = `translateY(${deltaY}px)`;
+          }
+          continue;
+        }
+        const deltaY = prevTops.get(id) - btn.getBoundingClientRect().top;
+        if (Math.abs(deltaY) > 1) {
+          btn.style.transition = "none";
+          btn.style.transform = `translateY(${deltaY}px)`;
+          btn.getBoundingClientRect();
+          btn.style.transition = "";
+          btn.style.transform = "";
+        }
+      }
+    });
+  }
+
+  onTabsListDragOver(e) {
+    if (!this._draggedTabId) {
+      return;
+    }
+    e.preventDefault();
+    e.stopPropagation();
+    e.dataTransfer.dropEffect = "move";
+
+    const draggedBtn = this._getDraggedButton();
+    if (!draggedBtn) {
+      return;
+    }
+
+    this._dragLastY = e.clientY;
+    const deltaY = e.clientY - this._dragStartY;
+    this._dragLastDeltaY = deltaY;
+    draggedBtn.style.transform = `translateY(${deltaY}px)`;
+
+    const draggedRect = draggedBtn.getBoundingClientRect();
+    const draggedCenterY = draggedRect.top + draggedRect.height / 2;
+
+    const tabs = this.tabManager?.tabs || [];
+    const fromIdx = tabs.findIndex(t => t.id === this._draggedTabId);
+    if (fromIdx === -1) {
+      return;
+    }
+
+    const buttons = Array.from(
+      this.shadowRoot?.querySelectorAll(".appbar-tab-button") || []
+    );
+    for (const btn of buttons) {
+      const targetId = btn.getAttribute("data-tab-id");
+      if (!targetId || targetId === this._draggedTabId) {
+        continue;
+      }
+      const toIdx = tabs.findIndex(t => t.id === targetId);
+      if (toIdx === -1) {
+        continue;
+      }
+      const rect = btn.getBoundingClientRect();
+      const midY = rect.top + rect.height / 2;
+      const movingDown = fromIdx < toIdx;
+      if ((movingDown && draggedCenterY > midY) || (!movingDown && draggedCenterY < midY)) {
+        this._animateReorder(() => {
+          this.tabManager?.moveTab(this._draggedTabId, targetId);
+        });
+        break;
+      }
+    }
   }
 
   onTabDragOver(e, targetTabId) {
     if (this._draggedTabId) {
-      e.preventDefault();
-      e.stopPropagation();
-      e.dataTransfer.dropEffect = "move";
-      if (this._dragOverTabId !== targetTabId) {
-        this._dragOverTabId = targetTabId;
-        this.requestUpdate();
-      }
+      this.onTabsListDragOver(e);
     }
   }
 
@@ -247,17 +365,15 @@ export default class AppbarMain extends MozLitElement {
     if (this._draggedTabId) {
       e.preventDefault();
       e.stopPropagation();
-      const fromId = this._draggedTabId;
-      this._dragOverTabId = null;
-      this._draggedTabId = null;
-      if (fromId && targetTabId && fromId !== targetTabId) {
-        this.tabManager?.moveTab(fromId, targetTabId);
-      }
-      this.requestUpdate();
+      this.onTabDragEnd();
     }
   }
 
   onTabDragEnd() {
+    const draggedBtn = this._getDraggedButton();
+    if (draggedBtn) {
+      draggedBtn.style.transform = "";
+    }
     this._draggedTabId = null;
     this._dragOverTabId = null;
     this.requestUpdate();
@@ -329,7 +445,11 @@ export default class AppbarMain extends MozLitElement {
 
         <div class="scroll-section">
           <!-- Web Tabs List -->
-          <div class="appbar-tabs-list">
+          <div
+            class="appbar-tabs-list"
+            @dragover=${e => this.onTabsListDragOver(e)}
+            @drop=${e => this.onTabDrop(e)}
+          >
             <!-- Pinned Tabs -->
             ${repeat(
               pinnedTabs,

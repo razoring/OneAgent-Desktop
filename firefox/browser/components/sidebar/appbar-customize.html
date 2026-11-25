@@ -113,11 +113,8 @@
         margin-bottom: 12px;
       }
 
-      .card-title-block h2 {
-        font-size: 14px;
-        font-weight: 600;
-        margin: 0 0 4px;
-        color: inherit;
+      .card-title-block .card-header-row {
+        margin-bottom: 4px;
       }
 
       .card-title-block p {
@@ -173,46 +170,61 @@
         text-overflow: ellipsis;
       }
 
-      /* Manage Apps Tile with Close Button */
-      .manage-tile {
-        position: relative;
+      /* Manage Apps List - matches Pinned Apps rounded container & divider */
+      .manage-row {
+        cursor: pointer;
       }
 
-      .manage-tile .tile-close-btn {
-        position: absolute;
-        top: 4px;
-        right: 4px;
-        width: 20px;
-        height: 20px;
+      .manage-usage {
+        font-size: 12px;
+        font-variant-numeric: tabular-nums;
+        color: var(--appbar-deemphasized);
+        flex-shrink: 0;
+        margin-inline-end: 4px;
+      }
+
+      .manage-close-btn,
+      button.btn-delete {
+        width: 28px;
+        height: 28px;
         appearance: none;
         margin: 0;
         padding: 0;
         min-width: 0;
         min-height: 0;
         border-radius: 50%;
-        border: none;
+        border: 1px solid var(--color-accent-primary);
         background: transparent;
         color: inherit;
-        opacity: 0.6;
-        display: flex;
+        opacity: 0.85;
+        display: inline-flex;
         align-items: center;
         justify-content: center;
+        flex-shrink: 0;
         cursor: pointer;
-        transition: opacity 150ms ease, background-color 150ms ease;
+        transition: opacity 150ms ease, background-color 150ms ease, border-color 150ms ease;
       }
 
-      .manage-tile:hover .tile-close-btn {
-        opacity: 0.9;
-        background-color: color-mix(in srgb, currentColor 14%, transparent);
-      }
-
-      .manage-tile .tile-close-btn:hover {
+      .manage-close-btn:hover,
+      button.btn-delete:hover {
         opacity: 1;
-        background-color: var(--icon-color-critical);
-        color: var(--button-text-color-destructive);
+        background-color: color-mix(in srgb, var(--color-accent-primary) 12%, transparent) !important;
+        border-color: var(--color-accent-primary) !important;
       }
 
-      .manage-tile .tile-close-btn img {
+      .manage-close-btn:active,
+      button.btn-delete:active {
+        opacity: 1;
+        background-color: color-mix(in srgb, var(--color-accent-primary) 22%, transparent) !important;
+      }
+
+      .manage-close-btn:focus-visible,
+      button.btn-delete:focus-visible {
+        outline: var(--focus-outline, 2px solid var(--appbar-focus));
+        outline-offset: var(--focus-outline-offset, 2px);
+      }
+
+      .manage-close-btn img {
         width: 12px;
         height: 12px;
         fill: currentColor;
@@ -454,34 +466,6 @@
         flex-shrink: 0;
       }
 
-      /* Delete button */
-      .btn-delete {
-        appearance: none;
-        background: transparent;
-        border: none;
-        cursor: pointer;
-        color: inherit;
-        opacity: 0.6;
-        padding: 4px;
-        margin: 0;
-        min-width: 0;
-        min-height: 0;
-        border-radius: 4px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 24px;
-        height: 24px;
-        flex-shrink: 0;
-        transition: opacity 150ms ease, background-color 150ms ease;
-      }
-
-      button.btn-delete:hover {
-        opacity: 1;
-        background-color: var(--appbar-item-hover);
-        border-color: transparent;
-      }
-
       .btn-delete img {
         width: 14px;
         height: 14px;
@@ -521,7 +505,10 @@
     <div class="section" id="section-pinned-apps">
       <div class="card">
         <div class="card-title-block">
-          <h2>Pinned apps</h2>
+          <div class="card-header-row">
+            <img class="card-header-icon" src="chrome://browser/skin/pin.svg" alt="" />
+            <h2 class="card-header-title">Pinned apps</h2>
+          </div>
           <p>Reposition where apps appear and edit their visibility.</p>
         </div>
 
@@ -553,10 +540,13 @@
     <div class="section" id="section-manage-apps">
       <div class="card">
         <div class="card-title-block">
-          <h2>Manage apps</h2>
+          <div class="card-header-row">
+            <img class="card-header-icon" src="chrome://global/skin/icons/performance.svg" alt="" />
+            <h2 class="card-header-title">Manage apps</h2>
+          </div>
           <p>Close currently active apps to save memory.</p>
         </div>
-        <div id="manage-grid" class="tiles-grid"></div>
+        <div id="manage-list" class="pinned-list-container"></div>
       </div>
     </div>
   </body>

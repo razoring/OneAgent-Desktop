@@ -273,6 +273,7 @@
   skin/classic/browser/search-tabs.svg                (../shared/icons/search-tabs.svg)
   skin/classic/browser/share.svg                      (../shared/icons/share.svg)
   skin/classic/browser/sidebar-collapsed.svg          (../shared/icons/sidebar-collapsed.svg)
+  skin/classic/browser/appbar-collapsed.svg           (../shared/icons/appbar-collapsed.svg)
   skin/classic/browser/sidebar-collapsed-right.svg    (../shared/icons/sidebar-collapsed-right.svg)
   skin/classic/browser/sidebar-expanded.svg           (../shared/icons/sidebar-expanded.svg)
   skin/classic/browser/sidebar-expanded-right.svg     (../shared/icons/sidebar-expanded-right.svg)

@@ -316,7 +316,7 @@ function renderPinnedApps() {
       deleteBtn.append(delImg);
 
       deleteBtn.addEventListener("click", () => {
-        tabMgr()?.removeTab(tab.id);
+        tabMgr()?.closeTab(tab.id);
         renderAll();
       });
       actions.append(deleteBtn);
@@ -327,42 +327,121 @@ function renderPinnedApps() {
   }
 }
 
-function renderManageApps() {
-  const grid = document.getElementById("manage-grid");
+let manageRenderSeq = 0;
+
+function collectBrowserPids(bc, pids = new Set()) {
+  if (!bc) {
+    return pids;
+  }
+  const pid = bc.currentWindowGlobal?.osPid;
+  if (pid) {
+    pids.add(pid);
+  }
+  for (const child of bc.children || []) {
+    collectBrowserPids(child, pids);
+  }
+  return pids;
+}
+
+async function getTabResourcePercentages(activeTabs) {
+  const percentages = new Map();
+  try {
+    const procInfo = await ChromeUtils.requestProcInfo();
+    const procByPid = new Map([[procInfo.pid, procInfo]]);
+    let totalMemory = procInfo.memory || 0;
+    for (const child of procInfo.children || []) {
+      procByPid.set(child.pid, child);
+      totalMemory += child.memory || 0;
+    }
+
+    const tabPids = new Map();
+    const pidShareCount = new Map();
+    for (const tab of activeTabs) {
+      const pids = collectBrowserPids(tab.browser?.browsingContext);
+      tabPids.set(tab.id, pids);
+      for (const pid of pids) {
+        if (pid !== procInfo.pid) {
+          pidShareCount.set(pid, (pidShareCount.get(pid) || 0) + 1);
+        }
+      }
+    }
+
+    for (const tab of activeTabs) {
+      const pids = tabPids.get(tab.id);
+      let tabMemory = 0;
+      for (const pid of pids) {
+        if (pid !== procInfo.pid) {
+          const proc = procByPid.get(pid);
+          const shares = pidShareCount.get(pid) || 1;
+          tabMemory += (proc?.memory || 0) / shares;
+        }
+      }
+      const pct = totalMemory > 0 ? (tabMemory / totalMemory) * 100 : 0;
+      if (pct >= 1) {
+        percentages.set(tab.id, `${Math.round(pct)}%`);
+      } else if (pct > 0) {
+        percentages.set(tab.id, `${pct.toFixed(1)}%`);
+      } else {
+        percentages.set(tab.id, "< 1%");
+      }
+    }
+  } catch (err) {
+    for (const tab of activeTabs) {
+      percentages.set(tab.id, "—");
+    }
+  }
+  return percentages;
+}
+
+async function renderManageApps() {
+  const list = document.getElementById("manage-list");
   const section = document.getElementById("section-manage-apps");
-  if (!grid || !section) {
+  if (!list || !section) {
     return;
   }
-  grid.replaceChildren();
 
   // Active apps are those loaded in memory
   const allTabs = tabMgr()?.tabs || [];
   const activeTabs = allTabs.filter(t => t.loaded);
 
   if (activeTabs.length === 0) {
+    list.replaceChildren();
     section.hidden = true;
     return;
   }
   section.hidden = false;
 
+  const seq = ++manageRenderSeq;
+  const percentages = await getTabResourcePercentages(activeTabs);
+  if (seq !== manageRenderSeq) {
+    return;
+  }
+
+  list.replaceChildren();
+
   for (const tab of activeTabs) {
-    const tile = document.createElement("div");
-    tile.className = "app-tile manage-tile";
-    tile.title = `Active: ${tab.title}`;
+    const row = document.createElement("div");
+    row.className = "pinned-row manage-row";
+    row.title = `Active: ${tab.title || tab.url}`;
 
     const img = document.createElement("img");
-    img.className = "tile-icon";
+    img.className = "pinned-icon";
     img.src = tab.iconUrl || "chrome://global/skin/icons/defaultFavicon.svg";
     img.alt = "";
 
     const titleEl = document.createElement("span");
-    titleEl.className = "tile-title";
-    titleEl.textContent = tab.title;
+    titleEl.className = "pinned-title";
+    titleEl.textContent = tab.title || tab.url;
+
+    const usageEl = document.createElement("span");
+    usageEl.className = "manage-usage";
+    usageEl.textContent = percentages.get(tab.id) || "< 1%";
+    usageEl.title = "Estimated memory usage";
 
     // Close button (x) to unload from memory
     const closeBtn = document.createElement("button");
     closeBtn.type = "button";
-    closeBtn.className = "tile-close-btn";
+    closeBtn.className = "manage-close-btn";
     closeBtn.title = "Close app to save memory";
 
     const closeImg = document.createElement("img");
@@ -376,14 +455,14 @@ function renderManageApps() {
       renderAll();
     });
 
-    // Clicking tile brings it into view
-    tile.addEventListener("click", () => {
+    // Clicking row brings it into view
+    row.addEventListener("click", () => {
       tabMgr()?.selectTab(tab.id);
       renderAll();
     });
 
-    tile.append(closeBtn, img, titleEl);
-    grid.append(tile);
+    row.append(img, titleEl, usageEl, closeBtn);
+    list.append(row);
   }
 }
 
@@ -575,3 +654,25 @@ if (freqGrid) {
 }
 
 renderAll();
+
+const topWin = getTopWin();
+const onAppbarTabsChanged = () => {
+  renderPinnedApps();
+  renderManageApps();
+};
+const onVisibilityChange = () => {
+  if (document.visibilityState === "visible") {
+    renderAll();
+  }
+};
+topWin.addEventListener("appbar-tabs-changed", onAppbarTabsChanged);
+document.addEventListener("visibilitychange", onVisibilityChange);
+window.addEventListener("pageshow", () => renderAll());
+window.addEventListener(
+  "unload",
+  () => {
+    topWin.removeEventListener("appbar-tabs-changed", onAppbarTabsChanged);
+    document.removeEventListener("visibilitychange", onVisibilityChange);
+  },
+  { once: true }
+);

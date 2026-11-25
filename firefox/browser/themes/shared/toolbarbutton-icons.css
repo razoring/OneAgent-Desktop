@@ -249,19 +249,11 @@
 }
 
 #sidebar-button {
-  list-style-image: url("chrome://browser/skin/sidebar-collapsed-right.svg");
-
-  &:hover {
-    list-style-image: url("chrome://browser/skin/sidebar-expanded-right.svg");
-  }
+  list-style-image: url("chrome://browser/skin/appbar-collapsed.svg");
 
   &[expanded],
   &[checked] {
     list-style-image: url("chrome://browser/skin/sidebar-expanded-right.svg");
-
-    &:hover {
-      list-style-image: url("chrome://browser/skin/sidebar-collapsed-right.svg");
-    }
   }
 }
 
