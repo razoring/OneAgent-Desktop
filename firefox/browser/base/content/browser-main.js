@@ -50,20 +50,6 @@
   } catch (e) {
     console.error("Failed to initialize DesktopMode:", e);
   }
-  try {
-    const { OneAgentUI } = ChromeUtils.importESModule("moz-src:///browser/components/oneagent/ui/OneAgentUI.sys.mjs");
-    const { OneAgentOrchestrator } = ChromeUtils.importESModule("moz-src:///browser/components/oneagent/core/OneAgentOrchestrator.sys.mjs");
-    ChromeUtils.importESModule("chrome://browser/content/oneagent/oneagent-tab-overlay.mjs", { global: "current" });
-    window.OneAgentUI = OneAgentUI;
-    window.OneAgentOrchestrator = OneAgentOrchestrator;
-    if (document.readyState === "complete") {
-      OneAgentUI.initWindow(window);
-    } else {
-      window.addEventListener("load", () => OneAgentUI.initWindow(window), { once: true });
-    }
-  } catch (e) {
-    console.error("Failed to initialize OneAgent:", e);
-  }
 }
 
 window.onload = gBrowserInit.onLoad.bind(gBrowserInit);

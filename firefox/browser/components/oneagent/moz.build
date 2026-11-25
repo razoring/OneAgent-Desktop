@@ -8,25 +8,5 @@ with Files("**"):
 JAR_MANIFESTS += ["jar.mn"]
 
 MOZ_SRC_FILES += [
-    "actors/OneAgentContentChild.sys.mjs",
-    "actors/OneAgentContentParent.sys.mjs",
-    "core/AuxEngine.sys.mjs",
-    "core/BrainEngine.sys.mjs",
-    "core/DecisionEngine.sys.mjs",
-    "core/LocalDecisionAdapter.sys.mjs",
-    "core/OneAgentOrchestrator.sys.mjs",
-    "core/TypeStubRouter.sys.mjs",
-    "runtime/BrowserSandbox.sys.mjs",
-    "runtime/GuardrailPolicy.sys.mjs",
-    "runtime/SharedStash.sys.mjs",
-    "runtime/SystemSandbox.sys.mjs",
-    "services/BackgroundSearch.sys.mjs",
-    "services/BlindCredentialBroker.sys.mjs",
-    "services/InternalBrowserAPI.sys.mjs",
-    "services/MCPClientManager.sys.mjs",
-    "services/OneAgentCron.sys.mjs",
-    "services/OneAgentMemory.sys.mjs",
-    "services/SkillManager.sys.mjs",
     "ui/DesktopMode.sys.mjs",
-    "ui/OneAgentUI.sys.mjs",
 ]
