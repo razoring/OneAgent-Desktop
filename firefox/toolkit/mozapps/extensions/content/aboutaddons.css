@@ -95,7 +95,8 @@ h2 {
   margin-inline-end: var(--main-margin-end);
   display: flex;
   flex-direction: column;
-  background: var(--background-color-canvas);
+  background: transparent;
+  backdrop-filter: var(--oa-blur-subtle);
   top: 0;
 
   /* NOTE: Make the sticky header to stay sticky only if it is leaving at least 2/3 of the
@@ -109,7 +110,7 @@ h2 {
 }
 
 .main-search {
-  background: var(--background-color-canvas);
+  background: transparent;
   display: flex;
   justify-content: flex-end;
   align-items: center;
@@ -135,7 +136,7 @@ search-addons {
 }
 
 .main-heading {
-  background: var(--background-color-canvas);
+  background: transparent;
   display: flex;
   padding-bottom: 16px;
   max-width: var(--page-main-content-width);
@@ -435,12 +436,12 @@ theme-preview {
 
 .addon-badge-recommended,
 .addon-badge-line {
-  border: 1px solid #cfcfd8;
+  border: 1px solid var(--oa-border-hairline, #cfcfd8);
   width: 20px;
   height: 20px;
 
   @media (prefers-color-scheme: dark) {
-    border-color: #3a3944;
+    border-color: var(--oa-border-hairline, #3a3944);
   }
 }
 

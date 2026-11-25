@@ -1031,7 +1031,6 @@ xul|*.addons-icon {
   .card {
     background-color: var(--oa-surface-card);
     background-image: var(--oa-sheen-surface);
-    backdrop-filter: var(--oa-blur-subtle);
     border: var(--oa-border-width) solid var(--oa-border-hairline);
     border-radius: var(--oa-radius-card);
     box-shadow: var(--oa-shadow-card);

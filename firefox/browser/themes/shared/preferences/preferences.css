@@ -82,7 +82,7 @@
   /* z-index = 2 so that the search-tooltips don't appear when the user scrolls
      up after searching. */
   z-index: 2;
-  background-color: color-mix(in srgb, var(--oa-surface-canvas, var(--background-color-canvas)) 82%, transparent);
+  background-color: transparent;
   backdrop-filter: var(--oa-blur-subtle);
   padding-top: var(--page-space-block-start);
   padding-bottom: var(--search-container-padding);
@@ -1292,8 +1292,12 @@ richlistitem .text-link:hover {
     width: 54px;
     box-shadow: var(--card-box-shadow);
     margin-block-start: var(--space-medium);
-    border: var(--border-width) solid var(--border-color);
+    border: var(--oa-border-width, var(--border-width)) solid var(--oa-border-hairline, var(--border-color));
     border-radius: var(--border-radius-small);
+
+    @media (prefers-color-scheme: dark) {
+      filter: brightness(0.82) contrast(0.9);
+    }
   }
 
   &:dir(rtl)::part(image) {

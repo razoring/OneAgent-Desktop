@@ -347,37 +347,31 @@ toolbar[inactive="true"] .urlbar,
   }
 
   .urlbar[popover-open] > & {
-    border: var(--urlbar-background-border-open);
-    box-shadow: var(--urlbar-background-box-shadow-open);
-    inset-inline: calc(-1 * (var(--urlbar-background-overhang-open) + var(--urlbar-input-growth-open-inline)));
-    inset-block: calc(-1 * (var(--urlbar-background-overhang-open) + var(--urlbar-input-growth-open-block)));
-    border-start-start-radius: var(--urlbar-background-border-top-radius-open);
-    border-start-end-radius: var(--urlbar-background-border-top-radius-open);
+    inset: 0;
+    border-radius: var(--oa-radius-panel, var(--urlbar-background-border-radius));
 
     @media not (forced-colors) {
       background-color: var(--oa-surface-glass-elevated);
       background-image: var(--oa-sheen-elevated);
-      backdrop-filter: var(--oa-blur-panel);
-      border: var(--oa-border-width) solid var(--oa-border-hairline);
-      box-shadow: var(--oa-shadow-panel);
+      border: var(--oa-border-width) solid var(--oa-border-glow);
+      box-shadow: var(--oa-shadow-recessed), 0 0 14px -3px var(--oa-glow-accent);
     }
-  }
 
-  /* The rest of the joint background is painted by the view's popover, which
-     the input can't reach into. Each half runs past the seam by more than the
-     shadow's blur radius, so its shadow carries the whole surface's geometry,
-     then is clipped back to the seam. Layout rounds both halves' clips to the
-     same device row, so the row the seam falls in is covered exactly once
-     wherever the input's edge lands. The two halves meet as one surface with
-     one shadow around it. */
-  .urlbar[popover-open] > & {
-    inset-block-end: calc(-1 * var(--urlbar-joint-background-overlap));
-    border-end-start-radius: 0;
-    border-end-end-radius: 0;
-    clip-path: inset(
-      calc(-1 * var(--urlbar-joint-background-shadow-margin)) calc(-1 * var(--urlbar-joint-background-shadow-margin))
-        calc(var(--urlbar-joint-background-overlap) - var(--urlbar-input-growth-open-block))
-    );
+    @media (forced-colors) {
+      border: var(--urlbar-background-border-open);
+      box-shadow: var(--urlbar-background-box-shadow-open);
+      inset-inline: calc(-1 * (var(--urlbar-background-overhang-open) + var(--urlbar-input-growth-open-inline)));
+      inset-block: calc(-1 * (var(--urlbar-background-overhang-open) + var(--urlbar-input-growth-open-block)));
+      inset-block-end: calc(-1 * var(--urlbar-joint-background-overlap));
+      border-start-start-radius: var(--urlbar-background-border-top-radius-open);
+      border-start-end-radius: var(--urlbar-background-border-top-radius-open);
+      border-end-start-radius: 0;
+      border-end-end-radius: 0;
+      clip-path: inset(
+        calc(-1 * var(--urlbar-joint-background-shadow-margin)) calc(-1 * var(--urlbar-joint-background-shadow-margin))
+          calc(var(--urlbar-joint-background-overlap) - var(--urlbar-input-growth-open-block))
+      );
+    }
   }
 
   .urlbar[open] > & {
@@ -621,6 +615,12 @@ toolbar[inactive="true"] .urlbar,
     overflow-clip-margin: var(--urlbar-joint-background-shadow-margin);
 
     max-height: min(calc(100% - var(--urlbarview-joint-background-outset-block)), 100vh);
+
+    @media not (forced-colors) {
+      /* Removing clip-path on .urlbarView-background isn't enough if overflow:clip
+       * sits with negative outset; ensure crisp floating sheet rounding. */
+      overflow: visible;
+    }
   }
 }
 
@@ -644,16 +644,21 @@ toolbar[inactive="true"] .urlbar,
     background-image: var(--oa-sheen-elevated);
     backdrop-filter: var(--oa-blur-panel);
     border: var(--oa-border-width) solid var(--oa-border-hairline);
+    border-radius: var(--oa-radius-panel);
     box-shadow: var(--oa-shadow-panel);
   }
 
   .urlbar > .urlbarView > & {
-    inset-block: calc(-1 * var(--urlbarview-margin-block) - var(--urlbar-joint-background-overlap)) calc(-1 * var(--urlbarview-joint-background-outset-block));
-    border-start-start-radius: 0;
-    border-start-end-radius: 0;
-    clip-path: inset(
-      var(--urlbar-joint-background-overlap) calc(-1 * var(--urlbar-joint-background-shadow-margin)) calc(-1 * var(--urlbar-joint-background-shadow-margin))
-    );
+    inset-block: 4px calc(-1 * var(--urlbarview-joint-background-outset-block));
+
+    @media (forced-colors) {
+      inset-block: calc(-1 * var(--urlbarview-margin-block) - var(--urlbar-joint-background-overlap)) calc(-1 * var(--urlbarview-joint-background-outset-block));
+      border-start-start-radius: 0;
+      border-start-end-radius: 0;
+      clip-path: inset(
+        var(--urlbar-joint-background-overlap) calc(-1 * var(--urlbar-joint-background-shadow-margin)) calc(-1 * var(--urlbar-joint-background-shadow-margin))
+      );
+    }
   }
 }
 

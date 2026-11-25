@@ -30,6 +30,10 @@ xul|findbar {
   box-shadow: inset 0 1px 0 0 var(--oa-edge-top);
   color: -moz-dialogtext;
 
+  @media (-moz-windows-mica) and (not (forced-colors)) {
+    background-color: color-mix(in srgb, var(--oa-surface-glass) 52%, transparent);
+  }
+
   @media not -moz-pref("browser.nova.enabled") {
     border-top-color: ThreeDShadow;
     background-color: -moz-dialog;

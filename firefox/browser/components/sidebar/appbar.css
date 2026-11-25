@@ -49,6 +49,10 @@
   margin-block-end: var(--urlbar-container-padding-block, 4px) !important;
   border: var(--oa-border-width, 1px) solid var(--oa-border-hairline, var(--chrome-content-separator-color));
   box-shadow: var(--oa-shadow-panel);
+
+  @media (-moz-windows-mica) and (not (forced-colors)) {
+    background-color: color-mix(in srgb, var(--oa-surface-glass) 48%, transparent);
+  }
 }
 
 #appbar-box[hidden="true"] {
@@ -83,6 +87,10 @@
   background-color: var(--oa-surface-canvas, light-dark(#f3f4f8, #0c0d11));
   border-radius: var(--oa-radius-panel, 12px) var(--oa-radius-panel, 12px) 0 0 !important;
   overflow: clip !important;
+}
+
+#appbar-box[internal-app="true"] .appbar-browser-stack > browser {
+  background-color: transparent;
 }
 
 .appbar-browser-stack > browser:not([selected="true"]) {

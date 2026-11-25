@@ -17,6 +17,10 @@
   background-image: var(--oa-sheen-ambient-canvas);
   background-attachment: fixed;
   color: var(--sidebar-text-color);
+
+  @media (-moz-windows-mica) and (not (forced-colors)) {
+    background-color: color-mix(in srgb, var(--oa-surface-canvas, transparent) 52%, transparent);
+  }
   font: menu;
   height: 100%;
 

@@ -646,7 +646,128 @@ function _getContentProperties(doc, hasTheme, data) {
       }
     }
   }
+  properties._oaTheme = _extractOATheme(doc, hasTheme, data);
   return properties;
+}
+
+function _rgbToHsl(r, g, b) {
+  const rn = r / 255;
+  const gn = g / 255;
+  const bn = b / 255;
+  const max = Math.max(rn, gn, bn);
+  const min = Math.min(rn, gn, bn);
+  const l = (max + min) / 2;
+  let h = 0;
+  let s = 0;
+  if (max !== min) {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    switch (max) {
+      case rn:
+        h = (gn - bn) / d + (gn < bn ? 6 : 0);
+        break;
+      case gn:
+        h = (bn - rn) / d + 2;
+        break;
+      default:
+        h = (rn - gn) / d + 4;
+        break;
+    }
+    h /= 6;
+  }
+  return [h * 360, s, l];
+}
+
+function _hslCss(h, s, l) {
+  const hh = ((h % 360) + 360) % 360;
+  const ss = Math.round(Math.max(0, Math.min(1, s)) * 100);
+  const ll = Math.round(Math.max(0, Math.min(1, l)) * 100);
+  return `hsl(${Math.round(hh)} ${ss}% ${ll}%)`;
+}
+
+function _extractOATheme(doc, hasTheme, data) {
+  if (!hasTheme || !data) {
+    return null;
+  }
+
+  let baseColor = null;
+  for (const key of [
+    "toolbarColor",
+    "accentcolor",
+    "ntp_background",
+    "sidebar",
+    "popup",
+    "tab_selected",
+  ]) {
+    const c = _cssColorToRGBA(doc, data[key]);
+    if (c && (c.a === undefined || c.a > 0)) {
+      const chroma = Math.max(c.r, c.g, c.b) - Math.min(c.r, c.g, c.b);
+      if (chroma > 10) {
+        baseColor = c;
+        break;
+      }
+    }
+  }
+
+  let accentColor = null;
+  for (const key of [
+    "icons_attention",
+    "tab_line",
+    "toolbar_field_border_focus",
+    "sidebar_highlight",
+    "popup_highlight",
+    "button_background_active",
+  ]) {
+    const c = _cssColorToRGBA(doc, data[key]);
+    if (c && (c.a === undefined || c.a > 0)) {
+      const chroma = Math.max(c.r, c.g, c.b) - Math.min(c.r, c.g, c.b);
+      if (chroma > 12) {
+        accentColor = c;
+        break;
+      }
+    }
+  }
+
+  const isDark = _hasDarkFrame(doc, data, data, hasTheme) ||
+    (() => {
+      const ref = baseColor || _cssColorToRGBA(doc, data.toolbarColor || data.accentcolor);
+      return ref ? _isColorDark(ref.r, ref.g, ref.b) : doc.defaultView?.matchMedia?.("(prefers-color-scheme: dark)")?.matches ?? true;
+    })();
+
+  const tint = baseColor ? `rgb(${baseColor.r}, ${baseColor.g}, ${baseColor.b})` : null;
+  const accentSource = accentColor || baseColor;
+  if (!tint && !accentSource) {
+    return null;
+  }
+
+  let accent = null;
+  let accentHover = null;
+  let accentActive = null;
+  let accentText = null;
+  if (accentSource) {
+    const [h, s] = _rgbToHsl(accentSource.r, accentSource.g, accentSource.b);
+    const sat = Math.max(0.45, Math.min(0.84, s * 1.15));
+    const baseL = isDark ? 0.67 : 0.43;
+    accent = _hslCss(h, sat, baseL);
+    accentHover = _hslCss(h, sat, isDark ? 0.74 : 0.37);
+    accentActive = _hslCss(h, sat, isDark ? 0.80 : 0.31);
+    accentText = isDark ? "#0b0f14" : "#ffffff";
+  }
+
+  return { tint, accent, accentHover, accentActive, accentText };
+}
+
+function _applyOATheme(root, hasTheme, oaTheme) {
+  const vars = [
+    ["--oa-theme-tint", oaTheme?.tint],
+    ["--oa-theme-accent", oaTheme?.accent],
+    ["--oa-theme-accent-hover", oaTheme?.accentHover],
+    ["--oa-theme-accent-active", oaTheme?.accentActive],
+    ["--oa-theme-accent-text", oaTheme?.accentText],
+  ];
+  for (const [name, val] of vars) {
+    _setProperty(root, hasTheme && !!val, name, val);
+  }
 }
 
 function _imageToCss(aWin, aImage) {
@@ -862,6 +983,10 @@ function _setProperties(root, hasTheme, themeData) {
       _setProperty(root, hasTheme, cssVarName, val);
     }
   }
+
+  const oaTheme = _extractOATheme(doc, hasTheme, themeData);
+  _applyOATheme(root, hasTheme, oaTheme);
+
   return processedColors;
 }
 

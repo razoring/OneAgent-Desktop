@@ -33,7 +33,7 @@
           color-scheme: dark;
         }
 
-        background-color: var(--appbar-page-bg);
+        background-color: color-mix(in srgb, var(--appbar-page-bg) 38%, transparent);
         background-image: var(--oa-sheen-ambient-canvas);
         background-attachment: fixed;
         color: var(--appbar-page-color);
@@ -78,7 +78,6 @@
       .card {
         background-color: var(--oa-surface-card);
         background-image: var(--oa-sheen-surface);
-        backdrop-filter: var(--oa-blur-subtle);
         border: var(--oa-border-width, 1px) solid var(--oa-border-hairline);
         border-radius: var(--oa-radius-card, 12px);
         box-shadow: var(--oa-shadow-card);

@@ -38,17 +38,11 @@
   @media (-moz-windows-mica) {
     background-color: transparent;
     @media -moz-pref("widget.windows.mica.toplevel-backdrop", 2) {
-      /* For acrylic, do the same we do for popups to guarantee some contrast */
-      /* stylelint-disable-next-line stylelint-plugin-mozilla/use-design-tokens, stylelint-plugin-mozilla/no-base-design-tokens */
-      background-color: light-dark(var(--color-white-alpha-60), var(--color-black-alpha-60));
+      /* Smoked translucent frost over DWM Acrylic — never milky white in dark mode */
+      background-color: light-dark(rgba(248, 250, 255, 0.36), rgba(10, 12, 16, 0.36));
     }
 
-    /* Using a semitransparent background preserves the tinting from the backdrop.
-     * Note that the toolbar text color from browser-colors.css should be ok,
-     * as the backdrop matches our color scheme. The .6 matches what we do for
-     * acrylic, and the .15 matches the 85% we do for the default toolbar
-     * background on the native theme. */
-    --toolbar-background-color: light-dark(var(--color-white-alpha-60), var(--color-white-alpha-20));
+    --toolbar-background-color: light-dark(rgba(255, 255, 255, 0.34), rgba(14, 15, 22, 0.28));
   }
 
   @media (-moz-windows-accent-color-in-titlebar) and ((-moz-windows-mica) or -moz-pref("browser.theme.windows.accent-color-in-tabs.enabled")) {
@@ -63,6 +57,39 @@
       --urlbar-box-background-color-focus: var(--button-background-color);
       --urlbar-box-background-color-hover: var(--button-background-color-hover);
       --urlbar-box-background-color-active: var(--button-background-color-active);
+    }
+  }
+}
+
+/* Global Nocturne Glass Acrylic chrome (works across default, Dark/Light, and [lwtheme]) */
+@media (-moz-windows-mica) and (not (forced-colors)) {
+  :root[customtitlebar] {
+    background-color: color-mix(
+      in srgb,
+      var(--oa-theme-tint, var(--lwt-accent-color, light-dark(#f3f4f8, #0c0d11))) 34%,
+      light-dark(rgba(248, 250, 255, 0.36), rgba(10, 12, 16, 0.34))
+    );
+    --toolbar-background-color: color-mix(
+      in srgb,
+      var(--oa-theme-tint, light-dark(#ffffff, #0e0f16)) 24%,
+      light-dark(rgba(255, 255, 255, 0.32), rgba(14, 15, 22, 0.28))
+    );
+
+    #navigator-toolbox:not(.fullscreen-floating-toolbox) {
+      background-color: color-mix(
+        in srgb,
+        var(--oa-theme-tint, transparent) 22%,
+        transparent
+      );
+      background-image: var(--oa-sheen-ambient-canvas);
+    }
+
+    #sidebar-box {
+      background-color: color-mix(
+        in srgb,
+        var(--oa-theme-tint, light-dark(#f3f4f8, #0c0d11)) 24%,
+        light-dark(rgba(248, 250, 255, 0.38), rgba(12, 13, 18, 0.38))
+      );
     }
   }
 }

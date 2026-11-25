@@ -9,7 +9,6 @@
   border-radius: var(--card-border-radius);
   background-color: var(--card-background-color);
   background-image: var(--oa-sheen-surface, none);
-  backdrop-filter: var(--oa-blur-subtle, none);
   box-shadow: var(--card-box-shadow);
   box-sizing: border-box;
   transition:

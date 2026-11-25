@@ -2268,6 +2268,13 @@ pref("browser.aboutwelcome.experimentsGate.maxDisplayMs", 8000);
 // Global Nova redesign enabled pref
 pref("browser.nova.enabled", true);
 
+// Windows 11 Acrylic frosted backdrop for global chrome & popups (Nocturne Glass)
+#ifdef XP_WIN
+pref("widget.windows.mica", true);
+pref("widget.windows.mica.popups", 1);
+pref("widget.windows.mica.toplevel-backdrop", 2);
+#endif
+
 // Disable singleProfile messaging mitigation (Bug 1963213) for multiProfile feature users
 pref("messaging-system.profile.singleProfileMessaging.disable", true);
 

@@ -552,6 +552,8 @@ menuseparator + #sidebar-extensions-separator {
       border-inline-end: 1px solid var(--oa-border-hairline, var(--sidebar-border-color));
       border-radius: 0 !important;
       overflow: visible !important;
+      background-color: var(--oa-surface-glass-elevated) !important;
+      background-image: var(--oa-sheen-elevated) !important;
       backdrop-filter: var(--oa-blur-panel);
       box-shadow: var(--oa-shadow-panel);
     }
@@ -817,14 +819,18 @@ and never match. */
     --sidebar-box-start-start-radius: var(--border-radius-medium);
     --sidebar-box-start-end-radius: var(--border-radius-medium);
 
-    background-color: var(--sidebar-background-color);
+    background-color: var(--oa-surface-glass, var(--sidebar-background-color));
     color: var(--sidebar-text-color);
     padding-block-end: 0;
-    border: var(--border-width) solid var(--chrome-content-separator-color);
+    border: var(--oa-border-width, var(--border-width)) solid var(--oa-border-hairline, var(--chrome-content-separator-color));
     border-block-end: none;
 
+    @media (-moz-windows-mica) and (not (forced-colors)) {
+      background-color: color-mix(in srgb, var(--oa-surface-glass) 48%, transparent);
+    }
+
     :root[lwtheme] & {
-      border-color: var(--sidebar-border-color);
+      border-color: var(--oa-border-hairline, var(--sidebar-border-color));
     }
 
     /* Only the edge facing the content area survives once the launcher is

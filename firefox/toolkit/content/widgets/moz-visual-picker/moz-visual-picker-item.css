@@ -5,6 +5,10 @@
 @import url("chrome://global/content/elements/moz-visual-picker-item.tokens.css");
 
 :host {
+  --visual-picker-item-border-radius: var(--oa-radius-control, var(--border-radius-medium));
+  --visual-picker-item-border-width: var(--oa-border-width, 1px);
+  --visual-picker-item-border-width-checked: var(--oa-border-width, 1px);
+  --visual-picker-item-border-color: var(--oa-border-hairline, var(--border-color-interactive));
   --visual-picker-item-border-radius-inner: calc(var(--visual-picker-item-border-radius) - var(--visual-picker-item-border-width-checked));
 
   cursor: default;
@@ -89,18 +93,22 @@
   }
 
   &:hover {
-    background-color: var(--button-background-color-ghost-hover);
+    background-color: var(--oa-surface-hover, var(--button-background-color-ghost-hover));
     color: var(--button-text-color-ghost-hover);
+    --visual-picker-item-border-color: var(--oa-border-hover);
   }
 
   &:hover:active:not(:disabled) {
-    background-color: var(--button-background-color-ghost-active);
+    background-color: var(--oa-surface-active, var(--button-background-color-ghost-active));
     color: var(--button-text-color-ghost-active);
   }
 
   &[checked] {
-    --visual-picker-item-border-width: var(--visual-picker-item-border-width-checked);
-    --visual-picker-item-border-color: var(--border-color-selected);
+    background-color: var(--oa-surface-active);
+    background-image: var(--oa-sheen-surface);
+    box-shadow: var(--oa-shadow-glow-active);
+    --visual-picker-item-border-width: var(--oa-border-width, 1px);
+    --visual-picker-item-border-color: var(--oa-border-glow, var(--border-color-selected));
   }
 
   ::slotted(:first-child) {

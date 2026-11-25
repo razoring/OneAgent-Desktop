@@ -16,9 +16,11 @@
    - Dark surfaces MUST stay deep smoked obsidian (`rgba(16–20, 17–21, 23–28, 0.76–0.86)`) or subtly tinted by `--lwt-accent-color`.
    - **NEVER** use milky white frost (`rgba(255, 255, 255, 0.12+)` backgrounds) in dark mode.
    - Light mode uses clean, cool crystal translucency (`rgba(249–252, 250–253, 253–255, 0.80–0.88)`) without chalky gray washout.
-3. **Subtle Blur Budget**:
-   - Inline cards / sticky headers / bottom bars: `--oa-blur-subtle` (`blur(8px) saturate(1.16)`).
+3. **Subtle Blur Budget & Containing-Block Safety**:
    - Floating menus / arrow panels / URL bar popover / expanded overlays / dialogs: `--oa-blur-panel` (`blur(11px) saturate(1.22)`).
+   - Sticky headers (with zero `position: fixed` descendants) / bottom bars / findbar: `--oa-blur-subtle` (`blur(8px) saturate(1.16)`).
+   - **NEVER** apply `backdrop-filter` to inline cards (`.card`, `moz-card`, tiles) or containers holding `anchor()` / `position: fixed` elements: `backdrop-filter` creates a `position: fixed` containing block that traps fixed/anchored descendants (e.g., anchored illustrations).
+   - **NEVER** apply `clip-path` (or `overflow: clip` on ancestors) on a `backdrop-filter` surface (like `.urlbarView-background`), as Gecko WebRender isolates clipped backdrop groups and stops blurring the page behind them.
    - **NEVER** exceed `12px` blur — background structure should stay softly legible, not smeared into soup.
 4. **One Universal Light Source (`155deg` Overhead Top-Leading)**:
    - Every element in the browser shares ONE key light positioned slightly above and to the inline-start (`155deg`):
@@ -99,10 +101,12 @@ Always prefer these classes (or compose directly from `--oa-*` tokens) when buil
 
 ## 4. Mandatory Agent Checklist (Before Shipping Any UI Edit)
 
-- [ ] **No hardcoded flat colors**: Use `--oa-surface-*`, `--oa-border-*`, `--oa-shadow-*`, or Firefox semantic tokens. Never add opaque `#202020` or milky white `rgba(255,255,255,0.15+)` fills.
+- [ ] **No hardcoded flat colors or Nova violet (`#b89cff`)**: Use `--oa-surface-*`, `--oa-border-*`, `--oa-shadow-*`, `--oa-theme-accent*`, or neutral Firefox semantic tokens. Never leave Nova violet (`--color-violet-30` / `#b89cff`), opaque `#202020`, or milky white `rgba(255,255,255,0.15+)` fills.
+- [ ] **Neutral hairline borders everywhere**: Keep `--border-color*`, `--button-border-color*`, `--input-border-color*`, and `--toolbar-field-border-color` mapped to `--oa-border-hairline` (never high-contrast `--color-accent-primary` or `#3a3944` solid borders on default buttons/badges).
+- [ ] **Transparent sticky headers**: Sticky top containers (`#search-container`, `.sticky-container`, `.main-search`, `.main-heading`) must keep `background: transparent` so they never slice `--oa-sheen-ambient-canvas`.
 - [ ] **Respect the `155deg` key light**: Elevated surfaces get top specular bevel + bottom shadow; recessed wells/inputs get top inner shadow + faint bottom lip.
-- [ ] **1px border limit**: Never use `2px+` borders on surfaces/inputs/cards (only `:focus-visible` accessibility outlines).
-- [ ] **Blur discipline**: Stay within `--oa-blur-subtle` (`8px`) or `--oa-blur-panel` (`11px`).
-- [ ] **Theme & High-Contrast safety**: Derive glows from `--color-accent-primary`, respect `:root[lwtheme]`, and wrap decorative glass rules in `@media not (forced-colors)`.
-- [ ] **Windows Mica menu safety**: Keep `@media (-moz-windows-mica-popups)` clean on `menupopup` so OS rounding isn't double-bordered.
+- [ ] **1px border limit**: Never use `2px+` borders on surfaces/inputs/cards (including checked `moz-visual-picker-item`; only `:focus-visible` accessibility outlines).
+- [ ] **Blur discipline & containing-block safety**: Stay within `--oa-blur-subtle` (`8px`) or `--oa-blur-panel` (`11px`). Never apply `backdrop-filter` to inline cards (breaks `anchor()` / `position: fixed`), never combine `clip-path` with `backdrop-filter` (breaks WebRender blur), and omit redundant CSS `backdrop-filter` under `@media (-moz-windows-mica-popups)` so DWM Acrylic passes cleanly.
+- [ ] **Theme chroma gate & High-Contrast safety**: Drive `--oa-theme-tint` (`chroma > 10`) and `--oa-theme-accent*` via `_extractOATheme` in `LightweightThemeConsumer.sys.mjs` -> `LightweightThemeChild.sys.mjs` so neutral black/white themes stay clean while chromatic themes infuse internal pages, Add Apps, sidebars, and menus; wrap decorative glass rules in `@media not (forced-colors)`.
+- [ ] **Windows Acrylic & Mica safety**: Keep `@media (-moz-windows-mica)` / `(-moz-windows-mica-popups)` translucent on toolbars/menus/arrow panels (`panel:not([type="drag"])`, `menupopup`, `.toolbar-menupopup`) without opaque `appearance: none` or double borders.
 - [ ] **Test visual restraint**: Step back — if borders, blur, or glow draw attention to themselves before the content, dial opacity down.

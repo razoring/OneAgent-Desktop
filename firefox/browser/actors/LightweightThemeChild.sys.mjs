@@ -45,7 +45,7 @@ export class LightweightThemeChild extends JSWindowActorChild {
       // Make sure to update the theme data on first page show.
       case "pageshow":
       case "DOMContentLoaded":
-        if (!this._initted && this._getChromeOuterWindowID()) {
+        if (this._getChromeOuterWindowID()) {
           this._initted = true;
           this.update();
         }
@@ -65,12 +65,31 @@ export class LightweightThemeChild extends JSWindowActorChild {
    * Forward the theme data to the page.
    */
   update() {
+    const themeData = Services.cpmm.sharedData.get(
+      `theme/${this._getChromeOuterWindowID()}`
+    );
+    const root = this.contentWindow?.document?.documentElement;
+    if (root) {
+      const oa = themeData?._oaTheme;
+      const vars = [
+        ["--oa-theme-tint", oa?.tint],
+        ["--oa-theme-accent", oa?.accent],
+        ["--oa-theme-accent-hover", oa?.accentHover],
+        ["--oa-theme-accent-active", oa?.accentActive],
+        ["--oa-theme-accent-text", oa?.accentText],
+      ];
+      for (const [name, val] of vars) {
+        if (val) {
+          root.style.setProperty(name, val);
+        } else {
+          root.style.removeProperty(name);
+        }
+      }
+    }
     const event = Cu.cloneInto(
       {
         detail: {
-          data: Services.cpmm.sharedData.get(
-            `theme/${this._getChromeOuterWindowID()}`
-          ),
+          data: themeData,
         },
       },
       this.contentWindow
