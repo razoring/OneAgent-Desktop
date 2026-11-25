@@ -27,5 +27,6 @@ MOZ_SRC_FILES += [
     "services/OneAgentCron.sys.mjs",
     "services/OneAgentMemory.sys.mjs",
     "services/SkillManager.sys.mjs",
+    "ui/DesktopMode.sys.mjs",
     "ui/OneAgentUI.sys.mjs",
 ]

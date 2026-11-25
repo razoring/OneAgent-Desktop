@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<!-- This Source Code Form is subject to the terms of the Mozilla Public
+   - License, v. 2.0. If a copy of the MPL was not distributed with this
+   - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
+<html xmlns="http://www.w3.org/1999/xhtml"
+      windowtype="OneAgent:DesktopPiP"
+      customtitlebar="true"
+      scrolling="false">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Security-Policy" content="default-src chrome:;" />
+    <title>Browser Stream</title>
+    <link rel="stylesheet" href="chrome://browser/content/oneagent/desktop-pip.css" />
+    <script src="chrome://browser/content/oneagent/desktop-pip.js" defer="defer"></script>
+  </head>
+  <body>
+    <div id="pip-stage">
+      <canvas id="pip-stream"></canvas>
+      <div id="pip-empty" hidden="true">Waiting for browser frame…</div>
+    </div>
+
+    <div id="pip-overlay">
+      <div id="pip-topbar">
+        <span id="pip-badge" class="live">LIVE</span>
+        <span id="pip-title">Browser</span>
+        <button id="pip-close-btn" type="button" title="Stop Browser">
+          <img src="chrome://global/skin/icons/close.svg" alt="Close" />
+        </button>
+      </div>
+
+      <div id="pip-controls">
+        <button id="pip-pause-btn" type="button" title="Pause / Resume stream">
+          <img id="pip-pause-icon" src="chrome://global/skin/media/pause-fill.svg" alt="" />
+          <span id="pip-pause-label">Pause</span>
+        </button>
+        <button id="pip-control-btn" type="button" title="Switch to Browser Mode to take control">
+          <img src="chrome://global/skin/icons/open-in-new.svg" alt="" />
+          <span>Take Control</span>
+        </button>
+      </div>
+    </div>
+  </body>
+</html>

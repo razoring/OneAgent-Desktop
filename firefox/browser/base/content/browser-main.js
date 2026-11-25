@@ -39,6 +39,18 @@
   ChromeUtils.importESModule("chrome://browser/content/urlbar/UrlbarInput.mjs", { global: "current" });
   ChromeUtils.importESModule("chrome://browser/content/urlbar/SearchbarInput.mjs", { global: "current" });
   try {
+    const { DesktopMode } = ChromeUtils.importESModule("moz-src:///browser/components/oneagent/ui/DesktopMode.sys.mjs");
+    window.DesktopMode = DesktopMode;
+    if (document.readyState === "complete") {
+      DesktopMode.initWindow(window);
+    } else {
+      window.addEventListener("DOMContentLoaded", () => DesktopMode.initWindow(window), { once: true });
+      window.addEventListener("load", () => DesktopMode.initWindow(window), { once: true });
+    }
+  } catch (e) {
+    console.error("Failed to initialize DesktopMode:", e);
+  }
+  try {
     const { OneAgentUI } = ChromeUtils.importESModule("moz-src:///browser/components/oneagent/ui/OneAgentUI.sys.mjs");
     const { OneAgentOrchestrator } = ChromeUtils.importESModule("moz-src:///browser/components/oneagent/core/OneAgentOrchestrator.sys.mjs");
     ChromeUtils.importESModule("chrome://browser/content/oneagent/oneagent-tab-overlay.mjs", { global: "current" });

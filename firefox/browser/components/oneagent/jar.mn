@@ -12,3 +12,6 @@ browser.jar:
     content/browser/oneagent/aboutOneAgent.html (ui/aboutOneAgent.html)
     content/browser/oneagent/aboutOneAgent.mjs (ui/aboutOneAgent.mjs)
     content/browser/oneagent/aboutOneAgent.css (ui/aboutOneAgent.css)
+    content/browser/oneagent/desktop-pip.xhtml (ui/desktop-pip.xhtml)
+    content/browser/oneagent/desktop-pip.css (ui/desktop-pip.css)
+    content/browser/oneagent/desktop-pip.js (ui/desktop-pip.js)

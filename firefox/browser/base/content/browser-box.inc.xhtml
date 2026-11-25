@@ -28,6 +28,12 @@
   <tabbox id="tabbrowser-tabbox" flex="1" tabcontainer="tabbrowser-tabs">
     <tabpanels id="tabbrowser-tabpanels" flex="1" selectedIndex="0"/>
   </tabbox>
+  <html:div id="desktop-mode-canvas" hidden="true">
+    <html:div class="desktop-mode-center">
+      <html:button id="desktop-mode-power-btn" type="button">Start Browser</html:button>
+      <html:p id="desktop-mode-status">Browser stopped — resources freed</html:p>
+    </html:div>
+  </html:div>
   <splitter id="oneagent-splitter" class="chromeclass-extrachrome sidebar-splitter oneagent-splitter" resizebefore="sibling" resizeafter="sibling" hidden="true" role="separator" aria-controls="oneagent-box" data-l10n-id="sidebar-resize-splitter"/>
   <vbox id="oneagent-box" hidden="true" class="chromeclass-extrachrome oneagent-right-sidebar">
     <stack id="oneagent-browser-stack" class="sidebar-browser-stack oneagent-browser-stack" flex="1">

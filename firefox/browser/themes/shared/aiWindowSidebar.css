@@ -124,3 +124,122 @@
   list-style-image: url("chrome://global/skin/icons/highlights.svg") !important;
 }
 
+/* Desktop Mode prototype */
+#desktop-mode-button {
+  list-style-image: url("chrome://browser/skin/device-desktop.svg");
+  -moz-window-dragging: no-drag;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 6px !important;
+  height: 26px !important;
+  min-height: 26px !important;
+  margin-block: auto !important;
+  margin-inline: 4px !important;
+  padding: 0 10px !important;
+  border-radius: var(--border-radius-medium, 8px) !important;
+  transition: background-color 150ms ease;
+
+  &:hover {
+    background-color: var(--toolbarbutton-hover-background) !important;
+  }
+
+  &[checked="true"] {
+    background-color: var(--toolbarbutton-active-background, color-mix(in srgb, currentColor 16%, transparent)) !important;
+  }
+
+  > .toolbarbutton-icon,
+  > .toolbarbutton-text {
+    background: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+
+  > .toolbarbutton-icon {
+    width: 14px !important;
+    height: 14px !important;
+  }
+
+  > .toolbarbutton-text {
+    display: flex !important;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1 !important;
+  }
+}
+
+:root[desktop-mode="true"] {
+  /* Keep the entire browser running in place without display:none so no layout
+   * or state is lost and its full dimensions remain intact for PiP streaming.
+   * Only visually hide the toolbar controls behind the titlebar strip. */
+  #TabsToolbar,
+  #PersonalToolbar,
+  #nav-bar-customization-target,
+  #PanelUI-button,
+  #nav-bar-overflow-button,
+  #nav-bar .content-analysis-indicator,
+  #nav-bar #private-browsing-indicator-with-label {
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
+
+  #nav-bar {
+    -moz-window-dragging: drag;
+  }
+
+  #browser {
+    position: relative;
+  }
+
+  #browser > *:not(#desktop-mode-canvas) {
+    pointer-events: none !important;
+  }
+
+  #desktop-mode-canvas {
+    display: flex !important;
+    position: absolute !important;
+    inset: 0 !important;
+    z-index: 200 !important;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--toolbox-background-color, light-dark(#f7f6fb, #131215));
+    color: var(--toolbox-text-color, inherit);
+  }
+}
+
+.desktop-mode-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+#desktop-mode-power-btn {
+  appearance: none;
+  border: 1px solid var(--button-border-color, color-mix(in srgb, currentColor 22%, transparent));
+  border-radius: var(--border-radius-medium, 8px);
+  background-color: var(--color-accent-primary, #0060df);
+  color: var(--button-text-color-primary, #ffffff);
+  font-size: 14px;
+  font-weight: 600;
+  padding: 10px 22px;
+  cursor: pointer;
+  transition: opacity 150ms ease, background-color 150ms ease;
+}
+
+#desktop-mode-power-btn:hover {
+  opacity: 0.9;
+}
+
+#desktop-mode-power-btn[running] {
+  background-color: var(--button-background-color-destructive, #d70022);
+  color: var(--button-text-color-destructive, #ffffff);
+}
+
+#desktop-mode-status {
+  margin: 0;
+  font-size: 12px;
+  opacity: 0.72;
+}
+
