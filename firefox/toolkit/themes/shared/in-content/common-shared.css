@@ -40,6 +40,8 @@
 :root {
   appearance: none;
   background-color: var(--background-color-canvas);
+  background-image: var(--glass-ambient-canvas-gradient);
+  background-attachment: fixed;
   color: var(--text-color);
 
   &:not(.system-font-size) {
@@ -136,12 +138,18 @@ xul|menulist {
   border: var(--button-border);
   border-radius: var(--button-border-radius);
   background-color: var(--button-background-color);
+  background-image: var(--glass-sheen-gradient);
+  backdrop-filter: var(--glass-backdrop-sm);
+  box-shadow:
+    inset 0 1px 0 0 color-mix(in srgb, var(--glass-highlight-top) 65%, transparent),
+    0 1px 2px var(--box-shadow-color-lighter-layer-1);
   font-weight: normal;
   padding: var(--button-padding);
   text-decoration: none;
   margin: var(--space-xsmall) var(--space-small);
   /* Ensure font-size isn't overridden by widget styling (e.g. in forms.css) */
   font-size: 1em;
+  transition: background-color 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
 }
 
 button {
@@ -392,10 +400,15 @@ xul|menulist > xul|menupopup xul|menuseparator {
 html|input:where([type="email"], [type="tel"], [type="text"], [type="password"], [type="url"], [type="number"]),
 html|textarea {
   appearance: none;
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--glass-border-outer-color, var(--border-color));
   border-radius: var(--border-radius-medium);
   color: inherit;
-  background-color: var(--background-color-box);
+  background-color: var(--glass-surface-interactive-bg, var(--background-color-box));
+  backdrop-filter: var(--glass-backdrop-sm);
+  box-shadow:
+    inset 0 1px 2px var(--glass-shadow-inner-bottom),
+    0 1px 0 0 var(--glass-highlight-top);
+  transition: border-color 150ms ease, box-shadow 150ms ease, background-color 150ms ease;
 }
 
 html|input:where([type="email"], [type="tel"], [type="text"], [type="password"], [type="url"], [type="number"]),
@@ -719,9 +732,12 @@ xul|listheader,
 xul|richlistbox {
   appearance: none;
   margin-inline: 0;
-  background-color: var(--background-color-box);
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius-small);
+  background-color: var(--glass-surface-bg, var(--background-color-box));
+  background-image: var(--glass-sheen-gradient);
+  backdrop-filter: var(--glass-backdrop-md);
+  border: 1px solid var(--glass-border-outer-color, var(--border-color));
+  border-radius: var(--border-radius-medium);
+  box-shadow: var(--box-shadow-level-1);
   color: var(--text-color);
 }
 
@@ -800,9 +816,12 @@ xul|panel[type="autocomplete-richlistbox"] {
 xul|tree {
   appearance: none;
   font-size: 1em;
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius-small);
-  background-color: var(--background-color-box);
+  border: 1px solid var(--glass-border-outer-color, var(--border-color));
+  border-radius: var(--border-radius-medium);
+  background-color: var(--glass-surface-bg, var(--background-color-box));
+  background-image: var(--glass-sheen-gradient);
+  backdrop-filter: var(--glass-backdrop-md);
+  box-shadow: var(--box-shadow-level-1);
   color: inherit;
   margin: 0;
 }

@@ -62,6 +62,8 @@
    text color, casts its shadow, and rounds and clips its corners. */
 :host(:not([inxulpanel])) {
   background-color: var(--panel-list-background-color);
+  background-image: var(--glass-sheen-gradient);
+  backdrop-filter: var(--glass-backdrop-lg);
   color: var(--panel-list-text-color);
   border: 1px solid var(--panel-list-border-color);
   border-radius: var(--panel-list-border-radius);

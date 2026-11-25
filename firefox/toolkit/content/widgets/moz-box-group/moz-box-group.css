@@ -8,6 +8,10 @@
   display: block;
   outline: var(--box-border);
   border-radius: var(--box-border-radius);
+  background-color: var(--glass-surface-bg);
+  background-image: var(--glass-sheen-gradient);
+  backdrop-filter: var(--glass-backdrop-md);
+  box-shadow: var(--box-shadow-level-1);
   overflow: hidden;
 }
 

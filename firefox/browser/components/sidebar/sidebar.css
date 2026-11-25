@@ -8,12 +8,14 @@
 @import url("chrome://browser/skin/identity-block/identity-block.css");
 
 :root {
-  --sidebar-box-border-color: light-dark(color-mix(in srgb, currentColor 10%, transparent), var(--border-color-deemphasized));
-  --sidebar-box-border-width: 0.5px;
+  --sidebar-box-border-color: var(--glass-border-outer-color, light-dark(color-mix(in srgb, currentColor 10%, transparent), var(--border-color-deemphasized)));
+  --sidebar-box-border-width: 1px;
   --sidebar-box-border: var(--sidebar-box-border-width) solid var(--sidebar-box-border-color);
-  --sidebar-box-background: light-dark(rgba(0, 0, 0, 0.03), rgba(255, 255, 255, 0.05));
+  --sidebar-box-background: var(--glass-surface-bg, light-dark(rgba(0, 0, 0, 0.03), rgba(255, 255, 255, 0.05)));
   --sidebar-box-color: currentColor;
   background-color: transparent;
+  background-image: var(--glass-ambient-canvas-gradient);
+  background-attachment: fixed;
   color: var(--sidebar-text-color);
   font: menu;
   height: 100%;
@@ -117,6 +119,9 @@ fxview-empty-state {
     padding-block: 83px;
     padding-inline: var(--space-medium);
     background-color: var(--sidebar-box-background);
+    background-image: var(--glass-sheen-gradient);
+    backdrop-filter: var(--glass-backdrop-md);
+    box-shadow: var(--box-shadow-level-2);
     color: var(--sidebar-box-color);
     border: var(--sidebar-box-border);
     border-radius: var(--border-radius-medium);

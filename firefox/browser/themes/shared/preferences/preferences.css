@@ -82,7 +82,8 @@
   /* z-index = 2 so that the search-tooltips don't appear when the user scrolls
      up after searching. */
   z-index: 2;
-  background-color: var(--background-color-canvas);
+  background-color: color-mix(in srgb, var(--background-color-canvas) 65%, transparent);
+  backdrop-filter: var(--glass-backdrop-md);
   padding-top: var(--page-space-block-start);
   padding-bottom: var(--search-container-padding);
   padding-inline: var(--focus-outline-offset);

@@ -8,8 +8,11 @@
   border: var(--card-border);
   border-radius: var(--card-border-radius);
   background-color: var(--card-background-color);
+  background-image: var(--glass-sheen-gradient);
+  backdrop-filter: var(--glass-backdrop-md);
   box-shadow: var(--card-box-shadow);
   box-sizing: border-box;
+  transition: box-shadow 180ms ease, border-color 180ms ease;
 }
 
 :host([spacing="compact"]) {

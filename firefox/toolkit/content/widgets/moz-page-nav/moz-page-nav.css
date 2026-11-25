@@ -17,7 +17,10 @@
   /* (Bug 1610081) Border provides clear differentiation between side
      navigation and main content area when prefers-reduced-motion is enabled. */
   padding-inline-end: var(--space-small);
-  border-inline-end: var(--border-width) solid var(--page-nav-border-color);
+  border-inline-end: var(--border-width) solid var(--glass-border-outer-color, var(--page-nav-border-color));
+  background-color: color-mix(in srgb, var(--glass-surface-bg) 55%, transparent);
+  backdrop-filter: var(--glass-backdrop-sm);
+  box-shadow: inset -1px 0 0 0 var(--glass-highlight-rim);
 
   @media (prefers-reduced-motion) {
     --page-nav-border-color: var(--border-color);

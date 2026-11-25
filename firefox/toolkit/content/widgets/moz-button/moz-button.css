@@ -113,11 +113,13 @@ button {
   border: var(--button-border);
   border-radius: var(--button-border-radius);
   background-color: var(--button-background-color);
+  box-shadow: inset 0 1px 0 0 color-mix(in srgb, var(--glass-highlight-top) 60%, transparent);
   color: var(--button-text-color);
   padding: var(--button-padding);
   font-weight: var(--button-font-weight);
   /* Ensure font-size isn't overridden by widget styling (e.g. in forms.css) */
   font-size: var(--button-font-size);
+  transition: background-color 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
   display: flex;
   justify-content: var(--button-content-alignment);
   align-items: center;

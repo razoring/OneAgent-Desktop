@@ -8,10 +8,43 @@
 @layer tokens-foundation, tokens-browser-theme, tokens-foundation-brand, tokens-foundation-nova, tokens-browser-theme-nova, tokens-foundation-brand-nova, tokens-prefers-contrast, tokens-prefers-contrast-nova, tokens-forced-colors, tokens-forced-colors-nova;
 
 :root,
+:host,
 :host(.anonymous-content-host) {
   @layer tokens-foundation {
+    /** Frosted Luminescence Glass & Depth Foundation **/
+    --glass-blur-sm: 12px;
+    --glass-blur-md: 20px;
+    --glass-blur-lg: 28px;
+    --glass-saturate: 165%;
+    --glass-backdrop-sm: blur(var(--glass-blur-sm)) saturate(var(--glass-saturate));
+    --glass-backdrop-md: blur(var(--glass-blur-md)) saturate(var(--glass-saturate));
+    --glass-backdrop-lg: blur(var(--glass-blur-lg)) saturate(var(--glass-saturate));
+    --glass-highlight-top: light-dark(rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0.14));
+    --glass-highlight-rim: light-dark(rgba(255, 255, 255, 0.62), rgba(255, 255, 255, 0.075));
+    --glass-shadow-inner-bottom: light-dark(rgba(15, 14, 26, 0.04), rgba(0, 0, 0, 0.36));
+    --glass-sheen-start: light-dark(rgba(255, 255, 255, 0.52), rgba(255, 255, 255, 0.065));
+    --glass-sheen-end: light-dark(rgba(15, 14, 26, 0.015), rgba(0, 0, 0, 0.14));
+    --glass-sheen-gradient: linear-gradient(
+      165deg,
+      var(--glass-sheen-start) 0%,
+      transparent 52%,
+      var(--glass-sheen-end) 100%
+    );
+    --glass-surface-bg: light-dark(rgba(255, 255, 255, 0.72), rgba(32, 31, 42, 0.68));
+    --glass-surface-elevated-bg: light-dark(rgba(255, 255, 255, 0.82), rgba(40, 38, 52, 0.76));
+    --glass-surface-floating-bg: light-dark(rgba(252, 252, 255, 0.86), rgba(28, 27, 37, 0.82));
+    --glass-surface-interactive-bg: light-dark(rgba(255, 255, 255, 0.58), rgba(255, 255, 255, 0.07));
+    --glass-surface-interactive-hover: light-dark(rgba(255, 255, 255, 0.86), rgba(255, 255, 255, 0.13));
+    --glass-surface-interactive-active: light-dark(rgba(242, 241, 250, 0.94), rgba(255, 255, 255, 0.19));
+    --glass-border-color: light-dark(rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.12));
+    --glass-border-outer-color: light-dark(rgba(20, 18, 34, 0.11), rgba(255, 255, 255, 0.12));
+    --glass-border-color-strong: light-dark(rgba(20, 18, 34, 0.17), rgba(255, 255, 255, 0.19));
+    --glass-ambient-canvas-gradient:
+      radial-gradient(1100px 680px at 12% -8%, color-mix(in srgb, var(--color-accent-primary) 12%, transparent), transparent 68%),
+      radial-gradient(900px 600px at 92% 106%, color-mix(in srgb, var(--color-accent-primary) 8%, transparent), transparent 68%);
+
     /** background-color **/
-    --background-color-box: light-dark(var(--color-white), var(--color-gray-80));
+    --background-color-box: var(--glass-surface-bg);
     --background-color-critical: light-dark(var(--color-red-0), var(--color-red-90));
     --background-color-information: light-dark(var(--color-blue-0), var(--color-blue-90));
     --background-color-overlay: var(--color-black-alpha-50);
@@ -34,14 +67,30 @@
     --border-width: 1px;
 
     /** box-shadow **/
-    --box-shadow-color-darker-layer-1: light-dark(rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.2));
-    --box-shadow-color-darker-layer-2: light-dark(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.4));
-    --box-shadow-color-lighter-layer-1: light-dark(rgba(0, 0, 0, 0.03), rgba(0, 0, 0, 0.15));
-    --box-shadow-color-lighter-layer-2: light-dark(rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.2));
-    --box-shadow-level-1: 0 0 1px var(--box-shadow-color-darker-layer-1), 0 1px 2px var(--box-shadow-color-darker-layer-2);
-    --box-shadow-level-2: 0 0.25px 0.75px var(--box-shadow-color-lighter-layer-1), 0 2px 6px var(--box-shadow-color-lighter-layer-2);
-    --box-shadow-level-3: 0 0.375px 1.5px var(--box-shadow-color-lighter-layer-1), 0 3px 12px var(--box-shadow-color-lighter-layer-2);
-    --box-shadow-level-4: 0 0.5px 2px var(--box-shadow-color-lighter-layer-1), 0 4px 16px var(--box-shadow-color-lighter-layer-2);
+    --box-shadow-color-darker-layer-1: light-dark(rgba(15, 14, 28, 0.10), rgba(0, 0, 0, 0.34));
+    --box-shadow-color-darker-layer-2: light-dark(rgba(15, 14, 28, 0.16), rgba(0, 0, 0, 0.52));
+    --box-shadow-color-lighter-layer-1: light-dark(rgba(15, 14, 28, 0.05), rgba(0, 0, 0, 0.26));
+    --box-shadow-color-lighter-layer-2: light-dark(rgba(15, 14, 28, 0.11), rgba(0, 0, 0, 0.42));
+    --box-shadow-level-1:
+      inset 0 1px 0 0 var(--glass-highlight-top),
+      inset 0 0 0 0.5px var(--glass-highlight-rim),
+      0 1px 2px var(--box-shadow-color-darker-layer-1),
+      0 2px 5px var(--box-shadow-color-lighter-layer-2);
+    --box-shadow-level-2:
+      inset 0 1px 0 0 var(--glass-highlight-top),
+      inset 0 0 0 0.5px var(--glass-highlight-rim),
+      0 1px 2px var(--box-shadow-color-lighter-layer-1),
+      0 6px 16px -2px var(--box-shadow-color-lighter-layer-2);
+    --box-shadow-level-3:
+      inset 0 1px 0 0 var(--glass-highlight-top),
+      inset 0 0 0 0.5px var(--glass-highlight-rim),
+      0 2px 4px var(--box-shadow-color-lighter-layer-1),
+      0 12px 28px -4px var(--box-shadow-color-darker-layer-2);
+    --box-shadow-level-4:
+      inset 0 1px 0 0 var(--glass-highlight-top),
+      inset 0 0 0 0.5px var(--glass-highlight-rim),
+      0 4px 10px var(--box-shadow-color-darker-layer-1),
+      0 20px 44px -6px var(--box-shadow-color-darker-layer-2);
 
     /** button **/
     --button-attention-dot-color: var(--color-accent-attention);
@@ -176,9 +225,9 @@
 
     /** card **/
     /* TODO Bug 2030793 - Move card tokens to be used by moz-card rather than globally */
-    --card-background-color: var(--background-color-box);
+    --card-background-color: var(--glass-surface-bg);
     --card-border: var(--card-border-width) solid var(--card-border-color);
-    --card-border-color: light-dark(color-mix(in srgb, currentColor 10%, transparent), color-mix(in srgb, currentColor 6%, transparent));
+    --card-border-color: var(--glass-border-outer-color);
     --card-border-radius: var(--border-radius-large);
     --card-border-radius-compact: var(--border-radius-medium);
     --card-border-width: var(--border-width);
@@ -437,12 +486,12 @@
     --opacity-deemphasized-strong: 0.6;
 
     /** panel **/
-    --panel-background-color: light-dark(var(--color-white), rgb(66, 65, 77));
-    --panel-border-color: var(--popup-border-color);
+    --panel-background-color: var(--glass-surface-floating-bg);
+    --panel-border-color: var(--glass-border-outer-color);
     --panel-border-radius: var(--popup-border-radius);
-    --panel-box-shadow: 0 0 var(--panel-box-shadow-margin) hsla(0, 0%, 0%, 0.2);
-    --panel-box-shadow-margin: 4px;
-    --panel-footer-background-color: light-dark(color-mix(in srgb, currentColor 12%, transparent), color-mix(in srgb, currentColor 17%, transparent));
+    --panel-box-shadow: var(--box-shadow-level-4);
+    --panel-box-shadow-margin: 8px;
+    --panel-footer-background-color: light-dark(color-mix(in srgb, currentColor 8%, transparent), color-mix(in srgb, currentColor 14%, transparent));
     --panel-footer-text-color: inherit;
     --panel-menuitem-border-radius: var(--border-radius-small);
     /* Block margin must be 0 so that there's always an item highlighted and no dead space when moving the pointer across items. */
@@ -452,8 +501,8 @@
     --panel-menuitem-padding-block: 8px;
     --panel-menuitem-padding-inline: 8px;
     --panel-padding: 16px;
-    --panel-padding-block: 4px;
-    --panel-separator-color: color-mix(in srgb, currentColor 25%, transparent);
+    --panel-padding-block: 6px;
+    --panel-separator-color: color-mix(in srgb, currentColor 16%, transparent);
     --panel-separator-padding: var(--panel-separator-padding-block) var(--panel-separator-padding-inline);
     --panel-separator-padding-block: 4px;
     --panel-separator-padding-inline: 8px;
@@ -461,10 +510,10 @@
     --panel-width: initial;
 
     /** popup **/
-    --popup-background-color: var(--background-color-box);
-    --popup-border-color: light-dark(rgb(240, 240, 244), rgb(82, 82, 94));
+    --popup-background-color: var(--glass-surface-floating-bg);
+    --popup-border-color: var(--glass-border-outer-color);
     --popup-border-radius: var(--border-radius-medium);
-    --popup-box-shadow: var(--box-shadow-level-3);
+    --popup-box-shadow: var(--box-shadow-level-4);
 
     /** sidebar **/
     --sidebar-background-color: light-dark(white, rgb(28, 27, 34));

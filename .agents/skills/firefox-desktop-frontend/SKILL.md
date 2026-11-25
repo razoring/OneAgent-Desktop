@@ -6,6 +6,7 @@ description: You MUST use this skill when working with HTML, JS, CSS and other f
 # Firefox desktop front-end
 
 ## Workflow
+- **Design Philosophy (MANDATORY)**: Before creating or modifying any UI, CSS, XUL, HTML, or Lit component, you MUST read and follow [DESIGN_PHILOSOPHY.md](DESIGN_PHILOSOPHY.md) (**Frosted Luminescence** — blurred architectural glassmorphism, 3-layer lighting with top specular rim highlights, diagonal sheen, and multi-layered elevation shadows using `--glass-*` tokens and `.glass-*` reusable classes across menus, chrome, sidebars, Appbar, and internal pages).
 - Whenever you're building, if `./mach build` was previously run and you have not made any changes to C++ or Rust code (nor rebased past incoming changes to such code), you can use `./mach build faster` to skip the compilation and linking steps and only build the front-end code. This can save a lot of time when you're only working on the browser/ or toolkit/ code.
 - For frontend-only work in an unconfigured fresh worktree, use `./mach bootstrap --application-choice browser_artifact_mode`. Preserve an existing build configuration, and do not use artifact mode when the work requires C++, Rust, or other native-code changes.
 - CSS should use reusable tokens from the design system (in `toolkit/themes/shared/design-system`) wherever possible, to ensure consistent UI and to make it easy to change styles across the board.

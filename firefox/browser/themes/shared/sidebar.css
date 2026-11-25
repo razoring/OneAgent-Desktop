@@ -75,9 +75,11 @@
 
   @media -moz-pref("sidebar.revamp") {
     border-radius: var(--border-radius-medium);
-    box-shadow: var(--content-area-shadow);
-    outline: 0.5px solid var(--sidebar-border-color);
-    background-color: var(--sidebar-background-color);
+    box-shadow: var(--box-shadow-level-3, var(--content-area-shadow));
+    outline: 0.5px solid var(--glass-border-outer-color, var(--sidebar-border-color));
+    background-color: var(--glass-surface-bg, var(--sidebar-background-color));
+    background-image: var(--glass-sheen-gradient);
+    backdrop-filter: var(--glass-backdrop-md);
     color: var(--sidebar-text-color);
   }
 }

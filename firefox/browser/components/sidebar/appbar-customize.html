@@ -40,6 +40,8 @@
         }
 
         background-color: var(--appbar-page-bg);
+        background-image: var(--glass-ambient-canvas-gradient);
+        background-attachment: fixed;
         color: var(--appbar-page-color);
       }
 
@@ -80,11 +82,12 @@
       }
 
       .card {
-        background-color: var(--appbar-card-bg);
-        border: var(--card-border, var(--card-border-width, 1px) solid var(--card-border-color));
-        border-radius: var(--card-border-radius, var(--border-radius-large, 12px));
-        box-shadow: var(--card-box-shadow, 0 0.25px 0.75px var(--box-shadow-color-lighter-layer-1),
-          0 2px 6px var(--box-shadow-color-lighter-layer-2));
+        background-color: var(--glass-surface-bg, var(--appbar-card-bg));
+        background-image: var(--glass-sheen-gradient);
+        backdrop-filter: var(--glass-backdrop-md);
+        border: 1px solid var(--glass-border-outer-color, var(--card-border-color));
+        border-radius: var(--card-border-radius, var(--border-radius-large, 14px));
+        box-shadow: var(--box-shadow-level-2);
         padding: 14px 16px;
       }
 
@@ -136,21 +139,28 @@
         align-items: center;
         justify-content: center;
         padding: 10px 6px;
-        border-radius: var(--border-radius-medium, 8px);
-        background-color: transparent;
-        border: var(--border-width, 1px) solid var(--border-color);
+        border-radius: var(--border-radius-medium, 10px);
+        background-color: var(--glass-surface-interactive-bg);
+        background-image: var(--glass-sheen-gradient);
+        backdrop-filter: var(--glass-backdrop-sm);
+        border: 1px solid var(--glass-border-outer-color, var(--border-color));
+        box-shadow: var(--box-shadow-level-1);
         cursor: pointer;
         text-align: center;
-        transition: background-color 150ms ease, border-color 150ms ease;
+        transition: background-color 150ms ease, border-color 150ms ease, box-shadow 150ms ease, transform 150ms ease;
       }
 
       .app-tile:hover {
-        background-color: var(--appbar-item-hover);
-        border-color: var(--appbar-tile-border-hover);
+        background-color: var(--glass-surface-interactive-hover, var(--appbar-item-hover));
+        border-color: var(--glass-border-color-strong, var(--appbar-tile-border-hover));
+        box-shadow: var(--box-shadow-level-2);
+        transform: translateY(-1px);
       }
 
       .app-tile:active {
-        background-color: var(--appbar-item-active);
+        background-color: var(--glass-surface-interactive-active, var(--appbar-item-active));
+        box-shadow: var(--box-shadow-level-1);
+        transform: translateY(0);
       }
 
       .app-tile .tile-icon {
@@ -258,15 +268,19 @@
 
       .search-input {
         width: 100%;
-        height: 32px;
+        height: 34px;
         padding: 0 28px 0 32px;
         font-size: 13px;
-        border: var(--border-width, 1px) solid var(--border-color);
+        border: 1px solid var(--glass-border-outer-color, var(--border-color));
         border-radius: 20px;
-        background-color: transparent;
+        background-color: var(--glass-surface-interactive-bg);
+        backdrop-filter: var(--glass-backdrop-sm);
+        box-shadow:
+          inset 0 1px 2px var(--glass-shadow-inner-bottom),
+          0 1px 0 0 var(--glass-highlight-top);
         color: inherit;
         outline: none;
-        transition: border-color 150ms ease, box-shadow 150ms ease;
+        transition: border-color 150ms ease, box-shadow 150ms ease, background-color 150ms ease;
       }
 
       .search-input:focus {
@@ -313,10 +327,12 @@
         left: 0;
         right: 0;
         z-index: 1000;
-        background-color: var(--appbar-page-bg);
-        border: 1px solid var(--appbar-card-border);
-        border-radius: var(--border-radius-medium, 6px);
-        box-shadow: var(--box-shadow-level-3);
+        background-color: var(--glass-surface-floating-bg, var(--appbar-page-bg));
+        background-image: var(--glass-sheen-gradient);
+        backdrop-filter: var(--glass-backdrop-lg);
+        border: 1px solid var(--glass-border-outer-color, var(--appbar-card-border));
+        border-radius: var(--border-radius-medium, 10px);
+        box-shadow: var(--box-shadow-level-4);
         max-height: 240px;
         overflow-y: auto;
         display: none;
@@ -371,10 +387,13 @@
 
       /* Pinned Apps List - Table taken from about:preferences#search */
       .pinned-list-container {
-        border: var(--box-border, var(--border-width, 1px) solid var(--border-color));
-        border-radius: var(--box-border-radius, var(--border-radius-medium, 8px));
+        border: 1px solid var(--glass-border-outer-color, var(--border-color));
+        border-radius: var(--box-border-radius, var(--border-radius-medium, 10px));
         overflow: hidden;
-        background-color: transparent;
+        background-color: color-mix(in srgb, var(--glass-surface-bg) 60%, transparent);
+        background-image: var(--glass-sheen-gradient);
+        backdrop-filter: var(--glass-backdrop-sm);
+        box-shadow: var(--box-shadow-level-1);
       }
 
       .pinned-row {
