@@ -41,6 +41,36 @@ export class DesktopMode {
       powerBtn._desktopModeBound = true;
       powerBtn.addEventListener("click", () => this.toggleBrowserPower(win));
     }
+    const sidebar = win.document.getElementById("desktop-chat-sidebar");
+    const sidebarToggle = win.document.getElementById("desktop-chat-sidebar-toggle");
+    const headerSidebarToggle = win.document.getElementById("desktop-chat-header-sidebar-toggle");
+    if (sidebar && !sidebar._desktopModeBound) {
+      sidebar._desktopModeBound = true;
+      const setSidebarCollapsed = collapsed => {
+        sidebar.toggleAttribute("collapsed", collapsed);
+        if (headerSidebarToggle) {
+          headerSidebarToggle.hidden = !collapsed;
+        }
+      };
+      sidebarToggle?.addEventListener("click", () => setSidebarCollapsed(true));
+      headerSidebarToggle?.addEventListener("click", () => setSidebarCollapsed(false));
+      for (const id of ["desktop-chat-browser-btn", "desktop-chat-top-browser-btn"]) {
+        win.document.getElementById(id)?.addEventListener("click", () => this.exitToBrowserMode(win));
+      }
+      win.document.getElementById("desktop-chat-history")?.addEventListener("click", e => {
+        const item = e.target.closest(".desktop-history-item");
+        if (!item) {
+          return;
+        }
+        for (const el of win.document.querySelectorAll("#desktop-chat-history .desktop-history-item")) {
+          el.toggleAttribute("selected", el === item);
+        }
+        const titleEl = win.document.getElementById("desktop-chat-title");
+        if (titleEl) {
+          titleEl.textContent = item.textContent;
+        }
+      });
+    }
     win.addEventListener(
       "unload",
       () => {

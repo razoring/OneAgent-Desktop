@@ -43,9 +43,115 @@
     </html:div>
   </tabbox>
   <html:div id="desktop-mode-canvas" hidden="true">
-    <html:div class="desktop-mode-center">
-      <html:button id="desktop-mode-power-btn" type="button">Start Browser</html:button>
-      <html:p id="desktop-mode-status">Browser stopped — resources freed</html:p>
+    <html:div id="desktop-chat-titlebar">
+      <html:span id="desktop-chat-title">Analyze quadratic derivation</html:span>
+    </html:div>
+    <html:div id="desktop-chat-body">
+    <html:aside id="desktop-chat-sidebar">
+      <html:div class="desktop-sidebar-header">
+        <html:button id="desktop-chat-sidebar-toggle" class="desktop-icon-btn" type="button" title="Toggle sidebar">
+          <html:img src="chrome://browser/skin/sidebar-expanded.svg" alt=""/>
+        </html:button>
+        <html:button id="desktop-chat-new-btn" class="desktop-new-chat-btn" type="button">
+          <html:img src="chrome://global/skin/icons/plus.svg" alt=""/>
+          <html:span>New chat</html:span>
+        </html:button>
+      </html:div>
+      <html:div id="desktop-chat-history">
+        <html:div class="desktop-history-section">Today</html:div>
+        <html:button class="desktop-history-item" type="button" selected="true">Analyze quadratic derivation</html:button>
+        <html:button class="desktop-history-item" type="button">Compare open research tabs</html:button>
+        <html:div class="desktop-history-section">Previous 7 Days</html:div>
+        <html:button class="desktop-history-item" type="button">Firefox notch architecture</html:button>
+        <html:button class="desktop-history-item" type="button">Refactor CSS token hierarchy</html:button>
+        <html:button class="desktop-history-item" type="button">Draft release notes</html:button>
+      </html:div>
+      <html:div class="desktop-sidebar-footer">
+        <html:div class="desktop-pip-card">
+          <html:p id="desktop-mode-status">Browser streaming in Picture-in-Picture</html:p>
+          <html:div class="desktop-pip-actions">
+            <html:button id="desktop-mode-power-btn" type="button">Stop Browser</html:button>
+            <html:button id="desktop-chat-browser-btn" type="button" title="Switch to Browser Mode">Browser</html:button>
+          </html:div>
+        </html:div>
+      </html:div>
+    </html:aside>
+    <html:main id="desktop-chat-main">
+      <html:header id="desktop-chat-header">
+        <html:div class="desktop-header-left">
+          <html:button id="desktop-chat-header-sidebar-toggle" class="desktop-icon-btn" type="button" title="Show sidebar" hidden="true">
+            <html:img src="chrome://browser/skin/sidebar-collapsed.svg" alt=""/>
+          </html:button>
+          <html:button id="desktop-chat-model-btn" type="button">
+            <html:span>qwen3:8b</html:span>
+            <html:img src="chrome://global/skin/icons/arrow-down-12.svg" alt=""/>
+          </html:button>
+        </html:div>
+        <html:button id="desktop-chat-top-browser-btn" class="desktop-header-pill-btn" type="button">
+          <html:img src="chrome://browser/skin/tab.svg" alt=""/>
+          <html:span>Switch to Browser</html:span>
+        </html:button>
+      </html:header>
+      <html:div id="desktop-chat-messages">
+        <html:div class="desktop-chat-thread">
+          <html:div class="desktop-msg desktop-msg-user">
+            <html:div class="desktop-user-bubble">
+              <html:span>Analyze </html:span>
+              <html:span class="notch-chip">
+                <html:img src="chrome://global/skin/icons/defaultFavicon.svg" alt=""/>
+                <html:span class="notch-chip-name">Firefox Source</html:span>
+              </html:span>
+              <html:span> and summarize the quadratic root formula.</html:span>
+            </html:div>
+          </html:div>
+          <html:div class="desktop-msg desktop-msg-assistant chat-rich-text">
+            <html:div class="notch-status-line">Thinking…</html:div>
+            <html:div class="notch-status-line">Calling tool: read_tab…</html:div>
+            <html:h3>Analysis Overview</html:h3>
+            <html:p>
+              <html:span>Reviewed </html:span>
+              <html:span class="notch-chip">
+                <html:img src="chrome://global/skin/icons/defaultFavicon.svg" alt=""/>
+                <html:span class="notch-chip-name">@Firefox Source</html:span>
+              </html:span>
+              <html:span> with <html:strong>markdown</html:strong>, <html:em>inline italics</html:em>, and <html:code>rich tokens</html:code>.</html:span>
+            </html:p>
+            <html:ul>
+              <html:li>Unified minimalist chrome tokens and notch pill geometry</html:li>
+              <html:li>Inline math rendering such as <html:span class="notch-math-inline">E = mc<html:sup>2</html:sup></html:span></html:li>
+            </html:ul>
+            <html:div class="notch-math-block">
+              <html:span class="notch-frac">
+                <html:span class="notch-frac-num">−b ± <html:span class="notch-sqrt">√<html:span class="notch-sqrt-body">b<html:sup>2</html:sup> − 4ac</html:span></html:span></html:span>
+                <html:span class="notch-frac-den">2a</html:span>
+              </html:span>
+            </html:div>
+            <html:div class="desktop-msg-actions">
+              <html:button class="desktop-icon-btn" type="button" title="Copy">
+                <html:img src="chrome://global/skin/icons/edit-copy.svg" alt=""/>
+              </html:button>
+              <html:button class="desktop-icon-btn" type="button" title="Regenerate">
+                <html:img src="chrome://global/skin/icons/arrow-counterclockwise-16.svg" alt=""/>
+              </html:button>
+            </html:div>
+          </html:div>
+        </html:div>
+      </html:div>
+      <html:div id="desktop-chat-composer-wrap">
+        <html:div id="desktop-chat-composer">
+          <html:div id="desktop-chat-input" contenteditable="true" role="textbox" aria-multiline="true" data-placeholder="Send a message… (@ to mention)"/>
+          <html:div class="desktop-composer-bar">
+            <html:div class="desktop-composer-left">
+              <html:button id="desktop-composer-menu-btn" class="desktop-circle-mask-btn desktop-circle-pound" type="button" aria-label="Options"/>
+            </html:div>
+            <html:div class="desktop-composer-right">
+              <html:span class="desktop-composer-model-tag">qwen3:8b</html:span>
+              <html:button id="desktop-composer-send-btn" class="desktop-circle-mask-btn desktop-circle-send" type="button" aria-label="Send"/>
+            </html:div>
+          </html:div>
+        </html:div>
+      </html:div>
+    </html:main>
     </html:div>
   </html:div>
   <splitter id="ai-window-splitter" class="chromeclass-extrachrome sidebar-splitter" resizebefore="sibling" resizeafter="sibling" collapsed="true"/>

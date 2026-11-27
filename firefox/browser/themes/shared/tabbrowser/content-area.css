@@ -405,33 +405,41 @@
     line-height: 1;
   }
 
-  #notch-response :is(h1, h2, h3) {
+  #notch-response :is(h1, h2, h3),
+  .chat-rich-text :is(h1, h2, h3) {
     margin: 6px 0 3px;
     font-weight: 600;
     line-height: 1.25;
   }
 
-  #notch-response h1 { font-size: 14px; }
-  #notch-response h2 { font-size: 13px; }
-  #notch-response h3 { font-size: 12.5px; }
+  #notch-response h1,
+  .chat-rich-text h1 { font-size: 14px; }
+  #notch-response h2,
+  .chat-rich-text h2 { font-size: 13px; }
+  #notch-response h3,
+  .chat-rich-text h3 { font-size: 12.5px; }
 
-  #notch-response p {
+  #notch-response p,
+  .chat-rich-text p {
     margin: 4px 0;
   }
 
-  #notch-response :is(ul, ol) {
+  #notch-response :is(ul, ol),
+  .chat-rich-text :is(ul, ol) {
     margin: 4px 0;
     padding-inline-start: 18px;
   }
 
-  #notch-response blockquote {
+  #notch-response blockquote,
+  .chat-rich-text blockquote {
     margin: 4px 0;
     padding-inline-start: 8px;
     border-inline-start: 2px solid color-mix(in srgb, var(--toolbar-field-color, currentColor) 35%, transparent);
     opacity: 0.85;
   }
 
-  #notch-response code {
+  #notch-response code,
+  .chat-rich-text code {
     font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
     font-size: 11.5px;
     padding: 1px 4px;
@@ -439,7 +447,8 @@
     background-color: color-mix(in srgb, var(--toolbar-field-color, currentColor) 10%, transparent);
   }
 
-  #notch-response pre {
+  #notch-response pre,
+  .chat-rich-text pre {
     margin: 5px 0;
     padding: 6px 8px;
     border-radius: 8px;
@@ -447,7 +456,8 @@
     overflow-x: auto;
   }
 
-  #notch-response pre code {
+  #notch-response pre code,
+  .chat-rich-text pre code {
     padding: 0;
     background: transparent;
   }
