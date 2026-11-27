@@ -58,6 +58,34 @@
     margin-inline-start: var(--urlbar-container-padding-block, 4px) !important;
     overflow: clip !important;
 
+    /* Clip Apple-style flipped notch at bottom-center so underlying theme/wallpaper shows through seamlessly */
+    mask-image:
+      linear-gradient(black, black),
+      radial-gradient(circle at 0 0, transparent 0, transparent 9.5px, black 10px),
+      radial-gradient(circle at 100% 0, transparent 0, transparent 9.5px, black 10px),
+      radial-gradient(circle, black 0, black 9.5px, transparent 10px),
+      radial-gradient(circle, black 0, black 9.5px, transparent 10px),
+      linear-gradient(black, black),
+      linear-gradient(black, black);
+    mask-position:
+      0 0,
+      calc(50% - 95px) 100%,
+      calc(50% + 95px) 100%,
+      calc(50% - 80px) 100%,
+      calc(50% + 80px) 100%,
+      50% 100%,
+      50% 100%;
+    mask-size:
+      100% 100%,
+      10px 10px,
+      10px 10px,
+      20px 20px,
+      20px 20px,
+      160px 20px,
+      180px 10px;
+    mask-repeat: no-repeat;
+    mask-composite: subtract, add, add, add, add, add, add;
+
     @media (-moz-platform: macos) {
       --content-scrollbar-inset-block: 0 var(--border-radius-medium);
       --content-scrollbar-inset-inline-start: var(--border-radius-medium);
@@ -85,6 +113,7 @@
       margin-inline-start: 0 !important;
 
       border-block-start: none;
+      mask-image: none;
     }
 
     /* A .browserContainer edge is only separated and rounded when it faces chrome.
