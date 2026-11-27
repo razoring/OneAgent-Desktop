@@ -432,6 +432,24 @@
               label="Customize Appbar"/>
   </menupopup>
 
+  <menupopup id="notch-options-menu">
+    <menuitem id="notch-menu-switch-to-chat"
+              class="menuitem-iconic"
+              label="Switch to Chat"
+              image="chrome://global/skin/icons/highlights.svg"/>
+    <menuseparator/>
+    <menuitem id="notch-menu-attach-files"
+              class="menuitem-iconic"
+              label="Attach files"
+              image="chrome://global/skin/icons/page-portrait.svg"/>
+    <menu id="notch-menu-attach-tabs"
+          class="menu-iconic"
+          label="Attach tab"
+          image="chrome://browser/skin/tab.svg">
+      <menupopup id="notch-attach-tabs-popup"/>
+    </menu>
+  </menupopup>
+
   <menupopup id="sidebar-history-menu">
     <menucaption data-l10n-id="sidebar-history-sort-by-heading-menucaption"
                  id="sidebar-history-sort-by-heading"

@@ -33,13 +33,11 @@
       <html:span class="notch-dot notch-dot-2"/>
       <html:span class="notch-dot notch-dot-3"/>
       <html:div id="notch-pill-content">
-        <html:button id="notch-left-btn" type="button" aria-label="Options">
-          <html:img src="chrome://global/skin/icons/menu.svg" alt=""/>
-        </html:button>
-        <html:input id="notch-input" type="text" spellcheck="false" placeholder="Type something…"/>
-        <html:button id="notch-send-btn" type="button" aria-label="Send">
-          <html:img src="chrome://global/skin/icons/arrow-up.svg" alt=""/>
-        </html:button>
+        <html:div id="notch-input-row">
+          <html:button id="notch-left-btn" type="button" aria-label="Options"/>
+          <html:div id="notch-input" contenteditable="true" role="textbox" aria-multiline="true" spellcheck="true" data-placeholder="Type something…"/>
+          <html:button id="notch-send-btn" type="button" aria-label="Send"/>
+        </html:div>
       </html:div>
     </html:div>
   </tabbox>
