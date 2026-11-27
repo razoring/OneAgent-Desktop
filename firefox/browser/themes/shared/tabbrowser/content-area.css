@@ -498,6 +498,33 @@
     padding: 0 2px;
   }
 
+  .notch-status-line {
+    display: block;
+    width: fit-content;
+    margin: 3px 0;
+    font-size: 12px;
+    font-weight: 500;
+    background: linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--toolbar-field-color, currentColor) 45%, transparent) 0%,
+      color-mix(in srgb, var(--toolbar-field-color, currentColor) 45%, transparent) 40%,
+      var(--toolbar-field-color, currentColor) 50%,
+      color-mix(in srgb, var(--toolbar-field-color, currentColor) 45%, transparent) 60%,
+      color-mix(in srgb, var(--toolbar-field-color, currentColor) 45%, transparent) 100%
+    );
+    background-size: 200% 100%;
+    background-repeat: no-repeat;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: notch-shimmer 1.8s linear infinite;
+  }
+
+  @keyframes notch-shimmer {
+    0% { background-position: 100% 0; }
+    100% { background-position: 0% 0; }
+  }
+
   @keyframes notch-lava-1 {
     0%, 100% { transform: translate(0px, 0px); }
     25% { transform: translate(1.2px, -1.0px); }

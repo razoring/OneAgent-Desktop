@@ -519,7 +519,13 @@
             continue;
           }
           flushList();
-          if (line.startsWith("> ")) {
+          const statusMatch = line.match(/^\[\[status:(.+)\]\]$/);
+          if (statusMatch) {
+            const st = document.createElement("div");
+            st.className = "notch-status-line";
+            st.textContent = statusMatch[1];
+            notchResponse.append(st);
+          } else if (line.startsWith("> ")) {
             const bq = document.createElement("blockquote");
             bq.append(renderInlineRich(line.slice(2), chipMap));
             notchResponse.append(bq);
@@ -564,6 +570,9 @@
         }
         const chipTokens = usedChips.map(n => `[[chip:${n}]]`).join(" ");
         const mockMd = [
+          "[[status:Thinking…]]",
+          "[[status:Searching the web…]]",
+          "[[status:Calling tool: read_tab…]]",
           "### Summary",
           `Analyzed ${chipTokens} for **${rawPrompt || "your request"}** with *inline* ++formatting++ and \`code\`.`,
           "- Supports **bold**, *italic*, ~~strike~~, and inline chips",
