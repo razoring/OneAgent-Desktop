@@ -50,6 +50,135 @@
   } catch (e) {
     console.error("Failed to initialize DesktopMode:", e);
   }
+
+  window.addEventListener(
+    "load",
+    () => {
+      const tabbox = document.getElementById("tabbrowser-tabbox");
+      if (!tabbox || !window.MousePosTracker) {
+        return;
+      }
+      const PROXIMITY_RADIUS = 46;
+      const ANIM_MS = 380;
+      let isHovered = false;
+      let isOpen = false;
+      let animLockUntil = 0;
+      const EMPTY_RECT = { top: 0, bottom: 0, left: 0, right: 0 };
+
+      const triggerBtn = document.getElementById("notch-circle-trigger");
+      const notchDots = document.getElementById("browser-notch-dots");
+      const notchInput = document.getElementById("notch-input");
+      const notchSendBtn = document.getElementById("notch-send-btn");
+
+      function openNotch() {
+        isOpen = true;
+        isHovered = true;
+        tabbox.setAttribute("notch-hovered", "true");
+        tabbox.setAttribute("notch-open", "true");
+        setTimeout(() => notchInput?.focus(), 160);
+      }
+
+      function closeNotch() {
+        if (!isOpen) {
+          return;
+        }
+        isOpen = false;
+        isHovered = false;
+        animLockUntil = Date.now() + ANIM_MS;
+        tabbox.removeAttribute("notch-open");
+        tabbox.removeAttribute("notch-hovered");
+        notchInput?.blur();
+      }
+
+      triggerBtn?.addEventListener("click", e => {
+        e.stopPropagation();
+        if (isHovered && !isOpen) {
+          openNotch();
+        }
+      });
+
+      notchSendBtn?.addEventListener("click", () => {
+        if (notchInput) {
+          notchInput.value = "";
+          notchInput.focus();
+        }
+      });
+
+      notchInput?.addEventListener("keydown", e => {
+        if (e.key === "Escape") {
+          closeNotch();
+        } else if (e.key === "Enter") {
+          notchInput.value = "";
+        }
+      });
+
+      window.addEventListener(
+        "mousedown",
+        e => {
+          if (isOpen && notchDots && !notchDots.contains(e.target)) {
+            closeNotch();
+          }
+        },
+        true
+      );
+
+      const notchTracker = {
+        getMouseTargetRect() {
+          if (isOpen) {
+            return { top: -1e6, bottom: 1e6, left: -1e6, right: 1e6 };
+          }
+          if (Date.now() < animLockUntil) {
+            return isHovered
+              ? { top: -1e6, bottom: 1e6, left: -1e6, right: 1e6 }
+              : EMPTY_RECT;
+          }
+          const rect = tabbox.getBoundingClientRect();
+          if (!rect.width || !rect.height) {
+            return EMPTY_RECT;
+          }
+          const cx = rect.left + rect.width / 2;
+          if (!isHovered) {
+            return {
+              left: cx - 29,
+              right: cx + 29,
+              top: rect.bottom - 23,
+              bottom: rect.bottom,
+            };
+          }
+          const cy = rect.bottom - 36;
+          const dist = Math.hypot(
+            window.MousePosTracker._x - cx,
+            window.MousePosTracker._y - cy
+          );
+          return dist <= PROXIMITY_RADIUS
+            ? { top: -1e6, bottom: 1e6, left: -1e6, right: 1e6 }
+            : EMPTY_RECT;
+        },
+        onMouseEnter() {
+          if (!isHovered) {
+            isHovered = true;
+            animLockUntil = Date.now() + ANIM_MS;
+            tabbox.setAttribute("notch-hovered", "true");
+          }
+        },
+        onMouseLeave() {
+          if (isHovered) {
+            isHovered = false;
+            animLockUntil = Date.now() + ANIM_MS;
+            tabbox.removeAttribute("notch-hovered");
+          }
+        },
+      };
+
+      window.MousePosTracker.addListener(notchTracker);
+      window.addEventListener(
+        "unload",
+        () => window.MousePosTracker?.removeListener(notchTracker),
+        { once: true }
+      );
+    },
+    { once: true }
+  );
 }
 
 window.onload = gBrowserInit.onLoad.bind(gBrowserInit);
