@@ -72,14 +72,15 @@
       const notchMenuChat = document.getElementById("notch-menu-switch-to-chat");
       const notchMenuAttach = document.getElementById("notch-menu-attach-files");
       const notchAttachTabsPopup = document.getElementById("notch-attach-tabs-popup");
+      const notchMentionMenuPopup = document.getElementById("notch-mention-menu-popup");
+      const notchMentionPopup = document.getElementById("notch-mention-popup");
+      const notchResponse = document.getElementById("notch-response");
       const notchPillContent = document.getElementById("notch-pill-content");
       const notchInput = document.getElementById("notch-input");
       const notchSendBtn = document.getElementById("notch-send-btn");
+      const pastAttachments = new Map();
 
-      function insertNotchChip(iconSrc, labelText, tooltipText) {
-        if (!notchInput || !labelText) {
-          return;
-        }
+      function createChipElement(iconSrc, labelText, tooltipText, onRemove) {
         const chip = document.createElement("span");
         chip.className = "notch-chip";
         chip.contentEditable = "false";
@@ -93,32 +94,57 @@
         name.className = "notch-chip-name";
         name.textContent = labelText;
 
-        const removeBtn = document.createElement("button");
-        removeBtn.type = "button";
-        removeBtn.className = "notch-chip-remove";
-        removeBtn.textContent = "×";
-        removeBtn.addEventListener("click", e => {
-          e.stopPropagation();
-          chip.remove();
+        chip.append(icon, name);
+        if (onRemove) {
+          const removeBtn = document.createElement("button");
+          removeBtn.type = "button";
+          removeBtn.className = "notch-chip-remove";
+          removeBtn.textContent = "×";
+          removeBtn.addEventListener("click", e => {
+            e.stopPropagation();
+            onRemove(chip);
+          });
+          chip.append(removeBtn);
+        }
+        return chip;
+      }
+
+      function insertNotchChip(iconSrc, labelText, tooltipText, isMention = false, replaceRange = null) {
+        if (!notchInput || !labelText) {
+          return;
+        }
+        if (!isMention) {
+          pastAttachments.set(labelText, {
+            name: labelText,
+            iconSrc,
+            tooltip: tooltipText || labelText,
+          });
+        }
+        const chip = createChipElement(iconSrc, labelText, tooltipText, el => {
+          el.remove();
           notchInput.focus();
         });
 
-        chip.append(icon, name, removeBtn);
-
         const sel = window.getSelection();
         const space = document.createTextNode(" ");
-        if (sel && sel.rangeCount && notchInput.contains(sel.anchorNode)) {
-          const range = sel.getRangeAt(0);
+        const range =
+          replaceRange ||
+          (sel && sel.rangeCount && notchInput.contains(sel.anchorNode) ? sel.getRangeAt(0) : null);
+        if (range) {
           range.deleteContents();
           range.insertNode(space);
           range.insertNode(chip);
           range.setStartAfter(space);
           range.collapse(true);
-          sel.removeAllRanges();
-          sel.addRange(range);
+          sel?.removeAllRanges();
+          sel?.addRange(range);
         } else {
           notchInput.append(chip, space);
         }
+      }
+
+      function insertMentionChip(att, replaceRange = null) {
+        insertNotchChip(att.iconSrc, `@${att.name}`, att.tooltip, true, replaceRange);
       }
 
       function insertFileChip(file) {
@@ -260,9 +286,298 @@
         }
       }
 
-      notchSendBtn?.addEventListener("click", () => {
+      function renderLatex(tex, displayMode = false) {
+        const LATEX_SYMS = {
+          alpha: "α", beta: "β", gamma: "γ", delta: "δ", epsilon: "ε", theta: "θ",
+          lambda: "λ", mu: "μ", pi: "π", sigma: "σ", phi: "φ", omega: "ω",
+          Delta: "Δ", Sigma: "Σ", Omega: "Ω", sum: "∑", prod: "∏", int: "∫",
+          infty: "∞", pm: "±", times: "×", cdot: "·", div: "÷", neq: "≠",
+          leq: "≤", geq: "≥", approx: "≈", to: "→", rightarrow: "→",
+          leftarrow: "←", partial: "∂", nabla: "∇", forall: "∀", exists: "∃",
+        };
+        function readGroup(str, i) {
+          while (i < str.length && str[i] === " ") {
+            i++;
+          }
+          if (str[i] !== "{") {
+            return [str[i] || "", i + 1];
+          }
+          let depth = 0;
+          const start = ++i;
+          while (i < str.length) {
+            if (str[i] === "{") {
+              depth++;
+            } else if (str[i] === "}") {
+              if (depth === 0) {
+                return [str.slice(start, i), i + 1];
+              }
+              depth--;
+            }
+            i++;
+          }
+          return [str.slice(start), i];
+        }
+        function parseNodes(str) {
+          const frag = document.createDocumentFragment();
+          let i = 0;
+          while (i < str.length) {
+            if (str.startsWith("\\frac", i)) {
+              const [num, i1] = readGroup(str, i + 5);
+              const [den, i2] = readGroup(str, i1);
+              const frac = document.createElement("span");
+              frac.className = "notch-frac";
+              const nEl = document.createElement("span");
+              nEl.className = "notch-frac-num";
+              nEl.append(parseNodes(num));
+              const dEl = document.createElement("span");
+              dEl.className = "notch-frac-den";
+              dEl.append(parseNodes(den));
+              frac.append(nEl, dEl);
+              frag.append(frac);
+              i = i2;
+            } else if (str.startsWith("\\sqrt", i)) {
+              const [body, i1] = readGroup(str, i + 5);
+              const wrap = document.createElement("span");
+              wrap.className = "notch-sqrt";
+              wrap.append("√");
+              const bEl = document.createElement("span");
+              bEl.className = "notch-sqrt-body";
+              bEl.append(parseNodes(body));
+              wrap.append(bEl);
+              frag.append(wrap);
+              i = i1;
+            } else if (str[i] === "^" || str[i] === "_") {
+              const tag = str[i] === "^" ? "sup" : "sub";
+              const [grp, i1] = readGroup(str, i + 1);
+              const el = document.createElement(tag);
+              el.append(parseNodes(grp));
+              frag.append(el);
+              i = i1;
+            } else if (str[i] === "\\") {
+              const m = str.slice(i + 1).match(/^[A-Za-z]+/);
+              if (m) {
+                frag.append(LATEX_SYMS[m[0]] || m[0]);
+                i += 1 + m[0].length;
+              } else {
+                frag.append(str[i + 1] || "");
+                i += 2;
+              }
+            } else if (str[i] === "{" || str[i] === "}") {
+              i++;
+            } else {
+              frag.append(str[i++]);
+            }
+          }
+          return frag;
+        }
+        const container = document.createElement(displayMode ? "div" : "span");
+        container.className = displayMode ? "notch-math-block" : "notch-math-inline";
+        container.append(parseNodes(tex.trim()));
+        return container;
+      }
+
+      function renderInlineRich(text, chipMap) {
+        const frag = document.createDocumentFragment();
+        const tokenRe = /(\[\[chip:([^\]]+)\]\]|\*\*([^*\n]+)\*\*|~~([^~\n]+)~~|\+\+([^+\n]+)\+\+|`([^`\n]+)`|\[([^\]]+)\]\(([^)]+)\)|\\\((.+?)\\\)|\$([^$\n]+)\$|\*([^*\n]+)\*)/g;
+        let last = 0;
+        for (const m of text.matchAll(tokenRe)) {
+          if (m.index > last) {
+            frag.append(text.slice(last, m.index));
+          }
+          if (m[2] !== undefined) {
+            const c = chipMap.get(m[2]) || {
+              iconSrc: "chrome://global/skin/icons/page-portrait.svg",
+              name: m[2],
+              tooltip: m[2],
+            };
+            frag.append(createChipElement(c.iconSrc, c.name, c.tooltip));
+          } else if (m[3] !== undefined) {
+            const el = document.createElement("strong");
+            el.textContent = m[3];
+            frag.append(el);
+          } else if (m[4] !== undefined) {
+            const el = document.createElement("s");
+            el.textContent = m[4];
+            frag.append(el);
+          } else if (m[5] !== undefined) {
+            const el = document.createElement("u");
+            el.textContent = m[5];
+            frag.append(el);
+          } else if (m[6] !== undefined) {
+            const el = document.createElement("code");
+            el.textContent = m[6];
+            frag.append(el);
+          } else if (m[7] !== undefined) {
+            const a = document.createElement("a");
+            a.textContent = m[7];
+            a.href = m[8];
+            frag.append(a);
+          } else if (m[9] !== undefined || m[10] !== undefined) {
+            frag.append(renderLatex(m[9] ?? m[10], false));
+          } else if (m[11] !== undefined) {
+            const el = document.createElement("em");
+            el.textContent = m[11];
+            frag.append(el);
+          }
+          last = m.index + m[0].length;
+        }
+        if (last < text.length) {
+          frag.append(text.slice(last));
+        }
+        return frag;
+      }
+
+      function renderMockResponse(mdText, chipMap) {
+        if (!notchResponse) {
+          return;
+        }
+        notchResponse.replaceChildren();
+        const header = document.createElement("div");
+        header.className = "notch-response-header";
+        const title = document.createElement("span");
+        title.textContent = "Response Preview";
+        const closeBtn = document.createElement("button");
+        closeBtn.type = "button";
+        closeBtn.className = "notch-response-close";
+        closeBtn.textContent = "×";
+        closeBtn.addEventListener("click", () => {
+          notchResponse.hidden = true;
+          notchResponse.replaceChildren();
+        });
+        header.append(title, closeBtn);
+        notchResponse.append(header);
+
+        const lines = mdText.split("\n");
+        let listEl = null;
+        let listTag = null;
+        let i = 0;
+        function flushList() {
+          if (listEl) {
+            notchResponse.append(listEl);
+            listEl = null;
+            listTag = null;
+          }
+        }
+        while (i < lines.length) {
+          const line = lines[i];
+          if (line.startsWith("```")) {
+            flushList();
+            const codeLines = [];
+            i++;
+            while (i < lines.length && !lines[i].startsWith("```")) {
+              codeLines.push(lines[i++]);
+            }
+            const pre = document.createElement("pre");
+            const code = document.createElement("code");
+            code.textContent = codeLines.join("\n");
+            pre.append(code);
+            notchResponse.append(pre);
+            i++;
+            continue;
+          }
+          if (line.trim().startsWith("$$") || line.trim().startsWith("\\[")) {
+            flushList();
+            const endTok = line.trim().startsWith("$$") ? "$$" : "\\]";
+            let expr = line.trim().slice(2);
+            if (expr.endsWith(endTok)) {
+              expr = expr.slice(0, -2);
+            } else {
+              i++;
+              while (i < lines.length && !lines[i].includes(endTok)) {
+                expr += " " + lines[i++];
+              }
+              if (i < lines.length) {
+                expr += " " + lines[i].replace(endTok, "");
+              }
+            }
+            notchResponse.append(renderLatex(expr, true));
+            i++;
+            continue;
+          }
+          const hMatch = line.match(/^(#{1,3})\s+(.+)$/);
+          if (hMatch) {
+            flushList();
+            const h = document.createElement(`h${hMatch[1].length}`);
+            h.append(renderInlineRich(hMatch[2], chipMap));
+            notchResponse.append(h);
+            i++;
+            continue;
+          }
+          const ulMatch = line.match(/^[-*]\s+(.+)$/);
+          const olMatch = line.match(/^\d+\.\s+(.+)$/);
+          if (ulMatch || olMatch) {
+            const tag = ulMatch ? "ul" : "ol";
+            if (listTag !== tag) {
+              flushList();
+              listEl = document.createElement(tag);
+              listTag = tag;
+            }
+            const li = document.createElement("li");
+            li.append(renderInlineRich((ulMatch || olMatch)[1], chipMap));
+            listEl.append(li);
+            i++;
+            continue;
+          }
+          flushList();
+          if (line.startsWith("> ")) {
+            const bq = document.createElement("blockquote");
+            bq.append(renderInlineRich(line.slice(2), chipMap));
+            notchResponse.append(bq);
+          } else if (line.trim()) {
+            const p = document.createElement("p");
+            p.append(renderInlineRich(line, chipMap));
+            notchResponse.append(p);
+          }
+          i++;
+        }
+        flushList();
+        notchResponse.hidden = false;
+      }
+
+      function sendNotchPrompt() {
+        if (!notchInput) {
+          return;
+        }
+        const chipMap = new Map();
+        const usedChips = [];
+        for (const el of notchInput.querySelectorAll(".notch-chip")) {
+          const name = el.querySelector(".notch-chip-name")?.textContent || "";
+          const iconSrc = el.querySelector("img")?.getAttribute("src") || "chrome://global/skin/icons/page-portrait.svg";
+          if (name) {
+            chipMap.set(name, { name, iconSrc, tooltip: el.title || name });
+            usedChips.push(name);
+          }
+        }
+        const rawPrompt = notchInput.textContent.replace(/\u200B/g, "").trim();
+        if (!rawPrompt && !usedChips.length) {
+          return;
+        }
+        if (!usedChips.length) {
+          const tab = window.gBrowser?.selectedTab;
+          const tabName = tab?.label || "Active Tab";
+          chipMap.set(tabName, {
+            name: tabName,
+            iconSrc: tab?.image || "chrome://global/skin/icons/defaultFavicon.svg",
+            tooltip: tab?.linkedBrowser?.currentURI?.spec || tabName,
+          });
+          usedChips.push(tabName);
+        }
+        const chipTokens = usedChips.map(n => `[[chip:${n}]]`).join(" ");
+        const mockMd = [
+          "### Summary",
+          `Analyzed ${chipTokens} for **${rawPrompt || "your request"}** with *inline* ++formatting++ and \`code\`.`,
+          "- Supports **bold**, *italic*, ~~strike~~, and inline chips",
+          "- Supports inline math like $E = mc^2$ and $\\alpha + \\beta \\approx \\pi$",
+          "$$\\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}$$",
+        ].join("\n");
+        notchMentionPopup?.hidePopup();
         clearNotchInput();
-        notchInput?.focus();
+        renderMockResponse(mockMd, chipMap);
+        notchInput.focus();
+      }
+
+      notchSendBtn?.addEventListener("click", () => {
+        sendNotchPrompt();
       });
 
       notchLeftBtn?.addEventListener("click", e => {
@@ -279,6 +594,28 @@
       notchMenuChat?.addEventListener("command", () => {
         closeNotch();
         window.DesktopMode?.toggle(window);
+      });
+
+      notchMentionMenuPopup?.addEventListener("popupshowing", () => {
+        notchMentionMenuPopup.replaceChildren();
+        if (!pastAttachments.size) {
+          const empty = document.createXULElement("menuitem");
+          empty.setAttribute("label", "No past attachments");
+          empty.setAttribute("disabled", "true");
+          notchMentionMenuPopup.appendChild(empty);
+          return;
+        }
+        for (const att of pastAttachments.values()) {
+          const item = document.createXULElement("menuitem");
+          item.className = "menuitem-iconic";
+          item.setAttribute("label", `@${att.name}`);
+          item.setAttribute("image", att.iconSrc);
+          item.addEventListener("command", () => {
+            insertMentionChip(att);
+            notchInput?.focus();
+          });
+          notchMentionMenuPopup.appendChild(item);
+        }
       });
 
       notchAttachTabsPopup?.addEventListener("popupshowing", () => {
@@ -374,14 +711,72 @@
         }
       }
 
-      notchInput?.addEventListener("input", () => applyInlineMarkdown());
+      function updateMentionAutocomplete() {
+        if (!notchMentionPopup || !notchInput || !pastAttachments.size) {
+          notchMentionPopup?.hidePopup();
+          return;
+        }
+        const sel = window.getSelection();
+        if (!sel || !sel.rangeCount || !sel.isCollapsed) {
+          notchMentionPopup.hidePopup();
+          return;
+        }
+        const node = sel.anchorNode;
+        if (!node || node.nodeType !== Node.TEXT_NODE || !notchInput.contains(node)) {
+          notchMentionPopup.hidePopup();
+          return;
+        }
+        const offset = sel.anchorOffset;
+        const before = node.textContent.slice(0, offset);
+        const m = before.match(/(?:^|\s)@([^\s@]*)$/);
+        if (!m) {
+          notchMentionPopup.hidePopup();
+          return;
+        }
+        const query = m[1].toLowerCase();
+        const matches = [...pastAttachments.values()].filter(att =>
+          att.name.toLowerCase().includes(query)
+        );
+        if (!matches.length) {
+          notchMentionPopup.hidePopup();
+          return;
+        }
+        const atStart = offset - m[1].length - 1;
+        notchMentionPopup.replaceChildren();
+        for (const att of matches) {
+          const item = document.createXULElement("menuitem");
+          item.className = "menuitem-iconic";
+          item.setAttribute("label", `@${att.name}`);
+          item.setAttribute("image", att.iconSrc);
+          item.addEventListener("command", () => {
+            const replaceRange = document.createRange();
+            replaceRange.setStart(node, atStart);
+            replaceRange.setEnd(node, offset);
+            insertMentionChip(att, replaceRange);
+            notchInput.focus();
+          });
+          notchMentionPopup.appendChild(item);
+        }
+        if (notchMentionPopup.state !== "open") {
+          notchMentionPopup.openPopup(notchInput, "before_start", 0, -6, false, false);
+        }
+      }
+
+      notchInput?.addEventListener("input", () => {
+        applyInlineMarkdown();
+        updateMentionAutocomplete();
+      });
 
       notchInput?.addEventListener("keydown", e => {
         if (e.key === "Escape") {
-          closeNotch();
+          if (notchMentionPopup?.state === "open") {
+            notchMentionPopup.hidePopup();
+          } else {
+            closeNotch();
+          }
         } else if (e.key === "Enter" && !e.shiftKey) {
           e.preventDefault();
-          clearNotchInput();
+          sendNotchPrompt();
         } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "u") {
           e.preventDefault();
           document.execCommand("underline");
@@ -395,7 +790,9 @@
             isOpen &&
             notchDots &&
             !notchDots.contains(e.target) &&
-            (!notchMenu || (!notchMenu.contains(e.target) && notchMenu.state !== "open"))
+            (!notchMenu || (!notchMenu.contains(e.target) && notchMenu.state !== "open")) &&
+            (!notchMentionPopup ||
+              (!notchMentionPopup.contains(e.target) && notchMentionPopup.state !== "open"))
           ) {
             closeNotch();
           }

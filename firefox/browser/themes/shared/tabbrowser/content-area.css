@@ -368,6 +368,136 @@
     display: none;
   }
 
+  #notch-response {
+    max-height: 240px;
+    overflow-y: auto;
+    padding: 6px 8px 4px;
+    border-bottom: 1px solid color-mix(in srgb, var(--toolbar-field-color, currentColor) 12%, transparent);
+    color: var(--toolbar-field-color, inherit);
+    font-size: 12.5px;
+    line-height: 1.45;
+    scrollbar-width: thin;
+    user-select: text;
+  }
+
+  #notch-response[hidden] {
+    display: none;
+  }
+
+  .notch-response-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 10.5px;
+    font-weight: 600;
+    opacity: 0.65;
+    margin-bottom: 4px;
+  }
+
+  .notch-response-close {
+    appearance: none;
+    border: none;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    padding: 0 4px;
+    font-size: 13px;
+    line-height: 1;
+  }
+
+  #notch-response :is(h1, h2, h3) {
+    margin: 6px 0 3px;
+    font-weight: 600;
+    line-height: 1.25;
+  }
+
+  #notch-response h1 { font-size: 14px; }
+  #notch-response h2 { font-size: 13px; }
+  #notch-response h3 { font-size: 12.5px; }
+
+  #notch-response p {
+    margin: 4px 0;
+  }
+
+  #notch-response :is(ul, ol) {
+    margin: 4px 0;
+    padding-inline-start: 18px;
+  }
+
+  #notch-response blockquote {
+    margin: 4px 0;
+    padding-inline-start: 8px;
+    border-inline-start: 2px solid color-mix(in srgb, var(--toolbar-field-color, currentColor) 35%, transparent);
+    opacity: 0.85;
+  }
+
+  #notch-response code {
+    font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+    font-size: 11.5px;
+    padding: 1px 4px;
+    border-radius: 4px;
+    background-color: color-mix(in srgb, var(--toolbar-field-color, currentColor) 10%, transparent);
+  }
+
+  #notch-response pre {
+    margin: 5px 0;
+    padding: 6px 8px;
+    border-radius: 8px;
+    background-color: color-mix(in srgb, var(--toolbar-field-color, currentColor) 8%, transparent);
+    overflow-x: auto;
+  }
+
+  #notch-response pre code {
+    padding: 0;
+    background: transparent;
+  }
+
+  .notch-math-inline,
+  .notch-math-block {
+    font-family: "Cambria Math", "STIX Two Math", Georgia, serif;
+    font-style: italic;
+  }
+
+  .notch-math-block {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 6px 0;
+    padding: 4px 8px;
+    border-radius: 6px;
+    background-color: color-mix(in srgb, var(--toolbar-field-color, currentColor) 5%, transparent);
+    font-size: 13.5px;
+  }
+
+  .notch-frac {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    vertical-align: middle;
+    margin: 0 2px;
+    font-size: 0.9em;
+    line-height: 1.1;
+  }
+
+  .notch-frac-num {
+    padding: 0 2px 1px;
+    border-bottom: 1px solid currentColor;
+  }
+
+  .notch-frac-den {
+    padding: 1px 2px 0;
+  }
+
+  .notch-sqrt {
+    display: inline-flex;
+    align-items: baseline;
+  }
+
+  .notch-sqrt-body {
+    border-top: 1px solid currentColor;
+    padding: 0 2px;
+  }
+
   @keyframes notch-lava-1 {
     0%, 100% { transform: translate(0px, 0px); }
     25% { transform: translate(1.2px, -1.0px); }
